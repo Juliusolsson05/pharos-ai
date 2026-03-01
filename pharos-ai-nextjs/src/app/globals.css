@@ -2,246 +2,254 @@
 
 /* ─────────────────────────────────────────────
    PHAROS — Blueprint / Palantir design system
-   Exact Blueprint dark-theme color palette
-   Source: blueprintjs.com/docs/#core/colors
 ───────────────────────────────────────────── */
 
 :root {
-  /* ── Background layers (Blueprint dark grays) ── */
-  --bg-app:    #1C2127;   /* app shell, deepest */
-  --bg-1:      #252A31;   /* main panel / content */
-  --bg-2:      #2F343C;   /* elevated: panel headers, card bg */
-  --bg-3:      #383E47;   /* hover state */
-  --bg-sel:    #2C3A54;   /* selected (blue-tinted) */
+  /* ── Background layers ── */
+  --bg-app:    #1C2127;
+  --bg-1:      #252A31;
+  --bg-2:      #2F343C;
+  --bg-3:      #383E47;
+  --bg-sel:    #2C3A54;
 
   /* ── Borders ── */
-  --bd:        #383E47;   /* standard border */
-  --bd-s:      #2F343C;   /* subtle separator */
+  --bd:        #383E47;
+  --bd-s:      #2F343C;
 
   /* ── Text ── */
-  --t1:        #F5F8FA;   /* primary */
-  --t2:        #ABB3BF;   /* secondary */
-  --t3:        #8F99A8;   /* muted */
-  --t4:        #5F6B7C;   /* disabled / very muted */
+  --t1:        #F5F8FA;
+  --t2:        #ABB3BF;
+  --t3:        #8F99A8;
+  --t4:        #5F6B7C;
 
-  /* ── Blueprint primary blue ── */
+  /* ── Primary blue ── */
   --blue:      #2D72D2;
   --blue-l:    #4C90F0;
   --blue-dim:  rgba(45, 114, 210, 0.15);
 
-  /* ── Status / intent ── */
-  --danger:    #E76A6E;   /* CRITICAL */
-  --warning:   #EC9A3C;   /* HIGH */
-  --success:   #23A26D;   /* verified / active */
-  --info:      #4C90F0;   /* ELEVATED */
-  --cyber:     #A28BE0;   /* CYBER ops / NATO */
-  --teal:      #32C8C8;   /* Israel (IDF) / naval */
+  /* ── Status ── */
+  --danger:    #E76A6E;
+  --warning:   #EC9A3C;
+  --success:   #23A26D;
+  --info:      #4C90F0;
+  --cyber:     #A28BE0;
+  --teal:      #32C8C8;
 
-  /* Dim variants for backgrounds */
+  /* ── Dim / border variants ── */
   --danger-dim:  rgba(231, 106, 110, 0.12);
   --danger-bd:   rgba(231, 106, 110, 0.30);
+  --warning-dim: rgba(236, 154,  60, 0.12);
   --warning-bd:  rgba(236, 154,  60, 0.25);
+  --success-dim: rgba( 35, 162, 109, 0.12);
   --success-bd:  rgba( 35, 162, 109, 0.25);
+  --info-dim:    rgba( 76, 144, 240, 0.12);
   --info-bd:     rgba( 76, 144, 240, 0.25);
   --blue-sel:    rgba( 45, 114, 210, 0.10);
-  --warning-dim: rgba(236, 154, 60,  0.12);
-  --success-dim: rgba(35,  162, 109, 0.12);
-  --info-dim:    rgba(76,  144, 240, 0.12);
-  --teal-dim:    rgba(50,  200, 200, 0.12);
+  --teal-dim:    rgba( 50, 200, 200, 0.12);
   --cyber-dim:   rgba(162, 139, 224, 0.15);
 }
 
-/* ── shadcn/Tailwind CSS-var bridge ── */
+/* ── shadcn/Tailwind bridge ── */
 :root {
-  --background:        var(--bg-1);
-  --foreground:        var(--t1);
-  --muted:             var(--bg-3);
-  --muted-foreground:  var(--t3);
-  --border:            var(--bd);
-  --input:             var(--bg-3);
-  --ring:              var(--blue);
-  --primary:           var(--blue);
-  --primary-foreground: var(--t1);
-  --secondary:         var(--bg-2);
-  --secondary-foreground: var(--t2);
-  --accent:            var(--bg-3);
-  --accent-foreground: var(--t1);
-  --destructive:       var(--danger);
-  --radius:            2px;
+  --background:            var(--bg-1);
+  --foreground:            var(--t1);
+  --muted:                 var(--bg-3);
+  --muted-foreground:      var(--t3);
+  --border:                var(--bd);
+  --input:                 var(--bg-3);
+  --ring:                  var(--blue);
+  --primary:               var(--blue);
+  --primary-foreground:    var(--t1);
+  --secondary:             var(--bg-2);
+  --secondary-foreground:  var(--t2);
+  --accent:                var(--bg-3);
+  --accent-foreground:     var(--t1);
+  --destructive:           var(--danger);
+  --radius:                2px;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overflow: hidden; }
+/* ── Base — resets and body defaults ────────────────────────────────────────
+   Wrapped in @layer base so Tailwind utilities always win.
+──────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
 
-body {
-  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg-app);
-  color: var(--t1);
-  font-size: 13px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  body {
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-app);
+    color: var(--t1);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+
+  ::-webkit-scrollbar          { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track    { background: transparent; }
+  ::-webkit-scrollbar-thumb    { background: var(--bd); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--t4); }
 }
 
-/* ── Layout ── */
-.layout-fill   { display: flex; flex: 1 1 0%; min-height: 0; overflow: hidden; }
-.layout-col    { display: flex; flex-direction: column; }
+/* ── Components — design system primitives ──────────────────────────────────
+   Wrapped in @layer components so Tailwind utilities override them.
+──────────────────────────────────────────────────────────────────────────── */
+@layer components {
 
-/* ── Panel primitives ── */
-.panel {
-  background: var(--bg-1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  /* Layout */
+  .layout-fill { display: flex; flex: 1 1 0%; min-height: 0; overflow: hidden; }
+  .layout-col  { display: flex; flex-direction: column; }
+
+  /* Panel primitives */
+  .panel {
+    background: var(--bg-1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    height: 36px;
+    min-height: 36px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--bd);
+    flex-shrink: 0;
+  }
+
+  .panel-body {
+    flex: 1 1 0%;
+    overflow-y: auto;
+  }
+
+  /* Typography helpers */
+  .label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--t3);
+    font-family: inherit;
+  }
+
+  .mono {
+    font-family: 'SFMono-Regular', 'Menlo', 'Cascadia Code', monospace;
+    font-size: 11px;
+    color: var(--t2);
+    letter-spacing: -0.01em;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--t1);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  /* Row / button reset */
+  .row-btn {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    font-size: inherit;
+    padding: 0;
+    display: block;
+    transition: background 0.1s;
+  }
+  .row-btn:hover { background: var(--bg-3); }
+
+  /* Status dots */
+  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-danger  { background: var(--danger);  }
+  .dot-warning { background: var(--warning); }
+  .dot-info    { background: var(--info);    }
+  .dot-success { background: var(--success); }
+  .dot-cyber   { background: var(--cyber);   }
+  .dot-teal    { background: var(--teal);    }
+  .dot-live    { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
+
+  /* Severity pills */
+  .sev {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: inherit;
+  }
+  .sev-crit  { background: var(--danger-dim);  color: var(--danger);  border: 1px solid var(--danger-bd);  }
+  .sev-high  { background: var(--warning-dim); color: var(--warning); border: 1px solid var(--warning-bd); }
+  .sev-std   { background: var(--info-dim);    color: var(--info);    border: 1px solid var(--info-bd);    }
+  .sev-mon   { background: var(--success-dim); color: var(--success); border: 1px solid var(--success-bd); }
+
+  /* Mini bar */
+  .bar-track { height: 4px; background: var(--bd); width: 100%; overflow: hidden; }
+  .bar-fill  { height: 100%; }
+
+  /* Card (X posts, detail sections) */
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--bd);
+  }
+  .card + .card { margin-top: 6px; }
+  .card-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--bd-s);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-body   { padding: 10px 12px; }
+  .card-footer {
+    padding: 6px 12px;
+    border-top: 1px solid var(--bd-s);
+    background: var(--bg-app);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Nav items */
+  .nav-item {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--t3);
+    border-bottom: 2px solid transparent;
+    border-right: 1px solid var(--bd);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .1s, background .1s;
+  }
+  .nav-item:hover           { color: var(--t1); background: var(--bg-3); }
+  .nav-item.active          { color: var(--t1); background: var(--bg-3); border-bottom-color: var(--blue); }
+
+  /* Table header */
+  .tbl-hdr {
+    display: flex;
+    align-items: center;
+    padding: 4px 14px;
+    gap: 0;
+    background: var(--bg-app);
+    border-bottom: 1px solid var(--bd);
+  }
+
+  /* No-underline links */
+  .no-underline { text-decoration: none; color: inherit; }
 }
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 14px;
-  height: 36px;
-  min-height: 36px;
-  background: var(--bg-2);
-  border-bottom: 1px solid var(--bd);
-  flex-shrink: 0;
-}
-
-.panel-body {
-  flex: 1 1 0%;
-  overflow-y: auto;
-}
-
-/* ── Typography ── */
-.label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--t3);
-  font-family: inherit;
-}
-
-.mono {
-  font-family: 'SFMono-Regular', 'Menlo', 'Cascadia Code', monospace;
-  font-size: 11px;
-  color: var(--t2);
-  letter-spacing: -0.01em;
-}
-
-.section-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--t1);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-/* ── Row / button reset ── */
-.row-btn {
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  color: inherit;
-  font-size: inherit;
-  padding: 0;
-  display: block;
-  transition: background 0.1s;
-}
-.row-btn:hover { background: var(--bg-3); }
-
-/* ── Status dots ── */
-.dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.dot-danger  { background: var(--danger);  }
-.dot-warning { background: var(--warning); }
-.dot-info    { background: var(--info);    }
-.dot-success { background: var(--success); }
-.dot-cyber   { background: var(--cyber);   }
-.dot-teal    { background: var(--teal);    }
-.dot-live    { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
-
-/* ── Severity pills ── */
-.sev {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 6px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-family: inherit;
-}
-.sev-crit  { background: var(--danger-dim);  color: var(--danger);  border: 1px solid rgba(231,106,110,.3); }
-.sev-high  { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(236,154, 60,.3); }
-.sev-std   { background: var(--info-dim);    color: var(--info);    border: 1px solid rgba( 76,144,240,.3); }
-.sev-mon   { background: var(--success-dim); color: var(--success); border: 1px solid rgba( 35,162,109,.3); }
-
-/* ── Mini bar ── */
-.bar-track { height: 4px; background: var(--bd); width: 100%; overflow: hidden; }
-.bar-fill  { height: 100%; }
-
-/* ── Card (for X posts + detail sections) ── */
-.card {
-  background: var(--bg-2);
-  border: 1px solid var(--bd);
-}
-.card + .card { margin-top: 6px; }
-.card-header {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--bd-s);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.card-body   { padding: 10px 12px; }
-.card-footer {
-  padding: 6px 12px;
-  border-top: 1px solid var(--bd-s);
-  background: var(--bg-app);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* ── Nav item ── */
-.nav-item {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding: 0 18px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--t3);
-  border-bottom: 2px solid transparent;
-  border-right: 1px solid var(--bd);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color .1s, background .1s;
-}
-.nav-item:hover           { color: var(--t1); background: var(--bg-3); }
-.nav-item.active          { color: var(--t1); background: var(--bg-3); border-bottom-color: var(--blue); }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar          { width: 5px; height: 5px; }
-::-webkit-scrollbar-track    { background: transparent; }
-::-webkit-scrollbar-thumb    { background: var(--bd); }
-::-webkit-scrollbar-thumb:hover { background: var(--t4); }
-
-/* ── Focus ── */
-:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
-
-/* ── Table header ── */
-.tbl-hdr {
-  display: flex;
-  align-items: center;
-  padding: 4px 14px;
-  gap: 0;
-  background: var(--bg-app);
-  border-bottom: 1px solid var(--bd);
-}
-
-/* @keyframes spin is provided by Tailwind v4's @import "tailwindcss" — no need to redefine */
