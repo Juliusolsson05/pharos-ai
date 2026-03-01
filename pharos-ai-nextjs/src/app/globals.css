@@ -215,3 +215,9 @@ body {
   background: var(--bg-app);
   border-bottom: 1px solid var(--bd);
 }
+
+/* Spin animation for loading indicators */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

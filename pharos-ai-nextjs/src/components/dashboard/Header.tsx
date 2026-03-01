@@ -8,7 +8,8 @@ const NAV = [
   { label: 'ACTORS',   href: '/dashboard/actors'   },
   { label: 'SIGNALS',  href: '/dashboard/signals'  },
   { label: 'BRIEF',    href: '/dashboard/brief'    },
-  { label: 'MAP',      href: '/dashboard/map'      },
+  { label: 'MAP',         href: '/dashboard/map'         },
+  { label: 'PREDICTIONS', href: '/dashboard/predictions' },
 ];
 
 export function Header() {
