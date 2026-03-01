@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import DeckGL from '@deck.gl/react';
 import { ArcLayer, ScatterplotLayer, TextLayer, PolygonLayer } from '@deck.gl/layers';
 import { HeatmapLayer } from '@deck.gl/aggregation-layers';
@@ -90,6 +91,7 @@ export default function IntelMap() {
         filled: true,
         stroked: true,
         pickable: true,
+        autoHighlight: true,
       }),
 
     visibility.strikes &&
@@ -98,11 +100,17 @@ export default function IntelMap() {
         data: STRIKE_ARCS,
         getSourcePosition: (d: StrikeArc): [number, number] => d.from,
         getTargetPosition: (d: StrikeArc): [number, number] => d.to,
-        getSourceColor: (d: StrikeArc): [number, number, number] =>
-          d.type === 'NAVAL' ? [50, 200, 200] : d.type === 'ISRAEL_STRIKE' ? [50, 200, 120] : [45, 114, 210],
+        getSourceColor: (d: StrikeArc): [number, number, number, number] =>
+          d.type === 'NAVAL'
+            ? [50, 200, 200, 220]
+            : d.type === 'ISRAEL_STRIKE'
+            ? [50, 200, 120, 220]
+            : [45, 114, 210, 220],
         getTargetColor: (): [number, number, number, number] => [255, 255, 255, 180],
-        getWidth: 2,
+        getWidth: (d: StrikeArc): number => (d.severity === 'CRITICAL' ? 3 : 2),
+        widthUnits: 'pixels',
         pickable: true,
+        autoHighlight: true,
       }),
 
     visibility.missiles &&
@@ -111,11 +119,13 @@ export default function IntelMap() {
         data: MISSILE_TRACKS,
         getSourcePosition: (d: MissileTrack): [number, number] => d.from,
         getTargetPosition: (d: MissileTrack): [number, number] => d.to,
-        getSourceColor: (): [number, number, number] => [210, 50, 50],
+        getSourceColor: (): [number, number, number, number] => [210, 50, 50, 220],
         getTargetColor: (d: MissileTrack): [number, number, number, number] =>
           d.intercepted ? [255, 200, 0, 200] : [255, 50, 50, 220],
-        getWidth: (d: MissileTrack): number => (d.intercepted ? 1 : 2),
+        getWidth: (d: MissileTrack): number => (d.severity === 'CRITICAL' ? 3 : 2),
+        widthUnits: 'pixels',
         pickable: true,
+        autoHighlight: true,
       }),
 
     visibility.targets &&
@@ -135,6 +145,7 @@ export default function IntelMap() {
         getLineColor: (): [number, number, number, number] => [255, 255, 255, 100],
         lineWidthMinPixels: 1,
         pickable: true,
+        autoHighlight: true,
       }),
 
     visibility.assets &&
@@ -149,6 +160,7 @@ export default function IntelMap() {
         getLineColor: (): [number, number, number, number] => [255, 255, 255, 150],
         lineWidthMinPixels: 1,
         pickable: true,
+        autoHighlight: true,
       }),
 
     visibility.targets &&
@@ -182,13 +194,73 @@ export default function IntelMap() {
       }),
   ].filter(Boolean);
 
-  const getTooltip = ({ object }: PickingInfo<TooltipObject>) => {
+  const getTooltip = ({ object, layer }: PickingInfo<TooltipObject>) => {
     if (!object) return null;
-    const obj = object as unknown as Record<string, unknown>;
-    const hasContent = obj.label || obj.name || obj.description;
-    if (!hasContent) return null;
+    const layerId = layer?.id ?? '';
+    let html = '';
+
+    if (layerId === 'strikes') {
+      const d = object as StrikeArc;
+      const typeLabel = d.type === 'NAVAL' ? 'NAVAL STRIKE' : d.type === 'ISRAEL_STRIKE' ? 'IDF STRIKE' : 'US STRIKE';
+      const typeColor = d.type === 'NAVAL' ? '#32C8C8' : d.type === 'ISRAEL_STRIKE' ? '#32C878' : '#4C9BE8';
+      html = `
+        <div style="font-weight:700;font-size:11px;color:#E8E8E8;margin-bottom:6px">${d.label}</div>
+        <div style="color:${typeColor};font-size:10px;margin-bottom:2px">TYPE: ${typeLabel}</div>
+        <div style="color:${d.severity === 'CRITICAL' ? '#E84C4C' : '#E8A84C'};font-size:10px">SEVERITY: ${d.severity}</div>
+      `;
+    } else if (layerId === 'missiles') {
+      const d = object as MissileTrack;
+      html = `
+        <div style="font-weight:700;font-size:11px;color:#E84C4C;margin-bottom:6px">${d.label}</div>
+        <div style="color:#E84C4C;font-size:10px;margin-bottom:2px">TYPE: IRGC BALLISTIC MISSILE</div>
+        <div style="color:${d.severity === 'CRITICAL' ? '#E84C4C' : '#E8A84C'};font-size:10px;margin-bottom:2px">SEVERITY: ${d.severity}</div>
+        <div style="color:${d.intercepted ? '#FFC800' : '#E84C4C'};font-size:10px">STATUS: ${d.intercepted ? '✓ INTERCEPTED' : '⚠ IMPACT CONFIRMED'}</div>
+      `;
+    } else if (layerId === 'targets') {
+      const d = object as Target;
+      const statusColor = d.status === 'DESTROYED' ? '#E84C4C' : d.status === 'DAMAGED' ? '#E8A84C' : '#E8E84C';
+      const typeColor = d.type === 'NUCLEAR' ? '#B84CE8' : d.type === 'MILITARY' ? '#E84C4C' : d.type === 'NAVAL' ? '#4C9BE8' : '#8F99A8';
+      html = `
+        <div style="font-weight:700;font-size:12px;color:#E8E8E8;margin-bottom:6px">${d.name}</div>
+        <div style="display:flex;gap:4px;margin-bottom:6px">
+          <span style="background:${typeColor}22;border:1px solid ${typeColor};color:${typeColor};font-size:8px;padding:1px 5px;border-radius:2px">${d.type}</span>
+          <span style="background:${statusColor}22;border:1px solid ${statusColor};color:${statusColor};font-size:8px;padding:1px 5px;border-radius:2px">${d.status}</span>
+        </div>
+        <div style="color:#C0C8D4;font-size:10px;line-height:1.5">${d.description}</div>
+      `;
+    } else if (layerId === 'assets') {
+      const d = object as Asset;
+      const nationColor = d.nation === 'US' ? '#4C9BE8' : '#32C8C8';
+      let extraLine = '';
+      if (d.type === 'CARRIER') {
+        extraLine = `<div style="color:#E8E84C;font-size:10px;margin-top:4px;font-weight:700">▶ CARRIER STRIKE GROUP</div>`;
+      }
+      html = `
+        <div style="font-weight:700;font-size:12px;color:#E8E8E8;margin-bottom:6px">${d.name}</div>
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <span style="background:${nationColor}22;border:1px solid ${nationColor};color:${nationColor};font-size:8px;padding:1px 5px;border-radius:2px">${d.nation}</span>
+          <span style="background:#2A2F38;border:1px solid #404854;color:#8F99A8;font-size:8px;padding:1px 5px;border-radius:2px">${d.type}</span>
+        </div>
+        ${d.description ? `<div style="color:#C0C8D4;font-size:10px;line-height:1.5;margin-top:4px">${d.description}</div>` : ''}
+        ${extraLine}
+      `;
+    } else if (layerId === 'zones') {
+      const d = object as ThreatZone;
+      const zoneColor = d.type === 'CLOSURE' ? '#E84C4C' : d.type === 'PATROL' ? '#E8A84C' : d.type === 'NFZ' ? '#E8E84C' : '#E84C4C';
+      html = `
+        <div style="font-weight:700;font-size:11px;color:#E8E8E8;margin-bottom:4px">${d.name}</div>
+        <div style="color:${zoneColor};font-size:10px">TYPE: ${d.type}</div>
+      `;
+    } else {
+      const obj = object as unknown as Record<string, unknown>;
+      const hasContent = obj.label || obj.name;
+      if (!hasContent) return null;
+      html = `<div style="font-size:11px;color:#E8E8E8">${String(obj.label ?? obj.name ?? '')}</div>`;
+    }
+
+    if (!html) return null;
     return {
-      html: `<div style="background:#1C2127;border:1px solid #404854;padding:6px 8px;font-size:11px;font-family:monospace;color:#E8E8E8;max-width:220px">${obj.label || obj.name}${obj.description ? `<br><span style="color:#8F99A8;font-size:10px">${String(obj.description)}</span>` : ''}</div>`,
+      html: `<div style="background:#1C2127;border:1px solid #404854;padding:8px 10px;font-family:monospace;max-width:260px;border-radius:2px">${html}</div>`,
       style: { backgroundColor: 'transparent', border: 'none', padding: '0' },
     };
   };
@@ -328,7 +400,7 @@ export default function IntelMap() {
         <div
           style={{
             position: 'absolute',
-            bottom: 16,
+            bottom: 52,
             right: 12,
             background: 'rgba(28,33,39,0.85)',
             border: '1px solid #404854',
@@ -341,7 +413,42 @@ export default function IntelMap() {
         >
           {viewState.latitude.toFixed(2)}°N {viewState.longitude.toFixed(2)}°E
         </div>
+
+        {/* Open Full Map Button */}
+        <OpenMapButton />
       </div>
     </div>
+  );
+}
+
+function OpenMapButton() {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link
+      href="/dashboard/map"
+      style={{
+        position: 'absolute',
+        bottom: 16,
+        right: 12,
+        background: hovered ? '#1F4F9B' : '#2D72D2',
+        color: 'white',
+        padding: '8px 16px',
+        fontSize: 11,
+        fontWeight: 700,
+        fontFamily: 'monospace',
+        border: 'none',
+        borderRadius: 2,
+        cursor: 'pointer',
+        letterSpacing: '0.08em',
+        textDecoration: 'none',
+        display: 'inline-block',
+        transition: 'background 0.15s ease',
+        zIndex: 10,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      ⤢&nbsp;&nbsp;OPEN FULL MAP
+    </Link>
   );
 }

@@ -31,6 +31,7 @@ export interface Asset {
   position: [number, number];
   type: 'CARRIER' | 'AFB' | 'NAVAL_BASE' | 'ARMY_BASE';
   nation: 'US' | 'ISRAEL';
+  description?: string;
 }
 
 export interface ThreatZone {
@@ -101,19 +102,19 @@ export const TARGETS: Target[] = [
 ];
 
 export const ALLIED_ASSETS: Asset[] = [
-  { id: 'a1', name: 'USS Ford CVN-78', position: [58.0, 25.5], type: 'CARRIER', nation: 'US' },
-  { id: 'a2', name: 'USS Eisenhower CVN-69', position: [44.0, 12.5], type: 'CARRIER', nation: 'US' },
-  { id: 'a3', name: 'USS Roosevelt CVN-71', position: [65.0, 21.0], type: 'CARRIER', nation: 'US' },
+  { id: 'a1', name: 'USS Ford CVN-78', position: [58.0, 25.5], type: 'CARRIER', nation: 'US', description: 'CSG-12 · Gulf of Oman · F/A-18 sorties ongoing' },
+  { id: 'a2', name: 'USS Eisenhower CVN-69', position: [44.0, 12.5], type: 'CARRIER', nation: 'US', description: 'CSG-2 · Red Sea / Gulf of Aden · Iron Dome maritime support' },
+  { id: 'a3', name: 'USS Roosevelt CVN-71', position: [65.0, 21.0], type: 'CARRIER', nation: 'US', description: 'CSG-9 · North Arabian Sea · QRF posture' },
   { id: 'a4', name: 'Nevatim AFB', position: [34.9408, 31.2083], type: 'AFB', nation: 'ISRAEL' },
   { id: 'a5', name: 'Ramon AFB', position: [34.6667, 30.7761], type: 'AFB', nation: 'ISRAEL' },
   { id: 'a6', name: 'Palmachim AB', position: [34.6894, 31.8969], type: 'AFB', nation: 'ISRAEL' },
   { id: 'a7', name: 'Tel Nof AB', position: [34.8219, 31.8394], type: 'AFB', nation: 'ISRAEL' },
-  { id: 'a8', name: 'Al Udeid AB Qatar', position: [51.3149, 25.1175], type: 'AFB', nation: 'US' },
-  { id: 'a9', name: 'Al Dhafra AB UAE', position: [54.5477, 24.2483], type: 'AFB', nation: 'US' },
+  { id: 'a8', name: 'Al Udeid AB Qatar', position: [51.3149, 25.1175], type: 'AFB', nation: 'US', description: 'USAF CENTCOM FWD HQ · 10,000 personnel · F-15E / A-10 / AWACS' },
+  { id: 'a9', name: 'Al Dhafra AB UAE', position: [54.5477, 24.2483], type: 'AFB', nation: 'US', description: 'F-35A / F-22 operations · Struck by IRGC cruise missile · 1 US KIA' },
   { id: 'a10', name: 'Ali Al Salem AB Kuwait', position: [47.5186, 29.3467], type: 'ARMY_BASE', nation: 'US' },
   { id: 'a11', name: 'Prince Sultan AB', position: [47.5804, 24.0621], type: 'AFB', nation: 'US' },
-  { id: 'a12', name: 'NSA Bahrain (5th Fleet)', position: [50.5860, 26.2285], type: 'NAVAL_BASE', nation: 'US' },
-  { id: 'a13', name: 'Diego Garcia', position: [72.4232, -7.3195], type: 'AFB', nation: 'US' },
+  { id: 'a12', name: 'NSA Bahrain (5th Fleet)', position: [50.5860, 26.2285], type: 'NAVAL_BASE', nation: 'US', description: 'US 5th Fleet HQ · Struck by IRGC ballistic missile · 2 US KIA' },
+  { id: 'a13', name: 'Diego Garcia', position: [72.4232, -7.3195], type: 'AFB', nation: 'US', description: 'USAF/USN BIOT · B-2 Spirit launch origin · ~7,000km from targets' },
   { id: 'a14', name: 'Al-Tanf Base Syria', position: [38.6, 33.5], type: 'ARMY_BASE', nation: 'US' },
   { id: 'a15', name: 'Ayn al-Asad Iraq', position: [42.4412, 33.7856], type: 'ARMY_BASE', nation: 'US' },
 ];
