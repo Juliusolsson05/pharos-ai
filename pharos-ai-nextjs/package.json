@@ -9,7 +9,7 @@
     "lint": "eslint",
     "electron": "electron .",
     "electron:dev": "concurrently -k -n NEXT,ELECTRON -c blue,green \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron:build": "next build && electron-builder --mac"
+    "electron:build": "CSC_IDENTITY_AUTO_DISCOVERY=false next build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac"
   },
   "dependencies": {
     "@deck.gl/aggregation-layers": "^9.2.10",
@@ -101,7 +101,8 @@
         { "target": "zip", "arch": "arm64" },
         { "target": "dir", "arch": "arm64" }
       ],
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "identity": null
     }
   }
 }

@@ -1,13 +1,12 @@
-const { app, BrowserWindow, Menu } = require('electron');
-const path   = require('path');
-const net    = require('net');
-const { spawn } = require('child_process');
+const { app, BrowserWindow, Menu, utilityProcess } = require('electron');
+const path = require('path');
+const net  = require('net');
 
-const isDev   = !app.isPackaged;
-const DEV_URL = 'http://localhost:3000';
-const PROD_PORT = 3745; // fixed port for the embedded Next.js server
+const isDev     = !app.isPackaged;
+const DEV_URL   = 'http://localhost:3000';
+const PROD_PORT = 3745;
 
-let nextServerProcess = null;
+let nextChild = null;
 
 // ─── Wait until a TCP port accepts connections ────────────────────────────────
 function waitForPort(port, timeoutMs = 30_000) {
@@ -18,40 +17,44 @@ function waitForPort(port, timeoutMs = 30_000) {
       sock.once('connect', () => { sock.destroy(); resolve(); });
       sock.once('error', () => {
         if (Date.now() >= deadline) return reject(new Error(`Port ${port} not ready after ${timeoutMs}ms`));
-        setTimeout(probe, 250);
+        setTimeout(probe, 300);
       });
     }
     probe();
   });
 }
 
-// ─── Spawn the standalone Next.js server (production only) ───────────────────
+// ─── Spawn the embedded Next.js standalone server (prod only) ─────────────────
+// utilityProcess.fork() runs in a Node.js context — NOT the Electron binary.
+// This is the correct way to run server-side scripts from Electron's main process.
 async function startNextServer() {
-  // electron-builder places extraResources in process.resourcesPath
-  const serverScript = path.join(process.resourcesPath, 'standalone', 'server.js');
+  const serverScript = path.join(
+    process.resourcesPath,
+    'standalone',
+    'server.js',
+  );
 
-  nextServerProcess = spawn(process.execPath, [serverScript], {
+  nextChild = utilityProcess.fork(serverScript, [], {
     env: {
       ...process.env,
-      PORT:      String(PROD_PORT),
-      NODE_ENV:  'production',
-      HOSTNAME:  '127.0.0.1',
+      PORT:     String(PROD_PORT),
+      HOSTNAME: '127.0.0.1',
+      NODE_ENV: 'production',
     },
     stdio: 'pipe',
   });
 
-  nextServerProcess.stdout.on('data', d => console.log('[Next]', d.toString().trim()));
-  nextServerProcess.stderr.on('data', d => console.error('[Next]', d.toString().trim()));
-  nextServerProcess.on('error', err => console.error('[Next] spawn error:', err));
+  nextChild.on('exit', code => console.log('[Next] exited with code', code));
 
   await waitForPort(PROD_PORT);
+  console.log('[Next] server ready on', PROD_PORT);
 }
 
 // ─── Create the browser window ────────────────────────────────────────────────
 async function createWindow() {
   const win = new BrowserWindow({
-    width:  1440,
-    height: 900,
+    width:     1440,
+    height:    900,
     minWidth:  1024,
     minHeight: 700,
     backgroundColor: '#1C2127',
@@ -70,8 +73,14 @@ async function createWindow() {
   if (isDev) {
     win.loadURL(DEV_URL);
   } else {
-    await startNextServer();
-    win.loadURL(`http://127.0.0.1:${PROD_PORT}/dashboard`);
+    try {
+      await startNextServer();
+      win.loadURL(`http://127.0.0.1:${PROD_PORT}/dashboard`);
+    } catch (err) {
+      console.error('[Pharos] Failed to start Next.js server:', err);
+      // Show error page rather than looping
+      win.loadURL(`data:text/html,<body style="background:#1C2127;color:#E84C4C;font-family:monospace;padding:40px"><h2>Failed to start server</h2><pre>${err}</pre></body>`);
+    }
   }
 
   win.once('ready-to-show', () => {
@@ -88,10 +97,10 @@ app.on('activate', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (nextServerProcess) nextServerProcess.kill();
+  if (nextChild) nextChild.kill();
   if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('before-quit', () => {
-  if (nextServerProcess) nextServerProcess.kill();
+  if (nextChild) nextChild.kill();
 });
