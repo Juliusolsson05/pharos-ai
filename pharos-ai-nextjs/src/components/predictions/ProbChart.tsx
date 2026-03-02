@@ -57,6 +57,7 @@ export function ProbChart({ data, color, height = 80, interactive = false, onCro
       },
       handleScroll: interactive,
       handleScale:  interactive,
+      attributionLogo: false,
     });
 
     const series = chart.addSeries(AreaSeries, {

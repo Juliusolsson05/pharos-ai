@@ -50,6 +50,7 @@ export function MiniChart({ data, color, positive, height = 80 }: MiniChartProps
       },
       handleScroll: false,
       handleScale: false,
+      attributionLogo: false,
     });
 
     const lineColor = positive ? 'rgba(34,197,94,0.9)' : 'rgba(239,68,68,0.9)';

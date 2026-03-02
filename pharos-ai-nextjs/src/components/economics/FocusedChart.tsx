@@ -143,6 +143,7 @@ export function FocusedChart({ index, data: initialData, initialRangeKey = '5d',
       },
       handleScroll: true,
       handleScale: true,
+      attributionLogo: false,
     });
 
     const series = chart.addSeries(AreaSeries, {
