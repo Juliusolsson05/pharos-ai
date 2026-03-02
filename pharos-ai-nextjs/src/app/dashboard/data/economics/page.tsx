@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ECONOMIC_INDEXES, ECON_CATEGORIES, type EconCategory } from '@/data/economicIndexes';
 import type { MarketResult } from '@/app/api/markets/route';
 import { IndexCard } from '@/components/economics/IndexCard';
+import { FocusedChart } from '@/components/economics/FocusedChart';
 
 const RANGES = [
   { key: '1d',  label: '1D',  interval: '5m'  },
@@ -30,6 +31,7 @@ export default function EconomicsPage() {
   const [rangeIdx, setRangeIdx] = useState(1); // default 5D
   const [tierFilter, setTierFilter] = useState(0); // 0 = all
   const [catFilter, setCatFilter] = useState<EconCategory | 'ALL'>('ALL');
+  const [focusedId, setFocusedId] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const range = RANGES[rangeIdx];
@@ -198,6 +200,7 @@ export default function EconomicsPage() {
               index={idx}
               data={marketData.get(idx.ticker)}
               loading={loading}
+              onFocus={() => setFocusedId(idx.id)}
             />
           ))}
         </div>
@@ -208,6 +211,20 @@ export default function EconomicsPage() {
           </div>
         )}
       </div>
+
+      {/* Focus overlay */}
+      {focusedId && (() => {
+        const idx = ECONOMIC_INDEXES.find(i => i.id === focusedId);
+        const d = idx ? marketData.get(idx.ticker) : undefined;
+        if (!idx || !d || d.error) return null;
+        return (
+          <FocusedChart
+            index={idx}
+            data={d}
+            onClose={() => setFocusedId(null)}
+          />
+        );
+      })()}
     </div>
   );
 }
