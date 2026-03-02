@@ -69,7 +69,13 @@ const DATA_EXTENT = extractTimeExtent(RAW_DATA);
 
 export function useMapFilters(): UseMapFiltersReturn {
   const [state, setState] = useState<FilterState>(INITIAL_STATE);
-  const [viewExtent, setViewExtent] = useState<[number, number]>(DATA_EXTENT);
+  // Default to 3-day view centered on the action, not the full data extent
+  const [viewExtent, setViewExtent] = useState<[number, number]>(() => {
+    const span = DATA_EXTENT[1] - DATA_EXTENT[0];
+    const threeDays = 3 * 86400_000;
+    if (span <= threeDays) return DATA_EXTENT;
+    return [Math.max(DATA_EXTENT[0], DATA_EXTENT[1] - threeDays), DATA_EXTENT[1]];
+  });
 
   // When toggling a dataset ON, auto-enable all its types
   const toggleDataset = useCallback((d: string) => setState(p => {

@@ -19,7 +19,7 @@ const BUCKETS = 80;
 
 export default function TimelineTrack({ histogram, ticks, leftPct, rightPct, isActive, trackRef, onClick, onHandleDown }: Props) {
   return (
-    <div ref={trackRef} className="relative cursor-crosshair" style={{ height: 28 }} onClick={onClick}>
+    <div ref={trackRef} className="relative cursor-crosshair" style={{ height: 32 }} onClick={onClick}>
       {/* Histogram bars */}
       {histogram.map((h, i) => {
         const pL = (i / BUCKETS) * 100;
@@ -27,9 +27,9 @@ export default function TimelineTrack({ histogram, ticks, leftPct, rightPct, isA
         return (
           <div key={i} className="absolute bottom-0" style={{
             left: `${pL}%`, width: `${100 / BUCKETS}%`,
-            height: `${Math.max(1, h * 22)}px`,
+            height: `${Math.max(2, h * 28)}px`,
             background: inR ? 'var(--blue)' : 'rgba(95,107,124,0.15)',
-            opacity: inR ? 0.5 : 0.25,
+            opacity: inR ? 0.7 : 0.25,
           }} />
         );
       })}
