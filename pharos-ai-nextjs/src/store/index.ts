@@ -13,6 +13,19 @@ import workspaceReducer, {
   setRowSizes,
   type WorkspaceState,
 } from './workspace-slice';
+import mapReducer, {
+  toggleDataset,
+  toggleType,
+  toggleActor,
+  togglePriority,
+  toggleStatus,
+  toggleHeat,
+  setTimeRange,
+  resetFilters,
+  toggleSidebar,
+  setMapStyle,
+  persistMapPrefs,
+} from './map-slice';
 import type { Column } from './presets';
 
 // ─── localStorage persistence ───────────────────────────────────────────────
@@ -53,9 +66,10 @@ function loadPersistedState(): { workspace: WorkspaceState } | undefined {
   return undefined;
 }
 
-// Listener middleware to persist workspace state on any workspace action
+// Listener middleware to persist state on relevant actions
 const listenerMiddleware = createListenerMiddleware();
 
+// Persist workspace state
 listenerMiddleware.startListening({
   matcher: isAnyOf(
     applyPreset,
@@ -78,15 +92,41 @@ listenerMiddleware.startListening({
   },
 });
 
+// Persist map UI preferences (filters, sidebarOpen, mapStyle)
+listenerMiddleware.startListening({
+  matcher: isAnyOf(
+    toggleDataset,
+    toggleType,
+    toggleActor,
+    togglePriority,
+    toggleStatus,
+    toggleHeat,
+    setTimeRange,
+    resetFilters,
+    toggleSidebar,
+    setMapStyle,
+  ),
+  effect: (_action, listenerApi) => {
+    const state = listenerApi.getState() as RootState;
+    persistMapPrefs(state.map);
+  },
+});
+
 // ─── Store ──────────────────────────────────────────────────────────────────
 
 export const store = configureStore({
   reducer: {
     workspace: workspaceReducer,
+    map: mapReducer,
   },
   preloadedState: loadPersistedState(),
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: ['map.viewState', 'map.activeStory', 'map.selectedItem'],
+        ignoredActions: ['map/setViewState', 'map/activateStory', 'map/setActiveStory', 'map/setSelectedItem'],
+      },
+    }).prepend(listenerMiddleware.middleware),
 });
 
 // ─── Typed hooks ────────────────────────────────────────────────────────────
