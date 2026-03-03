@@ -20,10 +20,11 @@ const parser = new Parser({
 // ─── Aggressive cache with stale-while-revalidate ─────────────
 // Each feed is cached for 10 minutes (fresh). After that it's stale
 // but still served immediately while a background refetch happens.
-// Max stale age: 30 minutes (after that, force-refetch).
+// Max stale age: 60 minutes (after that, force-refetch).
 
 const FRESH_TTL = 10 * 60 * 1000;    // 10 min — serve without any fetch
-const STALE_TTL = 30 * 60 * 1000;    // 30 min — serve stale + background refetch
+const STALE_TTL = 60 * 60 * 1000;    // 60 min — serve stale + background refetch
+const ERROR_TTL = 2 * 60 * 1000;     // 2 min  — cache errors briefly to avoid hammering
 const refetchingSet = new Set<string>(); // track in-flight background refetches
 
 interface CacheEntry {
@@ -32,6 +33,20 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
+
+/** Normalize any date string to a UTC ISO 8601 string.
+ *  Handles RFC 2822 (RSS), ISO 8601 (Atom), and dates missing timezone info.
+ *  Returns undefined only if the input is completely unparseable. */
+function normalizeDate(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) return d.toISOString();
+  // Some feeds use non-standard separators or missing 'T'
+  const cleaned = raw.replace(/\s+/g, ' ').trim();
+  const retry = new Date(cleaned);
+  if (!isNaN(retry.getTime())) return retry.toISOString();
+  return undefined;
+}
 
 /** Extract image URL from various RSS feed formats */
 function extractImage(item: Record<string, unknown>): string | undefined {
@@ -66,16 +81,20 @@ async function fetchFeed(id: string, url: string): Promise<FeedResult> {
     return {
       feedId: id,
       feedTitle: feed.title ?? id,
-      items: (feed.items ?? []).slice(0, 25).map(item => ({
-        title: item.title ?? '(untitled)',
-        link: item.link ?? '',
-        pubDate: item.pubDate ?? item.isoDate ?? '',
-        contentSnippet: (item.contentSnippet ?? '').slice(0, 300),
-        creator: item.creator ?? (item as any)['dc:creator'] ?? undefined,
-        categories: item.categories ?? [],
-        isoDate: item.isoDate ?? undefined,
-        imageUrl: extractImage(item as unknown as Record<string, unknown>),
-      })),
+      items: (feed.items ?? []).slice(0, 25).map(item => {
+        // Always produce a valid UTC ISO string — normalize from isoDate or pubDate
+        const iso = normalizeDate(item.isoDate) ?? normalizeDate(item.pubDate);
+        return {
+          title: item.title ?? '(untitled)',
+          link: item.link ?? '',
+          pubDate: item.pubDate ?? item.isoDate ?? '',
+          contentSnippet: (item.contentSnippet ?? '').slice(0, 300),
+          creator: item.creator ?? (item as any)['dc:creator'] ?? undefined,
+          categories: item.categories ?? [],
+          isoDate: iso,
+          imageUrl: extractImage(item as unknown as Record<string, unknown>),
+        };
+      }),
       cachedAt: Date.now(),
       fresh: true,
     };
@@ -94,6 +113,13 @@ function backgroundRefetch(id: string, url: string) {
     .then(result => {
       if (!result.error) {
         cache.set(url, { data: result, ts: Date.now() });
+      } else {
+        // On error: keep existing cached items but refresh the timestamp so
+        // stale data stays alive instead of expiring into empty results.
+        const existing = cache.get(url);
+        if (existing) {
+          cache.set(url, { data: existing.data, ts: Date.now() - FRESH_TTL });
+        }
       }
     })
     .finally(() => refetchingSet.delete(key));
@@ -123,6 +149,13 @@ async function getFeedCached(id: string, url: string): Promise<FeedResult> {
   const result = await fetchFeed(id, url);
   if (!result.error) {
     cache.set(url, { data: result, ts: now });
+  } else if (cached) {
+    // Fetch failed but we have old data — keep serving it rather than empty results.
+    cache.set(url, { data: cached.data, ts: now - FRESH_TTL });
+    return { ...cached.data, fresh: false, cachedAt: now - FRESH_TTL };
+  } else {
+    // No cached data at all — cache the error briefly to avoid hammering
+    cache.set(url, { data: result, ts: now - STALE_TTL + ERROR_TTL });
   }
   return result;
 }

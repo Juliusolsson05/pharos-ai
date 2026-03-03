@@ -14,7 +14,7 @@ export const RSS_FEEDS: RssFeed[] = [
   { id: 'ap',            name: 'Associated Press',     url: 'https://feedx.net/rss/ap.xml',                      perspective: 'WESTERN',     country: 'US',        tags: ['world', 'wire'], tier: 1 },
   { id: 'bbc',           name: 'BBC World',            url: 'https://feeds.bbci.co.uk/news/world/rss.xml',       perspective: 'WESTERN',     country: 'UK',        tags: ['world'], tier: 2 },
   { id: 'nyt',           name: 'New York Times',       url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', perspective: 'WESTERN', country: 'US',        tags: ['world'], tier: 2 },
-  { id: 'wapo',          name: 'Washington Post',      url: 'https://news.google.com/rss/search?q=site:washingtonpost.com+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'WESTERN', country: 'US', tags: ['world'], tier: 2 },
+  { id: 'wapo',          name: 'Washington Post',      url: 'https://feeds.washingtonpost.com/rss/world',              perspective: 'WESTERN', country: 'US', tags: ['world'], tier: 2 },
   { id: 'guardian',      name: 'The Guardian',         url: 'https://www.theguardian.com/world/rss',             perspective: 'WESTERN',     country: 'UK',        tags: ['world'], tier: 2 },
   { id: 'cnn',           name: 'CNN World',            url: 'http://rss.cnn.com/rss/edition_world.rss',          perspective: 'WESTERN',     country: 'US',        tags: ['world'], tier: 2 },
   { id: 'fox',           name: 'Fox News World',       url: 'https://moxie.foxnews.com/google-publisher/world.xml', perspective: 'WESTERN',  country: 'US',        tags: ['world', 'conservative'], tier: 3 },
@@ -28,11 +28,11 @@ export const RSS_FEEDS: RssFeed[] = [
   // ── Israeli media ──
   { id: 'timesofisrael', name: 'Times of Israel',      url: 'https://www.timesofisrael.com/feed/',               perspective: 'ISRAELI',     country: 'Israel',    tags: ['israel', 'mideast'], tier: 3 },
   { id: 'jpost',         name: 'Jerusalem Post',       url: 'https://www.jpost.com/rss/rssfeedsfrontpage.aspx',  perspective: 'ISRAELI',     country: 'Israel',    tags: ['israel', 'mideast'], tier: 3 },
-  { id: 'haaretz',       name: 'Haaretz',              url: 'https://news.google.com/rss/search?q=site:haaretz.com+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'ISRAELI', country: 'Israel', tags: ['israel', 'mideast', 'liberal'], tier: 3 },
+  { id: 'haaretz',       name: 'Haaretz',              url: 'https://www.haaretz.com/srv/haaretz-latest-headlines',   perspective: 'ISRAELI', country: 'Israel', tags: ['israel', 'mideast', 'liberal'], tier: 3 },
   { id: 'i24',           name: 'i24NEWS',              url: 'https://news.google.com/rss/search?q=site:i24news.tv+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'ISRAELI', country: 'Israel', tags: ['israel', 'mideast'], tier: 3 },
 
   // ── Iranian state / aligned media ──
-  { id: 'presstv',       name: 'Press TV',             url: 'https://news.google.com/rss/search?q=site:presstv.ir+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'IRANIAN', country: 'Iran', tags: ['iran', 'mideast'], stateFunded: true, tier: 4 },
+  { id: 'presstv',       name: 'Press TV',             url: 'https://www.presstv.ir/rss.xml',                         perspective: 'IRANIAN', country: 'Iran', tags: ['iran', 'mideast'], stateFunded: true, tier: 4 },
   { id: 'irna',          name: 'IRNA',                 url: 'https://news.google.com/rss/search?q=site:en.irna.ir+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'IRANIAN', country: 'Iran', tags: ['iran', 'mideast', 'official'], stateFunded: true, tier: 4 },
   { id: 'tehrantimes',   name: 'Tehran Times',         url: 'https://news.google.com/rss/search?q=site:tehrantimes.com+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'IRANIAN', country: 'Iran', tags: ['iran', 'mideast'], stateFunded: true, tier: 4 },
   { id: 'tasnim',        name: 'Tasnim News',          url: 'https://news.google.com/rss/search?q=site:tasnimnews.com+when:1d&hl=en-US&gl=US&ceid=US:en', perspective: 'IRANIAN', country: 'Iran', tags: ['iran', 'mideast', 'irgc'], tier: 4 },
