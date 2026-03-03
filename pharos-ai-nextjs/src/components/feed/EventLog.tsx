@@ -66,7 +66,7 @@ export function EventLog({ events, selectedId, onSelect }: Props) {
                   key={evt.id}
                   variant="ghost"
                   onClick={() => onSelect(isOn ? null : evt.id)}
-                  className="grid grid-cols-[36px_42px_1fr_20px] gap-0 w-full h-auto px-3 py-1.5 rounded-none justify-start items-start border-b border-[var(--bd-s)]"
+                  className="grid grid-cols-[40px_50px_1fr_24px] gap-0 w-full h-auto px-3 py-1.5 rounded-none justify-start items-start border-b border-[var(--bd-s)]"
                   style={{
                     borderLeft: `3px solid ${isOn ? sc : 'transparent'}`,
                     background: isOn ? 'var(--bg-sel)' : 'transparent',
@@ -87,7 +87,7 @@ export function EventLog({ events, selectedId, onSelect }: Props) {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-3">
+                    <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
                       {evt.title}
                     </p>
                     <div className="flex gap-1.5 mt-0.5">
