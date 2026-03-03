@@ -8,7 +8,7 @@
 
 // ─── Level 1: Actor ───────────────────────────────────────────────────────────
 
-export type Actor = string;
+export type ActorKey = string;
 export type Affiliation = 'FRIENDLY' | 'HOSTILE';
 
 export type ActorMeta = {

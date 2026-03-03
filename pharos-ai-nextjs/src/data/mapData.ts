@@ -1,5 +1,5 @@
 import type {
-  Actor,
+  ActorKey,
   Priority,
   MarkerCategory,
   KineticType,
@@ -11,11 +11,11 @@ import type {
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
-export type { Actor };
+export type { ActorKey };
 
 export type StrikeArc = {
   id:        string;
-  actor:     Actor;
+  actor:     ActorKey;
   priority:  Priority;
   category:  Extract<MarkerCategory, 'KINETIC'>;
   type:      Extract<KineticType, 'AIRSTRIKE' | 'NAVAL_STRIKE'>;
@@ -29,7 +29,7 @@ export type StrikeArc = {
 
 export type MissileTrack = {
   id:        string;
-  actor:     Actor;
+  actor:     ActorKey;
   priority:  Priority;
   category:  Extract<MarkerCategory, 'KINETIC'>;
   type:      Extract<KineticType, 'BALLISTIC' | 'CRUISE' | 'DRONE'>;
@@ -43,7 +43,7 @@ export type MissileTrack = {
 
 export type Target = {
   id:          string;
-  actor:       Actor;
+  actor:       ActorKey;
   priority:    Priority;
   category:    Extract<MarkerCategory, 'INSTALLATION'>;
   type:        InstallationType;
@@ -56,7 +56,7 @@ export type Target = {
 
 export type Asset = {
   id:          string;
-  actor:       Actor;
+  actor:       ActorKey;
   priority:    Priority;
   category:    Extract<MarkerCategory, 'INSTALLATION'>;
   type:        Extract<InstallationType, 'CARRIER' | 'AIR_BASE' | 'NAVAL_BASE' | 'ARMY_BASE'>;
@@ -68,7 +68,7 @@ export type Asset = {
 
 export type ThreatZone = {
   id:          string;
-  actor:       Actor;
+  actor:       ActorKey;
   priority:    Priority;
   category:    Extract<MarkerCategory, 'ZONE'>;
   type:        ZoneType;

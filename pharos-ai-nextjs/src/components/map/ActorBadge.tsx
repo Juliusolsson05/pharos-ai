@@ -2,10 +2,10 @@
 
 import { ACTOR_META } from '@/data/mapTokens';
 
-import type { Actor } from '@/data/mapTokens';
+import type { ActorKey } from '@/data/mapTokens';
 
 type Props = {
-  actor:     Actor;
+  actor:     ActorKey;
   isActive?: boolean;  // true = opaque chip, false = muted/ghost
 };
 
