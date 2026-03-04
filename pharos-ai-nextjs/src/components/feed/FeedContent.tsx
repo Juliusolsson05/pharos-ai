@@ -31,6 +31,7 @@ export function FeedContent() {
   const [verOnly, setVerOnly] = useState(false);
   const [selId,   setSelId]   = useState<string | null>(() => initEvent);
   const [tab,     setTab]     = useState<'report' | 'signals'>('report');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { defaultLayout, onLayoutChanged } = usePanelLayout({ id: 'feed', panelIds: ['filters', 'log', 'detail'] });
 
   const filtered = useMemo(() => {
@@ -66,21 +67,42 @@ export function FeedContent() {
           </>
         ) : (
           <>
-            <div className="max-h-[45%] min-h-[180px] border-b border-[var(--bd)]">
-              <FeedFilterRail
-                sevFilter={sevFilter}
-                typeFilter={typeFilter}
-                verOnly={verOnly}
-                totalFiltered={filtered.length}
-                onSevChange={(s, v) => setSevFilter(p => ({ ...p, [s]: v }))}
-                onTypeChange={(t, v) => setTypeFilter(p => ({ ...p, [t]: v }))}
-                onVerChange={setVerOnly}
-                currentDay={currentDay}
-                onDayChange={(day) => { setDay(day); setShowAllDays(false); }}
-                showAll={showAllDays}
-                onAllClick={() => setShowAllDays(true)}
-              />
+            {/* Compact filter bar */}
+            <div className="shrink-0 flex items-center gap-2 px-3 py-[6px] border-b border-[var(--bd)] bg-[var(--bg-2)]">
+              <button
+                onClick={() => setFiltersOpen(p => !p)}
+                className={`text-[10px] px-[10px] py-[4px] border font-semibold tracking-wide transition-colors mono ${
+                  filtersOpen
+                    ? 'border-[var(--blue)] bg-[var(--blue-dim)] text-[var(--blue-l)]'
+                    : 'border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t3)]'
+                }`}
+              >
+                FILTERS
+              </button>
+              <span className="mono text-[9px] text-[var(--t4)]">{filtered.length} events</span>
+              <span className="mono text-[9px] text-[var(--t4)]">·</span>
+              <span className="mono text-[9px] text-[var(--t3)]">{showAllDays ? 'ALL DAYS' : `DAY ${currentDay}`}</span>
             </div>
+
+            {/* Collapsible filter rail */}
+            {filtersOpen && (
+              <div className="max-h-[45%] overflow-y-auto border-b border-[var(--bd)]">
+                <FeedFilterRail
+                  sevFilter={sevFilter}
+                  typeFilter={typeFilter}
+                  verOnly={verOnly}
+                  totalFiltered={filtered.length}
+                  onSevChange={(s, v) => setSevFilter(p => ({ ...p, [s]: v }))}
+                  onTypeChange={(t, v) => setTypeFilter(p => ({ ...p, [t]: v }))}
+                  onVerChange={setVerOnly}
+                  currentDay={currentDay}
+                  onDayChange={(day) => { setDay(day); setShowAllDays(false); }}
+                  showAll={showAllDays}
+                  onAllClick={() => setShowAllDays(true)}
+                />
+              </div>
+            )}
+
             <div className="flex-1 min-h-0">
               <EventLog
                 events={filtered}
