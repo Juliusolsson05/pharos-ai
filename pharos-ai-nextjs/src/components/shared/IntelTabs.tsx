@@ -1,5 +1,6 @@
 'use client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 export interface TabItem<T extends string> {
   value: T;
@@ -11,10 +12,11 @@ interface IntelTabsProps<T extends string> {
   onValueChange: (v: T) => void;
   tabs: TabItem<T>[];
   children: React.ReactNode;
+  compact?: boolean;
 }
 
 export function IntelTabBar<T extends string>({
-  value, onValueChange, tabs, children,
+  value, onValueChange, tabs, children, compact = false,
 }: IntelTabsProps<T>) {
   return (
     <Tabs
@@ -24,13 +26,19 @@ export function IntelTabBar<T extends string>({
     >
       <TabsList
         variant="line"
-        className="h-[38px] w-full rounded-none border-b border-[var(--bd)] bg-[var(--bg-2)] flex gap-0 p-0 justify-start overflow-x-auto touch-scroll hide-scrollbar"
+        className={cn(
+          'w-full rounded-none border-b border-[var(--bd)] bg-[var(--bg-2)] flex gap-0 p-0 justify-start overflow-x-auto touch-scroll hide-scrollbar',
+          compact ? 'h-8' : 'h-[38px]',
+        )}
       >
         {tabs.map(tab => (
           <TabsTrigger
             key={tab.value}
             value={tab.value}
-            className="rounded-none h-full px-[18px] text-[10px] font-bold tracking-[0.06em] uppercase shrink-0 transition-[color,border-color,background] duration-100"
+            className={cn(
+              'rounded-none h-full font-bold uppercase shrink-0 transition-[color,border-color,background] duration-100',
+              compact ? 'px-3 text-[9px] tracking-[0.05em]' : 'px-[18px] text-[10px] tracking-[0.06em]',
+            )}
             style={{
               color: value === tab.value ? 'var(--t1)' : 'var(--t2)',
               borderBottom: value === tab.value ? '2px solid var(--blue)' : '2px solid transparent',

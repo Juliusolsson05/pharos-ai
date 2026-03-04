@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useCallback } from 'react';
 
 import { useAppSelector, useAppDispatch } from '@/store';
 import {
@@ -110,6 +110,16 @@ export function useMapFilters(): UseMapFiltersReturn {
     return map;
   }, [rawData]);
 
+  const setViewExtent = useCallback((ext: [number, number]) => dispatch(setViewExtentAction(ext)), [dispatch]);
+  const toggleDataset = useCallback((d: string) => dispatch(toggleDatasetAction({ dataset: d, datasetTypes: datasetTypesMap[d] })), [dispatch, datasetTypesMap]);
+  const toggleType    = useCallback((t: string) => dispatch(toggleTypeAction(t)), [dispatch]);
+  const toggleActor   = useCallback((a: string) => dispatch(toggleActorAction(a)), [dispatch]);
+  const togglePriority = useCallback((p: string) => dispatch(togglePriorityAction(p)), [dispatch]);
+  const toggleStatus  = useCallback((s: string) => dispatch(toggleStatusAction(s)), [dispatch]);
+  const toggleHeat    = useCallback(() => dispatch(toggleHeatAction()), [dispatch]);
+  const setTimeRange  = useCallback((r: [number, number] | null) => dispatch(setTimeRangeAction(r)), [dispatch]);
+  const resetFilters  = useCallback(() => dispatch(resetFiltersAction()), [dispatch]);
+
   return {
     state: filterState,
     filtered,
@@ -118,15 +128,15 @@ export function useMapFilters(): UseMapFiltersReturn {
     rawData,
     dataExtent,
     viewExtent,
-    setViewExtent: (ext) => dispatch(setViewExtentAction(ext)),
-    toggleDataset:  (d) => dispatch(toggleDatasetAction({ dataset: d, datasetTypes: datasetTypesMap[d] })),
-    toggleType:     (t) => dispatch(toggleTypeAction(t)),
-    toggleActor:    (a) => dispatch(toggleActorAction(a)),
-    togglePriority: (p) => dispatch(togglePriorityAction(p)),
-    toggleStatus:   (s) => dispatch(toggleStatusAction(s)),
-    toggleHeat:     ()  => dispatch(toggleHeatAction()),
-    setTimeRange:   (r) => dispatch(setTimeRangeAction(r)),
-    resetFilters:   ()  => dispatch(resetFiltersAction()),
+    setViewExtent,
+    toggleDataset,
+    toggleType,
+    toggleActor,
+    togglePriority,
+    toggleStatus,
+    toggleHeat,
+    setTimeRange,
+    resetFilters,
     isFiltered,
     isLoading,
   };

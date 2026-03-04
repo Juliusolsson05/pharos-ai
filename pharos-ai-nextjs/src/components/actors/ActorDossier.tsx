@@ -12,6 +12,7 @@ import { getActorForDay, dayAbbrev } from '@/lib/day-filter';
 import { useXPostsByActor } from '@/api/x-posts';
 import { useConflictDay } from '@/hooks/use-conflict-day';
 import type { Actor, XPost } from '@/types/domain';
+import { cn } from '@/lib/utils';
 
 type DossierTab = 'intel' | 'signals' | 'military';
 
@@ -20,9 +21,11 @@ type Props = {
   tab: DossierTab;
   onTabChange: (t: DossierTab) => void;
   currentDay: string;
+  compact?: boolean;
+  pageScroll?: boolean;
 };
 
-export function ActorDossier({ actor, tab, onTabChange, currentDay }: Props) {
+export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = false, pageScroll = false }: Props) {
   const snap   = getActorForDay(actor, currentDay);
   const actC   = ACT_C[snap?.activityLevel] ?? 'var(--t2)';
   const staC   = STA_C[snap?.stance] ?? 'var(--t2)';
@@ -42,9 +45,9 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay }: Props) {
   if (!snap) return null;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className={cn(pageScroll ? 'flex flex-col' : 'flex-1 flex flex-col overflow-hidden')}>
       {/* Header */}
-      <div className="px-5 py-3 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0">
+      <div className={cn('border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0', compact ? 'px-3 py-2' : 'px-5 py-3')}>
         <div className="label text-[8px] text-[var(--t3)] mb-2">
           ACTOR INTELLIGENCE DOSSIER // PHAROS THREAT ANALYSIS // OPERATION EPIC FURY
         </div>
@@ -105,8 +108,8 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay }: Props) {
       </div>
 
       {/* Tabs */}
-      <IntelTabBar value={tab} onValueChange={onTabChange} tabs={tabs}>
-        <TabsContent value="intel" className="flex-1 min-h-0 overflow-hidden">
+      <IntelTabBar value={tab} onValueChange={onTabChange} tabs={tabs} compact={compact}>
+        <TabsContent value="intel" className={pageScroll ? '' : 'flex-1 min-h-0 overflow-hidden'}>
           <ActorIntelTab
             actor={actor}
             snap={snap}
@@ -117,9 +120,9 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay }: Props) {
           />
         </TabsContent>
 
-        <TabsContent value="signals" className="flex-1 min-h-0 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="px-4 py-3">
+        <TabsContent value="signals" className={pageScroll ? '' : 'flex-1 min-h-0 overflow-hidden'}>
+          {pageScroll ? (
+            <div className={cn(compact ? 'px-3 py-3' : 'px-4 py-3')}>
               {posts.length === 0 ? (
                 <div className="p-12 text-center">
                   <span className="text-xl text-[var(--t3)]">𝕏</span>
@@ -138,11 +141,33 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay }: Props) {
                 </>
               )}
             </div>
-          </ScrollArea>
+          ) : (
+            <ScrollArea className="h-full">
+              <div className={cn(compact ? 'px-3 py-3' : 'px-4 py-3')}>
+                {posts.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <span className="text-xl text-[var(--t3)]">𝕏</span>
+                    <p className="label text-[var(--t3)] mt-2">
+                      No signals indexed for this actor
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-2.5">
+                      <span className="label text-[8px]">
+                        {posts.length} POSTS · PHAROS-CURATED · {actor.name.toUpperCase()}
+                      </span>
+                    </div>
+                    {posts.map(p => <XPostCard key={p.id} post={p as XPost} />)}
+                  </>
+                )}
+              </div>
+            </ScrollArea>
+          )}
         </TabsContent>
 
         {iso3 && (
-          <TabsContent value="military" className="flex-1 min-h-0 overflow-hidden">
+          <TabsContent value="military" className={pageScroll ? '' : 'flex-1 min-h-0 overflow-hidden'}>
             <ActorMilitaryTab actor={actor} iso3={iso3} />
           </TabsContent>
         )}

@@ -5,6 +5,7 @@ import { CheckCircle, ArrowRight, ChevronRight, ChevronDown } from 'lucide-react
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { IntelEvent } from '@/types/domain';
 import { useXPosts } from '@/api/x-posts';
 import { SEV_C } from '@/lib/severity-colors';
@@ -26,9 +27,11 @@ interface Props {
   events: IntelEvent[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  compact?: boolean;
+  pageScroll?: boolean;
 }
 
-export function EventLog({ events, selectedId, onSelect }: Props) {
+export function EventLog({ events, selectedId, onSelect, compact = false, pageScroll = false }: Props) {
   const { data: allPosts } = useXPosts();
 
   const eventPostCounts = useMemo(() => {
@@ -55,92 +58,176 @@ export function EventLog({ events, selectedId, onSelect }: Props) {
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="panel-header justify-between">
+    <div className={cn(pageScroll ? 'flex flex-col' : 'flex-1 flex flex-col overflow-hidden')}>
+      <div className={cn('panel-header justify-between', compact && 'h-8 min-h-8 px-3')}>
         <span className="section-title">Operation Epic Fury</span>
         <Badge variant="outline" className="text-[9px] text-[var(--t4)] border-[var(--bd)]">{events.length}</Badge>
       </div>
 
       {/* Column headers */}
-      <div className="grid grid-cols-[40px_50px_1fr_24px] px-3 py-1 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0">
+      <div className={cn('grid grid-cols-[40px_50px_1fr_24px] px-3 py-1 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0', compact && 'py-0.5')}>
         {['TIME', 'SEV', 'TITLE', ''].map(h => <span key={h} className="label text-[8px]">{h}</span>)}
       </div>
 
-      <ScrollArea className="flex-1">
-        {events.length === 0 && (
-          <div className="p-6 text-center">
-            <span className="label">No results</span>
-          </div>
-        )}
-        {sortedDates.map(date => {
-          const dayEvents = grouped[date];
-          const isExpanded = expandedDates.has(date);
-          const critCount = dayEvents.filter(e => e.severity === 'CRITICAL').length;
-          const highCount = dayEvents.filter(e => e.severity === 'HIGH').length;
-          return (
-          <div key={date}>
-            <button
-              onClick={() => toggleDate(date)}
-              className="w-full flex items-center gap-2 px-3 py-1.5 bg-[var(--bg-2)] border-b border-[var(--bd)] cursor-pointer hover:bg-[var(--bg-3)] transition-colors"
-            >
-              {isExpanded
-                ? <ChevronDown size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
-                : <ChevronRight size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
-              }
-              <span className="mono text-[9px] text-[var(--t3)]">{date}</span>
-              <span className="mono text-[8px] text-[var(--t4)]">{dayEvents.length} events</span>
-              {critCount > 0 && <span className="mono text-[8px] text-[var(--danger)]">{critCount} CRIT</span>}
-              {highCount > 0 && <span className="mono text-[8px] text-[var(--warning)]">{highCount} HIGH</span>}
-            </button>
-            {isExpanded && dayEvents.map(evt => {
-              const isOn = selectedId === evt.id;
-              const sc   = SEV_C[evt.severity] ?? 'var(--info)';
-              const sbg  = SEV_BG[evt.severity] ?? 'var(--info-dim)';
-              const xc   = eventPostCounts.get(evt.id) ?? 0;
-              return (
-                <Button
-                  key={evt.id}
-                  variant="ghost"
-                  onClick={() => onSelect(isOn ? null : evt.id)}
-                  className="grid grid-cols-[40px_50px_1fr_24px] gap-0 w-full h-auto px-3 py-1.5 rounded-none justify-start items-start border-b border-[var(--bd-s)]"
-                  style={{
-                    borderLeft: `3px solid ${isOn ? sc : 'transparent'}`,
-                    background: isOn ? 'var(--bg-sel)' : 'transparent',
-                  }}
-                >
-                  <span className="mono text-[9px] text-[var(--t3)] self-center">
-                    {fmtTime(evt.timestamp)}
-                  </span>
+      {pageScroll ? (
+        <div>
+          {events.length === 0 && (
+            <div className="p-6 text-center">
+              <span className="label">No results</span>
+            </div>
+          )}
+          {sortedDates.map(date => {
+            const dayEvents = grouped[date];
+            const isExpanded = expandedDates.has(date);
+            const critCount = dayEvents.filter(e => e.severity === 'CRITICAL').length;
+            const highCount = dayEvents.filter(e => e.severity === 'HIGH').length;
+            return (
+            <div key={date}>
+              <button
+                onClick={() => toggleDate(date)}
+                className="w-full flex items-center gap-2 px-3 py-1.5 bg-[var(--bg-2)] border-b border-[var(--bd)] cursor-pointer hover:bg-[var(--bg-3)] transition-colors"
+              >
+                {isExpanded
+                  ? <ChevronDown size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
+                  : <ChevronRight size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
+                }
+                <span className="mono text-[9px] text-[var(--t3)]">{date}</span>
+                <span className="mono text-[8px] text-[var(--t4)]">{dayEvents.length} events</span>
+                {critCount > 0 && <span className="mono text-[8px] text-[var(--danger)]">{critCount} CRIT</span>}
+                {highCount > 0 && <span className="mono text-[8px] text-[var(--warning)]">{highCount} HIGH</span>}
+              </button>
+              {isExpanded && dayEvents.map(evt => {
+                const isOn = selectedId === evt.id;
+                const sc   = SEV_C[evt.severity] ?? 'var(--info)';
+                const sbg  = SEV_BG[evt.severity] ?? 'var(--info-dim)';
+                const xc   = eventPostCounts.get(evt.id) ?? 0;
+                return (
+                  <Button
+                    key={evt.id}
+                    variant="ghost"
+                    onClick={() => onSelect(isOn ? null : evt.id)}
+                    className={cn(
+                      'grid grid-cols-[40px_50px_1fr_24px] gap-0 w-full h-auto px-3 rounded-none justify-start items-start border-b border-[var(--bd-s)]',
+                      compact ? 'py-1' : 'py-1.5',
+                    )}
+                    style={{
+                      borderLeft: `3px solid ${isOn ? sc : 'transparent'}`,
+                      background: isOn ? 'var(--bg-sel)' : 'transparent',
+                    }}
+                  >
+                    <span className="mono text-[9px] text-[var(--t3)] self-center">
+                      {fmtTime(evt.timestamp)}
+                    </span>
 
-                  <div className="self-center">
-                    <Badge
-                      variant="outline"
-                      className="text-[7px] px-1 py-px tracking-[0.06em] rounded-sm"
-                      style={{ color: sc, borderColor: sc, background: sbg }}
-                    >
-                      {evt.severity.slice(0, 4)}
-                    </Badge>
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
-                      {evt.title}
-                    </p>
-                    <div className="flex gap-1.5 mt-0.5">
-                      <span className="mono text-[8px] text-[var(--t3)]">{evt.sources.length}src</span>
-                      {xc > 0 && <span className="mono text-[8px] text-[var(--t2)]">𝕏{xc}</span>}
-                      {evt.verified && <CheckCircle size={8} className="text-[var(--success)]" strokeWidth={2} />}
+                    <div className="self-center">
+                      <Badge
+                        variant="outline"
+                        className="text-[7px] px-1 py-px tracking-[0.06em] rounded-sm"
+                        style={{ color: sc, borderColor: sc, background: sbg }}
+                      >
+                        {evt.severity.slice(0, 4)}
+                      </Badge>
                     </div>
-                  </div>
 
-                  <ArrowRight size={9} className="text-[var(--t3)] self-center" strokeWidth={1.5} />
-                </Button>
-              );
-            })}
-          </div>
-          );
-        })}
-      </ScrollArea>
+                    <div>
+                      <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
+                        {evt.title}
+                      </p>
+                      <div className="flex gap-1.5 mt-0.5">
+                        <span className="mono text-[8px] text-[var(--t3)]">{evt.sources.length}src</span>
+                        {xc > 0 && <span className="mono text-[8px] text-[var(--t2)]">𝕏{xc}</span>}
+                        {evt.verified && <CheckCircle size={8} className="text-[var(--success)]" strokeWidth={2} />}
+                      </div>
+                    </div>
+
+                    <ArrowRight size={9} className="text-[var(--t3)] self-center" strokeWidth={1.5} />
+                  </Button>
+                );
+              })}
+            </div>
+            );
+          })}
+        </div>
+      ) : (
+        <ScrollArea className="flex-1">
+          {events.length === 0 && (
+            <div className="p-6 text-center">
+              <span className="label">No results</span>
+            </div>
+          )}
+          {sortedDates.map(date => {
+            const dayEvents = grouped[date];
+            const isExpanded = expandedDates.has(date);
+            const critCount = dayEvents.filter(e => e.severity === 'CRITICAL').length;
+            const highCount = dayEvents.filter(e => e.severity === 'HIGH').length;
+            return (
+            <div key={date}>
+              <button
+                onClick={() => toggleDate(date)}
+                className="w-full flex items-center gap-2 px-3 py-1.5 bg-[var(--bg-2)] border-b border-[var(--bd)] cursor-pointer hover:bg-[var(--bg-3)] transition-colors"
+              >
+                {isExpanded
+                  ? <ChevronDown size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
+                  : <ChevronRight size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
+                }
+                <span className="mono text-[9px] text-[var(--t3)]">{date}</span>
+                <span className="mono text-[8px] text-[var(--t4)]">{dayEvents.length} events</span>
+                {critCount > 0 && <span className="mono text-[8px] text-[var(--danger)]">{critCount} CRIT</span>}
+                {highCount > 0 && <span className="mono text-[8px] text-[var(--warning)]">{highCount} HIGH</span>}
+              </button>
+              {isExpanded && dayEvents.map(evt => {
+                const isOn = selectedId === evt.id;
+                const sc   = SEV_C[evt.severity] ?? 'var(--info)';
+                const sbg  = SEV_BG[evt.severity] ?? 'var(--info-dim)';
+                const xc   = eventPostCounts.get(evt.id) ?? 0;
+                return (
+                  <Button
+                    key={evt.id}
+                    variant="ghost"
+                    onClick={() => onSelect(isOn ? null : evt.id)}
+                    className={cn(
+                      'grid grid-cols-[40px_50px_1fr_24px] gap-0 w-full h-auto px-3 rounded-none justify-start items-start border-b border-[var(--bd-s)]',
+                      compact ? 'py-1' : 'py-1.5',
+                    )}
+                    style={{
+                      borderLeft: `3px solid ${isOn ? sc : 'transparent'}`,
+                      background: isOn ? 'var(--bg-sel)' : 'transparent',
+                    }}
+                  >
+                    <span className="mono text-[9px] text-[var(--t3)] self-center">
+                      {fmtTime(evt.timestamp)}
+                    </span>
+
+                    <div className="self-center">
+                      <Badge
+                        variant="outline"
+                        className="text-[7px] px-1 py-px tracking-[0.06em] rounded-sm"
+                        style={{ color: sc, borderColor: sc, background: sbg }}
+                      >
+                        {evt.severity.slice(0, 4)}
+                      </Badge>
+                    </div>
+
+                    <div>
+                      <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
+                        {evt.title}
+                      </p>
+                      <div className="flex gap-1.5 mt-0.5">
+                        <span className="mono text-[8px] text-[var(--t3)]">{evt.sources.length}src</span>
+                        {xc > 0 && <span className="mono text-[8px] text-[var(--t2)]">𝕏{xc}</span>}
+                        {evt.verified && <CheckCircle size={8} className="text-[var(--success)]" strokeWidth={2} />}
+                      </div>
+                    </div>
+
+                    <ArrowRight size={9} className="text-[var(--t3)] self-center" strokeWidth={1.5} />
+                  </Button>
+                );
+              })}
+            </div>
+            );
+          })}
+        </ScrollArea>
+      )}
     </div>
   );
 }

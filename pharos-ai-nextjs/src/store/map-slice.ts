@@ -44,7 +44,6 @@ export type MapState = {
 const MAP_STORAGE_KEY = 'pharos:map:v1';
 
 type PersistedMapPrefs = {
-  filters: SerializableFilterState;
   sidebarOpen: boolean;
   mapStyle: 'dark' | 'satellite';
 };
@@ -62,7 +61,6 @@ export function persistMapPrefs(state: MapState): void {
   if (typeof window === 'undefined') return;
   try {
     const persisted: PersistedMapPrefs = {
-      filters:     state.filters,
       sidebarOpen: state.sidebarOpen,
       mapStyle:    state.mapStyle,
     };
@@ -107,7 +105,7 @@ function buildInitialState(): MapState {
   const persisted = loadPersistedMapPrefs();
   return {
     viewState:      INITIAL_VIEW,
-    filters:        persisted?.filters ?? EMPTY_FILTERS,
+    filters:        EMPTY_FILTERS,
     initialFilters: EMPTY_FILTERS,
     dataExtent:     [0, 0],
     viewExtent:     [0, 0],
@@ -148,10 +146,8 @@ const mapSlice = createSlice({
         ? dataExtent
         : [Math.max(dataExtent[0], dataExtent[1] - threeDays), dataExtent[1]];
 
-      // If no persisted filters (datasets is empty), use computed initial
-      if (state.filters.datasets.length === 0) {
-        state.filters = initialFilters;
-      }
+      // Always initialize filters from data (no localStorage persistence for filters)
+      state.filters = initialFilters;
 
       // Default timeRange to last 24 hours of data
       const oneDay = 86400_000;

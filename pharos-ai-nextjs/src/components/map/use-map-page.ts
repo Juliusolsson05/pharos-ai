@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useAppSelector, useAppDispatch } from '@/store';
 import {
@@ -62,15 +62,6 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     else dispatch(setSelectedItemAction(null));
   }, [dispatch]);
 
-  // Clear stale transitionDuration on mount (prevents phantom fly-to after rotation)
-  useEffect(() => {
-    if (viewState.transitionDuration) {
-      const { transitionDuration: _, ...clean } = viewState as MapViewState & { transitionDuration?: number };
-      dispatch(setViewStateAction(clean as MapViewState));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const showTimeline = overlayVisibility.timeline && !(isMobile && !!selectedItem);
 
   return {
@@ -89,12 +80,7 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     handleMapClick,
     showTimeline,
     // Actions (pre-bound for convenience)
-    setViewState:    (vs: MapViewState) => {
-      // Strip transitionDuration from intermediate/final viewState updates
-      // to prevent stale transitions on DeckGL remount (e.g. rotation)
-      const { transitionDuration: _, ...clean } = vs as MapViewState & { transitionDuration?: number };
-      dispatch(setViewStateAction(clean as MapViewState));
-    },
+    setViewState:    (vs: MapViewState) => { dispatch(setViewStateAction(vs)); },
     activateStory:   (story: Parameters<typeof activateStoryAction>[0]) => dispatch(activateStoryAction(story)),
     setActiveStory:  (story: Parameters<typeof setActiveStoryAction>[0]) => dispatch(setActiveStoryAction(story)),
     setSelectedItem: (item: Parameters<typeof setSelectedItemAction>[0]) => dispatch(setSelectedItemAction(item)),

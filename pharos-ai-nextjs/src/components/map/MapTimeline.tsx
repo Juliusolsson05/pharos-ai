@@ -104,6 +104,7 @@ export default function MapTimeline({ rawData, dataExtent, viewExtent, onViewExt
         background: 'rgba(28,33,39,0.92)',
         borderTop: '1px solid var(--bd)',
         padding: isMobile ? '6px 10px calc(12px + var(--safe-bottom))' : '4px 16px 6px',
+        touchAction: 'none',
       }}>
       <div className="flex items-center justify-between mb-0.5">
         <div className="flex items-center gap-0.5 overflow-x-auto touch-scroll hide-scrollbar pr-2">

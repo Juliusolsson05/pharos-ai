@@ -9,6 +9,7 @@ import { usePanelLayout } from '@/hooks/use-panel-layout';
 import { useConflictDay } from '@/hooks/use-conflict-day';
 import { useActors } from '@/api/actors';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { ActorList } from '@/components/actors/ActorList';
 import { ActorDossier } from '@/components/actors/ActorDossier';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -19,6 +20,8 @@ export function ActorsContent() {
   const initActor    = searchParams.get('actor');
   const { currentDay, setDay } = useConflictDay();
   const isMobile = useIsMobile(1024);
+  const isLandscapePhone = useIsLandscapePhone();
+  const usePageScroll = isMobile && isLandscapePhone;
 
   const [selId, setSelId] = useState<string | null>(() => initActor);
   const [tab,   setTab]   = useState<'intel' | 'signals' | 'military'>('intel');
@@ -29,10 +32,10 @@ export function ActorsContent() {
 
   if (isMobile) {
     return (
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div className={`flex-1 min-h-0 flex flex-col ${usePageScroll ? 'overflow-y-auto' : 'overflow-hidden'}`}>
         {selected ? (
           <>
-            <div className="panel-header justify-between gap-2">
+            <div className={`panel-header justify-between gap-2 ${usePageScroll ? 'h-8 min-h-8 px-3' : ''}`}>
               <Button
                 variant="ghost"
                 size="xs"
@@ -46,7 +49,7 @@ export function ActorsContent() {
                 <DaySelector currentDay={currentDay} onDayChange={setDay} />
               </div>
             </div>
-            <ActorDossier actor={selected} tab={tab} onTabChange={setTab} currentDay={currentDay} />
+            <ActorDossier actor={selected} tab={tab} onTabChange={setTab} currentDay={currentDay} compact={usePageScroll} pageScroll={usePageScroll} />
           </>
         ) : (
           <ActorList
@@ -54,6 +57,8 @@ export function ActorsContent() {
             onSelect={id => { setSelId(id); if (id) setTab('intel'); }}
             currentDay={currentDay}
             onDayChange={setDay}
+            compact={usePageScroll}
+            pageScroll={usePageScroll}
           />
         )}
       </div>

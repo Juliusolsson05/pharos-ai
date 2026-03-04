@@ -5,6 +5,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { usePanelLayout } from '@/hooks/use-panel-layout';
 import { useConflictDay } from '@/hooks/use-conflict-day';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { XPost } from '@/types/domain';
 import { useXPosts } from '@/api/x-posts';
@@ -15,6 +16,8 @@ import { getPostsForDay } from '@/lib/day-filter';
 
 export function SignalsContent() {
   const isMobile = useIsMobile(1024);
+  const isLandscapePhone = useIsLandscapePhone();
+  const usePageScroll = isMobile && isLandscapePhone;
   const [sigFilter,  setSigFilter]  = useState<Record<Significance, boolean>>({ BREAKING: true, HIGH: true, STANDARD: true });
   const [acctFilter, setAcctFilter] = useState<Record<AccountType, boolean>>({ military: true, government: true, journalist: true, analyst: true, official: true });
   const [pharosOnly, setPharosOnly] = useState(false);
@@ -82,20 +85,22 @@ export function SignalsContent() {
       onDayChange={(day) => { setDay(day); setShowAll(false); }}
       showAll={showAll}
       onAllClick={() => setShowAll(true)}
+      compact={usePageScroll}
+      pageScroll={usePageScroll}
     />
   );
 
   if (isMobile) {
     return (
-      <div className="flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden">
+      <div className={`flex flex-col flex-1 min-h-0 min-w-0 ${usePageScroll ? 'overflow-y-auto' : 'overflow-hidden'}`}>
         {/* Header */}
-        <div className="panel-header shrink-0">
+        <div className={`panel-header shrink-0 ${usePageScroll ? 'h-8 min-h-8 px-3' : ''}`}>
           <span className="section-title">Field Signals — Operation Epic Fury</span>
           <span className="label ml-auto text-[var(--t4)]">PHAROS-CURATED</span>
         </div>
 
         {/* Compact filter bar */}
-        <div className="shrink-0 flex items-center gap-2 px-3 py-[6px] border-b border-[var(--bd)] bg-[var(--bg-2)]">
+        <div className={`shrink-0 flex items-center gap-2 px-3 border-b border-[var(--bd)] bg-[var(--bg-2)] ${usePageScroll ? 'py-1.5' : 'py-[6px]'}`}>
           <button
             onClick={() => setFiltersOpen(p => !p)}
             className={`text-[10px] px-[10px] py-[4px] border font-semibold tracking-wide transition-colors mono ${
@@ -113,13 +118,13 @@ export function SignalsContent() {
 
         {/* Collapsible filter rail */}
         {filtersOpen && (
-          <div className="max-h-[45%] overflow-y-auto border-b border-[var(--bd)] shrink-0">
+          <div className={`${usePageScroll ? '' : 'max-h-[45%] overflow-y-auto'} border-b border-[var(--bd)] shrink-0`}>
             {filterRail}
           </div>
         )}
 
         {/* Signals feed */}
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className={usePageScroll ? '' : 'flex-1 min-h-0 overflow-y-auto'}>
           <div className="px-3 py-3">
             {signalsList}
           </div>

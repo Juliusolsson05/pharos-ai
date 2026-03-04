@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { usePanelLayout } from '@/hooks/use-panel-layout';
 import { useConflictDay } from '@/hooks/use-conflict-day';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import type { Severity, EventType } from '@/types/domain';
 import { useEvents } from '@/api/events';
 import { FeedFilterRail, ALL_TYPES } from '@/components/feed/FeedFilterRail';
@@ -20,6 +21,8 @@ export function FeedContent() {
   const searchParams = useSearchParams();
   const initEvent    = searchParams.get('event');
   const isMobile = useIsMobile(1024);
+  const isLandscapePhone = useIsLandscapePhone();
+  const usePageScroll = isMobile && isLandscapePhone;
   const { currentDay, setDay, allDays } = useConflictDay();
   const { data: allEvents } = useEvents();
   const [showAllDays, setShowAllDays] = useState(true);
@@ -49,10 +52,10 @@ export function FeedContent() {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden">
+      <div className={`flex flex-col flex-1 min-h-0 min-w-0 ${usePageScroll ? 'overflow-y-auto' : 'overflow-hidden'}`}>
         {selected ? (
           <>
-            <div className="panel-header">
+            <div className={`panel-header ${usePageScroll ? 'h-8 min-h-8 px-3' : ''}`}>
               <Button
                 variant="ghost"
                 size="xs"
@@ -63,12 +66,12 @@ export function FeedContent() {
                 BACK TO FEED
               </Button>
             </div>
-            <EventDetail event={selected} tab={tab} onTabChange={setTab} />
+            <EventDetail event={selected} tab={tab} onTabChange={setTab} compact={usePageScroll} pageScroll={usePageScroll} />
           </>
         ) : (
           <>
             {/* Compact filter bar */}
-            <div className="shrink-0 flex items-center gap-2 px-3 py-[6px] border-b border-[var(--bd)] bg-[var(--bg-2)]">
+            <div className={`shrink-0 flex items-center gap-2 px-3 border-b border-[var(--bd)] bg-[var(--bg-2)] ${usePageScroll ? 'py-1.5' : 'py-[6px]'}`}>
               <button
                 onClick={() => setFiltersOpen(p => !p)}
                 className={`text-[10px] px-[10px] py-[4px] border font-semibold tracking-wide transition-colors mono ${
@@ -86,7 +89,7 @@ export function FeedContent() {
 
             {/* Collapsible filter rail */}
             {filtersOpen && (
-              <div className="max-h-[45%] overflow-y-auto border-b border-[var(--bd)]">
+              <div className={`${usePageScroll ? '' : 'max-h-[45%] overflow-y-auto'} border-b border-[var(--bd)]`}>
                 <FeedFilterRail
                   sevFilter={sevFilter}
                   typeFilter={typeFilter}
@@ -99,15 +102,19 @@ export function FeedContent() {
                   onDayChange={(day) => { setDay(day); setShowAllDays(false); }}
                   showAll={showAllDays}
                   onAllClick={() => setShowAllDays(true)}
+                  compact={usePageScroll}
+                  pageScroll={usePageScroll}
                 />
               </div>
             )}
 
-            <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className={usePageScroll ? '' : 'flex-1 min-h-0 overflow-y-auto'}>
               <EventLog
                 events={filtered}
                 selectedId={selId}
                 onSelect={id => { setSelId(id); if (id) setTab('report'); }}
+                compact={usePageScroll}
+                pageScroll={usePageScroll}
               />
             </div>
           </>

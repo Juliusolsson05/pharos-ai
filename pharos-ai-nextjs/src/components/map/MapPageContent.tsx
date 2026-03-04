@@ -14,11 +14,7 @@ export default function FullMapPage({ embedded = false }: { embedded?: boolean }
   const isMobile = useIsMobile(1024);
   const ctx = useMapPage({ isMobile: isMobile || isLandscapePhone });
 
-  // Clear stale transitionDuration when layout mode changes
-  // so DeckGL doesn't try to animate on fresh mount
-  const mode = isLandscapePhone ? 'landscape' : isMobile ? 'mobile' : 'desktop';
-
-  if (isLandscapePhone) return <LandscapeMapLayout key={mode} ctx={ctx} embedded={embedded} />;
-  if (isMobile) return <MobileMapLayout key={mode} ctx={ctx} embedded={embedded} />;
-  return <DesktopMapLayout key={mode} ctx={ctx} embedded={embedded} />;
+  if (isLandscapePhone) return <LandscapeMapLayout ctx={ctx} embedded={embedded} />;
+  if (isMobile) return <MobileMapLayout ctx={ctx} embedded={embedded} />;
+  return <DesktopMapLayout ctx={ctx} embedded={embedded} />;
 }

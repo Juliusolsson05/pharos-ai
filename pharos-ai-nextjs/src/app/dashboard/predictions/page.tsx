@@ -15,6 +15,7 @@ import { MarketCard } from '@/components/predictions/MarketCard';
 import { FocusedMarket } from '@/components/predictions/FocusedMarket';
 import { fmtVol, getLeadProb, COL } from '@/components/predictions/utils';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 
 const SORT_OPTS = [
   { key: 'volume',      label: 'TOTAL VOL' },
@@ -35,6 +36,8 @@ export default function PredictionsPage() {
   const [expandedId,     setExpandedId]     = useState<string | null>(null);
   const [focusedId,      setFocusedId]      = useState<string | null>(null);
   const isMobile = useIsMobile(1024);
+  const isLandscapePhone = useIsLandscapePhone();
+  const usePageScroll = isMobile && isLandscapePhone;
 
   const fetchMarkets = async (isManual = false) => {
     setLoading(true); setIsRefreshing(true); setError(null);
@@ -99,10 +102,10 @@ export default function PredictionsPage() {
     : '—';
 
   return (
-    <div className="flex flex-col flex-1 min-w-0 overflow-hidden h-full bg-[var(--bg-1)]">
+    <div className={`flex flex-col flex-1 min-w-0 h-full bg-[var(--bg-1)] ${usePageScroll ? 'overflow-y-auto' : 'overflow-hidden'}`}>
 
       {/* ── Top bar ── */}
-      <div className="flex items-center gap-4 shrink-0 px-3 md:px-4 h-[44px] bg-[var(--bg-app)] border-b border-[var(--bd)]">
+      <div className={`flex items-center gap-4 shrink-0 px-3 md:px-4 bg-[var(--bg-app)] border-b border-[var(--bd)] ${usePageScroll ? 'h-9' : 'h-[44px]'}`}>
         <div className="flex items-center gap-2">
           <TrendingUp size={14} strokeWidth={2.5} className="text-[var(--blue-l)] shrink-0" />
           <span className="section-title">PREDICTION MARKETS</span>
@@ -167,7 +170,7 @@ export default function PredictionsPage() {
           <div />
         </div>
       ) : (
-        <div className="shrink-0 flex items-center gap-2 px-3 py-2 bg-[var(--bg-app)] border-b border-[var(--bd)] overflow-x-auto touch-scroll">
+        <div className={`shrink-0 flex items-center gap-2 px-3 bg-[var(--bg-app)] border-b border-[var(--bd)] overflow-x-auto touch-scroll ${usePageScroll ? 'py-1.5' : 'py-2'}`}>
           <ToggleGroup type="single" value={sortBy} onValueChange={v => v && setSortBy(v as SortBy)} className="flex gap-1">
             {SORT_OPTS.map(col => (
               <ToggleGroupItem
@@ -187,7 +190,7 @@ export default function PredictionsPage() {
       )}
 
       {/* ── Content ── */}
-      <div className="flex-1 overflow-y-auto">
+      <div className={usePageScroll ? '' : 'flex-1 overflow-y-auto'}>
         {loading ? (
           <div className="py-2">
             {Array.from({ length: 8 }).map((_, i) => (

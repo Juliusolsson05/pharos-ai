@@ -25,6 +25,7 @@ export function Header() {
   const { data: conflict } = useConflict();
   const isMobile = useIsMobile();
   const isLandscapePhone = useIsLandscapePhone();
+  const isLandscapeNonMap = isLandscapePhone && !path.startsWith('/dashboard/map');
 
   // Hide header on map page in landscape phone mode — map has its own navigation
   if (isLandscapePhone && path.startsWith('/dashboard/map')) return null;
@@ -51,7 +52,7 @@ export function Header() {
       {isMobile && (
         <div className="flex flex-col">
           <div
-            className="h-11 flex items-center justify-between gap-2 px-2 border-b border-[var(--bd)]"
+            className={`${isLandscapeNonMap ? 'h-9 px-2.5' : 'h-11 px-2'} flex items-center justify-between gap-2 border-b border-[var(--bd)]`}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           >
             <Link href="/dashboard" className="no-underline flex items-center gap-2 min-w-0">
@@ -61,7 +62,7 @@ export function Header() {
             <span className="mono text-[8px] text-[var(--t4)] truncate">{displayDate} · UTC</span>
           </div>
           <nav
-            className="h-9 flex items-stretch overflow-x-auto touch-scroll hide-scrollbar"
+            className={`${isLandscapeNonMap ? 'h-8' : 'h-9'} flex items-stretch overflow-x-auto touch-scroll hide-scrollbar`}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           >
             {NAV.map(item => {
