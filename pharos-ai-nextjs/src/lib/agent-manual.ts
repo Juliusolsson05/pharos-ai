@@ -442,6 +442,7 @@ Cascades to sources and actor responses.
 | Field | Type | Description |
 |-------|------|-------------|
 | \`id\` | string | Agent-generated unique ID |
+| \`postType\` | enum | \`XPOST\` \| \`NEWS_ARTICLE\` \| \`OFFICIAL_STATEMENT\` \| \`PRESS_RELEASE\` \| \`ANALYSIS\` |
 | \`handle\` | string | e.g. \`"@PentagonPress"\` |
 | \`displayName\` | string | e.g. \`"Pentagon Press Secretary"\` |
 | \`content\` | string | Full post text |
@@ -451,12 +452,21 @@ Cascades to sources and actor responses.
 
 **Optional:** \`verified\`, \`likes\`, \`retweets\`, \`replies\`, \`views\`, \`pharosNote\`, \`eventId\`, \`actorId\`
 
+**\`postType\` rules:**
+- \`XPOST\` — an actual tweet posted on X/Twitter. **\`tweetId\` is required** — provide a realistic 19-digit numeric string (e.g. \`"1894731234567890123"\`).
+- \`NEWS_ARTICLE\` — news wire/media headline (Reuters, AP, BBC, CNN, etc.)
+- \`OFFICIAL_STATEMENT\` — formal statement from a government, military, or official body
+- \`PRESS_RELEASE\` — formal press release
+- \`ANALYSIS\` — analyst commentary, thread, or assessment (@ISWResearch, @ArmsControlWonk, etc.)
+
 ⚠️ \`accountType\` is **lowercase** — the only enum in the system that is. All others are UPPERCASE.
 
-**Example:**
+**Example (X post):**
 \`\`\`json
 {
   "id": "xp-@PentagonPress-2026-03-03-02",
+  "postType": "XPOST",
+  "tweetId": "1894731200567890111",
   "handle": "@PentagonPress",
   "displayName": "Pentagon Press Secretary",
   "content": "CENTCOM: monitoring increased IRGC Navy activity in the Strait of Hormuz.",
@@ -468,6 +478,23 @@ Cascades to sources and actor responses.
   "views": 890000,
   "eventId": "evt-2026-03-03-hormuz-naval-001",
   "actorId": "us"
+}
+\`\`\`
+
+**Example (news article):**
+\`\`\`json
+{
+  "id": "xp-@Reuters-2026-03-03-05",
+  "postType": "NEWS_ARTICLE",
+  "handle": "@Reuters",
+  "displayName": "Reuters",
+  "content": "BREAKING: Israeli aircraft strike Fordow nuclear facility. IAEA inspectors denied access.",
+  "accountType": "journalist",
+  "significance": "BREAKING",
+  "timestamp": "2026-03-03T08:30:00.000Z",
+  "verified": true,
+  "likes": 45000,
+  "views": 3200000
 }
 \`\`\`
 

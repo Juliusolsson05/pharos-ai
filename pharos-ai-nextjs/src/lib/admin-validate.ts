@@ -20,6 +20,8 @@ export const INSTALLATION_STATUSES = ['ACTIVE', 'DEGRADED', 'STRUCK', 'DAMAGED',
 // ─── Story enums ──────────────────────────────────────────────────────────────
 
 /** Valid iconName values — must exactly match StoryIcon.tsx ICON_MAP keys */
+export const POST_TYPES = ['XPOST', 'NEWS_ARTICLE', 'OFFICIAL_STATEMENT', 'PRESS_RELEASE', 'ANALYSIS'] as const;
+
 export const STORY_ICON_NAMES = [
   'Plane', 'Radiation', 'Anchor', 'Crosshair', 'Ship', 'Skull',
   'Zap', 'Target', 'Swords', 'Shield', 'Flame', 'AlertTriangle', 'Building2',

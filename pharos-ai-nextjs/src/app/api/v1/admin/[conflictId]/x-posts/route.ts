@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { ok, err } from '@/lib/api-utils';
 import { requireAdmin } from '@/lib/admin-auth';
-import { assertRequired, assertEnum, parseISODate, safeJson } from '@/lib/admin-validate';
+import { assertRequired, assertEnum, parseISODate, safeJson, POST_TYPES } from '@/lib/admin-validate';
 import { checkXPostEnforcement } from '@/lib/enforcement';
 import { isEnforcementMode, enforcementResponse } from '@/lib/enforcement-utils';
-import { SignificanceLevel, AccountType } from '@/generated/prisma/client';
+import { SignificanceLevel, AccountType, PostType } from '@/generated/prisma/client';
 
 const SIGNIFICANCE_LEVELS = Object.values(SignificanceLevel);
 const ACCOUNT_TYPES = Object.values(AccountType);
+const POST_TYPE_VALUES = Object.values(PostType);
 
 export async function POST(
   req: NextRequest,
@@ -31,6 +32,16 @@ export async function POST(
 
   const accErr = assertEnum(body.accountType, ACCOUNT_TYPES, 'accountType');
   if (accErr) return err('VALIDATION', accErr);
+
+  // postType validation — default XPOST
+  const postType: PostType = body.postType ?? 'XPOST';
+  const ptErr = assertEnum(postType, POST_TYPE_VALUES, 'postType');
+  if (ptErr) return err('VALIDATION', ptErr);
+
+  // tweetId required when postType = XPOST
+  if (postType === PostType.XPOST && !body.tweetId) {
+    return err('VALIDATION', 'tweetId is required when postType is XPOST. Provide a realistic numeric ID string (e.g. "1894731234567890123").');
+  }
 
   const ts = parseISODate(body.timestamp, 'timestamp');
   if (typeof ts === 'string') return err('VALIDATION', ts);
@@ -61,24 +72,26 @@ export async function POST(
     data: {
       id: body.id,
       conflictId,
-      handle: body.handle,
+      tweetId:     body.tweetId    ?? null,
+      postType,
+      handle:      body.handle,
       displayName: body.displayName,
-      avatar: body.avatar ?? '',
+      avatar:      body.avatar     ?? '',
       avatarColor: body.avatarColor ?? '#6B7280',
-      verified: body.verified ?? false,
+      verified:    body.verified   ?? false,
       accountType: body.accountType,
       significance: body.significance,
-      timestamp: ts,
-      content: body.content,
-      images: body.images ?? [],
-      videoThumb: body.videoThumb ?? null,
-      likes: body.likes ?? 0,
-      retweets: body.retweets ?? 0,
-      replies: body.replies ?? 0,
-      views: body.views ?? 0,
-      pharosNote: body.pharosNote ?? null,
-      eventId: body.eventId ?? null,
-      actorId: body.actorId ?? null,
+      timestamp:   ts,
+      content:     body.content,
+      images:      body.images     ?? [],
+      videoThumb:  body.videoThumb ?? null,
+      likes:       body.likes      ?? 0,
+      retweets:    body.retweets   ?? 0,
+      replies:     body.replies    ?? 0,
+      views:       body.views      ?? 0,
+      pharosNote:  body.pharosNote ?? null,
+      eventId:     body.eventId    ?? null,
+      actorId:     body.actorId    ?? null,
     },
   });
 

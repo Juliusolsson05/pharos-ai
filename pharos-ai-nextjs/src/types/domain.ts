@@ -129,9 +129,12 @@ export interface IntelEvent {
 export type Significance = 'BREAKING' | 'HIGH' | 'STANDARD';
 export type AccountType = 'military' | 'government' | 'journalist' | 'analyst' | 'official';
 
+export type PostType = 'XPOST' | 'NEWS_ARTICLE' | 'OFFICIAL_STATEMENT' | 'PRESS_RELEASE' | 'ANALYSIS';
+
 export interface XPost {
   id: string;
   tweetId?: string;
+  postType?: PostType;
   handle: string;
   displayName: string;
   avatar: string;

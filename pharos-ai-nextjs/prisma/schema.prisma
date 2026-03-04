@@ -98,6 +98,14 @@ enum AccountType {
   official
 }
 
+enum PostType {
+  XPOST              // Actual tweet on X/Twitter — tweetId required
+  NEWS_ARTICLE       // News wire / media article / headline
+  OFFICIAL_STATEMENT // Government / military / org official statement
+  PRESS_RELEASE      // Formal press release
+  ANALYSIS           // Analyst commentary, thread, assessment
+}
+
 enum Perspective {
   WESTERN
   US_GOV
@@ -402,7 +410,8 @@ model EventActorResponse {
 model XPost {
   id           String           @id
   conflictId   String
-  tweetId      String?          @unique   // Real X/Twitter numeric ID for embeds
+  tweetId      String?          @unique   // Real X/Twitter numeric ID for embeds — required when postType = XPOST
+  postType     PostType         @default(XPOST)
   handle       String
   displayName  String
   avatar       String
