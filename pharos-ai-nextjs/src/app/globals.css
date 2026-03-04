@@ -322,4 +322,9 @@
       min-height: 40px;
     }
   }
+
+  /* Landscape phone: hide app header for full-screen map */
+  @media (max-height: 500px) and (orientation: landscape) and (pointer: coarse) {
+    header { display: none !important; }
+  }
 }
