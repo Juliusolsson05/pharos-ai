@@ -103,7 +103,7 @@ export function FeedContent() {
               </div>
             )}
 
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               <EventLog
                 events={filtered}
                 selectedId={selId}
