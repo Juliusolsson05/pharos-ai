@@ -27,7 +27,8 @@ export function Header() {
   const isMobile = useIsMobile();
   const isLandscapePhone = useIsLandscapePhone();
   const isLandscapeNonMap = isLandscapePhone && !path.startsWith('/dashboard/map');
-  const showLandscapeHeader = useLandscapeHeaderVisibility(isLandscapeNonMap, path);
+  const landscapeAutoHideEnabled = isLandscapeNonMap && path !== '/dashboard' && path !== '/dashboard/data';
+  const showLandscapeHeader = useLandscapeHeaderVisibility(landscapeAutoHideEnabled, path);
 
   if (isLandscapeNonMap && !showLandscapeHeader) return null;
 
@@ -54,7 +55,7 @@ export function Header() {
     >
       {/* Mobile header */}
       {isMobile && (
-        <div className="flex flex-col">
+        <div className="flex flex-col pt-[var(--safe-top)]">
           <div
             className={`${isLandscapeNonMap ? 'h-9 px-2.5' : 'h-11 px-2'} flex items-center justify-between gap-2 border-b border-[var(--bd)]`}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
