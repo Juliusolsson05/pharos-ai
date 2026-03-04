@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import type { FeedItem } from '@/types/domain';
 import { useRssFeeds, useRssCollections } from '@/api/rss';
-import { clientCache, CLIENT_FRESH_TTL, type CachedFeed } from '@/lib/client-cache';
+import { clientCache, CLIENT_FRESH_TTL } from '@/lib/client-cache';
 import { ConflictBanner } from '@/components/news/ConflictBanner';
 import { ChannelView } from '@/components/news/ChannelView';
 import { AllFeedsView } from '@/components/news/AllFeedsView';
