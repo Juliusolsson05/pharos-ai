@@ -8,10 +8,10 @@ import { Button } from '@/components/ui/button';
 import DatasetDrilldown from '@/features/map/components/DatasetDrilldown';
 
 import { LAYER_DISPLAY } from '@/data/map-tokens';
-import { ALL_DATASETS, DATASET_LABEL } from '@/hooks/use-map-filters';
+import { ALL_DATASETS, DATASET_LABEL } from '@/features/map/hooks/use-map-filters';
 
 import type { FilterFacets, FilterState } from '@/features/map/lib/map-filter-engine';
-import type { DatasetName } from '@/hooks/use-map-filters';
+import type { DatasetName } from '@/features/map/hooks/use-map-filters';
 
 type Props = {
   state: FilterState; facets: FilterFacets; isFiltered: boolean;

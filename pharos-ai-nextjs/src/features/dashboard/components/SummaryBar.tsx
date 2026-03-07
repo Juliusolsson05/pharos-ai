@@ -3,7 +3,7 @@
 import { fmtDate }  from '@/shared/lib/format';
 import { useConflict } from '@/features/dashboard/queries/conflicts';
 import { useEvents } from '@/features/events/queries';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function SummaryBar() {

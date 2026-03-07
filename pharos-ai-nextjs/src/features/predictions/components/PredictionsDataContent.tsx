@@ -7,8 +7,8 @@ import { MarketCard } from '@/features/predictions/components/MarketCard';
 import { FocusedMarket } from '@/features/predictions/components/FocusedMarket';
 import { MARKET_GROUPS, UNCATEGORIZED_GROUP, assignGroup } from '@/data/prediction-groups';
 import { fmtVol, getLeadProb } from '@/features/predictions/components/utils';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 import type { PredictionMarket } from '@/types/domain';
 
 const ALL_GROUPS = [...MARKET_GROUPS, UNCATEGORIZED_GROUP];

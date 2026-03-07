@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 
 import TimelineTrack from '@/features/map/components/TimelineTrack';
-import { useTimelineDrag } from '@/hooks/use-timeline-drag';
+import { useTimelineDrag } from '@/features/map/hooks/use-timeline-drag';
 
 import type { DataArrays } from '@/features/map/lib/map-filter-engine';
 

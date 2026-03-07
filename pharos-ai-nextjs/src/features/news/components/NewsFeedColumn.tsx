@@ -4,8 +4,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import type { RssFeed, FeedItem, FeedResult } from '@/types/domain';
 import { timeAgo } from '@/shared/lib/format';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 
 type NewsFeedColumnProps = {
   feed: RssFeed;

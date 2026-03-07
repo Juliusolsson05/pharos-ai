@@ -2,11 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { usePanelLayout } from '@/hooks/use-panel-layout';
-import { useConflictDay } from '@/hooks/use-conflict-day';
-import { useIsMobile } from '@/hooks/use-is-mobile';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
+import { usePanelLayout } from '@/shared/hooks/use-panel-layout';
+import { useConflictDay } from '@/shared/hooks/use-conflict-day';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { XPost } from '@/types/domain';

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { DaySelector } from '@/shared/components/shared/DaySelector';
 
-import { useAppSelector, useAppDispatch } from '@/store';
+import { useAppSelector, useAppDispatch } from '@/shared/state';
 import {
   applyPreset,
   addWidget as addWidgetAction,
@@ -19,12 +19,12 @@ import {
   resetToPreset,
   setColumnSizes,
   setRowSizes,
-} from '@/store/workspace-slice';
-import { ALL_WIDGET_KEYS, WIDGET_LABELS, PRESETS, type WidgetKey } from '@/store/presets';
+} from '@/features/dashboard/state/workspace-slice';
+import { ALL_WIDGET_KEYS, WIDGET_LABELS, PRESETS, type WidgetKey } from '@/features/dashboard/state/presets';
 
 import { useBootstrap } from '@/features/dashboard/queries';
-import { useIsMobile } from '@/hooks/use-is-mobile';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useConflict, useConflictDays } from '@/features/dashboard/queries/conflicts';
 import { useEvents } from '@/features/events/queries';
 import { useActors } from '@/features/actors/queries';

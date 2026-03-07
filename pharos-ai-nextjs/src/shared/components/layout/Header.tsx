@@ -5,9 +5,9 @@ import { fmtDate }    from '@/shared/lib/format';
 import { useBootstrap } from '@/features/dashboard/queries';
 import { useEvents } from '@/features/events/queries';
 import { useConflict } from '@/features/dashboard/queries/conflicts';
-import { useIsMobile } from '@/hooks/use-is-mobile';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeHeaderVisibility } from '@/hooks/use-landscape-header-visibility';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeHeaderVisibility } from '@/shared/hooks/use-landscape-header-visibility';
 
 const NAV = [
   { label: 'OVERVIEW',    href: '/dashboard'              },

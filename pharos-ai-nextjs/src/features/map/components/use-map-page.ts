@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { useAppSelector, useAppDispatch } from '@/store';
+import { useAppSelector, useAppDispatch } from '@/shared/state';
 import {
   setViewState    as setViewStateAction,
   activateStory   as activateStoryAction,
@@ -11,10 +11,10 @@ import {
   toggleSidebar   as toggleSidebarAction,
   setSidebarOpen  as setSidebarOpenAction,
   setMapStyle     as setMapStyleAction,
-} from '@/store/map-slice';
+} from '@/features/map/state/map-slice';
 import { useMapStories } from '@/features/map/queries';
-import { useMapFilters } from '@/hooks/use-map-filters';
-import { useMapLayers } from '@/hooks/use-map-layers';
+import { useMapFilters } from '@/features/map/hooks/use-map-filters';
+import { useMapLayers } from '@/features/map/hooks/use-map-layers';
 import { createBuildTooltip } from '@/features/map/lib/map-tooltip';
 
 import type { MapViewState, PickingInfo } from '@deck.gl/core';

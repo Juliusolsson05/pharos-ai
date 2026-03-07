@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import type { ConflictCollection } from '@/types/domain';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 
 type ConflictBannerProps = {
   collection: ConflictCollection;

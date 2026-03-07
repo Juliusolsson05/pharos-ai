@@ -3,8 +3,8 @@
 import { useRssFeeds } from '@/features/news/queries';
 import type { ConflictChannel, FeedItem } from '@/types/domain';
 import { NewsFeedColumn } from './NewsFeedColumn';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
 type ChannelViewProps = {
   channel: ConflictChannel;

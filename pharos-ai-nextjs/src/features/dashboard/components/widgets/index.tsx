@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { WidgetKey } from '@/store/presets';
+import type { WidgetKey } from '@/features/dashboard/state/presets';
 
 import { SituationWidget } from './SituationWidget';
 import { LatestEventsWidget } from './LatestEventsWidget';

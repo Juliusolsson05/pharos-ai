@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { NewsFeedColumn } from './NewsFeedColumn';
 import { useRssFeeds } from '@/features/news/queries';
 import { PERSPECTIVE_COLORS } from '@/features/news/lib/news-colors';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import type { FeedItem } from '@/types/domain';
 
 const PERSPECTIVES = ['ALL', 'WESTERN', 'US_GOV', 'ISRAELI', 'IRANIAN', 'ARAB', 'RUSSIAN', 'CHINESE', 'INDEPENDENT'] as const;

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 
 const DATA_SOURCES = [
   {

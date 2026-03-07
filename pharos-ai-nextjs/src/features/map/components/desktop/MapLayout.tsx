@@ -16,7 +16,7 @@ import MapFilterPanel    from '@/features/map/components/MapFilterPanel';
 import MapTimeline       from '@/features/map/components/MapTimeline';
 import MapVisibilityMenu from '@/features/map/components/MapVisibilityMenu';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { usePanelLayout } from '@/hooks/use-panel-layout';
+import { usePanelLayout } from '@/shared/hooks/use-panel-layout';
 
 import type { MapPageContext } from '@/features/map/components/use-map-page';
 import { FlyToInterpolator } from '@deck.gl/core';

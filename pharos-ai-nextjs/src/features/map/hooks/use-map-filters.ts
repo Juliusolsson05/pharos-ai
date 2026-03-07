@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useCallback } from 'react';
 
-import { useAppSelector, useAppDispatch } from '@/store';
+import { useAppSelector, useAppDispatch } from '@/shared/state';
 import {
   initializeFilters as initializeFiltersAction,
   toggleDataset  as toggleDatasetAction,
@@ -13,8 +13,8 @@ import {
   setViewExtent  as setViewExtentAction,
   resetFilters   as resetFiltersAction,
   toSerializable,
-} from '@/store/map-slice';
-import { selectFilterState, selectIsFiltered } from '@/store/map-selectors';
+} from '@/features/map/state/map-slice';
+import { selectFilterState, selectIsFiltered } from '@/features/map/state/map-selectors';
 
 import { useMapData } from '@/features/map/queries';
 import { applyFilters, extractInitialState, extractTimeExtent } from '@/features/map/lib/map-filter-engine';

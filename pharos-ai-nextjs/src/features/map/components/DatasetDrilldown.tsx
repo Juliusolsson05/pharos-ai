@@ -1,7 +1,7 @@
 'use client';
 
 import FilterSection from '@/features/map/components/FilterSection';
-import { DATASET_LABEL } from '@/hooks/use-map-filters';
+import { DATASET_LABEL } from '@/features/map/hooks/use-map-filters';
 
 import type { DatasetFacets, FilterState } from '@/features/map/lib/map-filter-engine';
 

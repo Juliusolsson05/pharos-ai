@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
-import { useIsMobile } from '@/hooks/use-is-mobile';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useMapPage } from '@/features/map/components/use-map-page';
 import { MapScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 

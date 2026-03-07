@@ -4,7 +4,7 @@ import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRssFeeds } from '@/features/news/queries';
 import type { RssFeed, FeedItem } from '@/types/domain';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 
 // ─── Types ────────────────────────────────────────────────────
 

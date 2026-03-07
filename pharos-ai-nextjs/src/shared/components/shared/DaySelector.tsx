@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { DayPickerDropdown } from '@/shared/components/shared/DayPickerDropdown';
 import { dayLabel, dayShort } from '@/shared/lib/day-filter';
-import { useConflictDay } from '@/hooks/use-conflict-day';
+import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useEvents } from '@/features/events/queries';
 import { useConflictDays } from '@/features/dashboard/queries/conflicts';
 

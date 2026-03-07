@@ -12,7 +12,7 @@ import workspaceReducer, {
   setColumnSizes,
   setRowSizes,
   type WorkspaceState,
-} from './workspace-slice';
+} from '@/features/dashboard/state/workspace-slice';
 import mapReducer, {
   toggleDataset,
   toggleType,
@@ -25,8 +25,8 @@ import mapReducer, {
   toggleSidebar,
   setMapStyle,
   persistMapPrefs,
-} from './map-slice';
-import type { Column } from './presets';
+} from '@/features/map/state/map-slice';
+import type { Column } from '@/features/dashboard/state/presets';
 
 // ─── localStorage persistence ───────────────────────────────────────────────
 

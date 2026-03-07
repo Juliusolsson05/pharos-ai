@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { LANDSCAPE_SCROLL_EVENT } from '@/hooks/use-landscape-scroll-emitter';
+import { LANDSCAPE_SCROLL_EVENT } from '@/shared/hooks/use-landscape-scroll-emitter';
 
 const UP_THRESHOLD = 22;
 const DOWN_THRESHOLD = 14;

@@ -5,12 +5,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Flag from '@/shared/components/shared/Flag';
 import { DaySelector } from '@/shared/components/shared/DaySelector';
 import { BriefSection, EconChip, ScenarioCard } from '@/features/brief/components/BriefSection';
-import { useConflictDay } from '@/hooks/use-conflict-day';
+import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useConflictDaySnapshot } from '@/features/dashboard/queries/conflicts';
 import { useActors } from '@/features/actors/queries';
 import { BRIEF_SOURCES, TIER_C } from '@/features/brief/components/brief-constants';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 import { BriefScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 
 const MAJOR_IDS = ['us', 'idf', 'iran', 'irgc', 'houthis'];

@@ -14,9 +14,9 @@ import { MarketCard } from '@/features/predictions/components/MarketCard';
 import { FocusedMarket } from '@/features/predictions/components/FocusedMarket';
 import { assignGroup, MARKET_GROUPS, UNCATEGORIZED_GROUP } from '@/data/prediction-groups';
 import { fmtVol, getLeadProb, COL } from '@/features/predictions/components/utils';
-import { useIsMobile } from '@/hooks/use-is-mobile';
-import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 import type { PredictionMarket } from '@/types/domain';
 
 const SORT_OPTS = [
