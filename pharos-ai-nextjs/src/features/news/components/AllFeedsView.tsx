@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { NewsFeedColumn } from './NewsFeedColumn';
-import { useRssFeeds } from '@/api/rss';
+import { useRssFeeds } from '@/features/news/queries';
 import { PERSPECTIVE_COLORS } from '@/features/news/lib/news-colors';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import type { FeedItem } from '@/types/domain';

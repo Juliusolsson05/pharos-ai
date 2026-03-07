@@ -12,7 +12,7 @@ import {
   setSidebarOpen  as setSidebarOpenAction,
   setMapStyle     as setMapStyleAction,
 } from '@/store/map-slice';
-import { useMapStories } from '@/api/map';
+import { useMapStories } from '@/features/map/queries';
 import { useMapFilters } from '@/hooks/use-map-filters';
 import { useMapLayers } from '@/hooks/use-map-layers';
 import { createBuildTooltip } from '@/features/map/lib/map-tooltip';

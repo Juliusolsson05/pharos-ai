@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 import { dayLabel, dayShort, dayIndex } from '@/shared/lib/day-filter';
-import { useBootstrap } from '@/api/bootstrap';
+import { useBootstrap } from '@/features/dashboard/queries';
 
 export function useConflictDay() {
   const searchParams = useSearchParams();

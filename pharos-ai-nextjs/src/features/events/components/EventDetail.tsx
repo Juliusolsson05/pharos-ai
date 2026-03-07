@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { IntelTabBar, TabsContent } from '@/shared/components/shared/IntelTabs';
 import { SectionDivider } from '@/shared/components/shared/SectionDivider';
 import XPostCard from '@/shared/components/shared/XPostCard';
-import { useXPostsByEvent } from '@/api/x-posts';
+import { useXPostsByEvent } from '@/features/events/queries/x-posts';
 import type { IntelEvent, XPost } from '@/types/domain';
 import { SEV_C } from '@/shared/lib/severity-colors';
 import { cn } from '@/shared/lib/utils';

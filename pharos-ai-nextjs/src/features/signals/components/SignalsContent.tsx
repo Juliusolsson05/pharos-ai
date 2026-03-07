@@ -10,7 +10,7 @@ import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter'
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { XPost } from '@/types/domain';
-import { useXPosts } from '@/api/x-posts';
+import { useXPosts } from '@/features/events/queries/x-posts';
 import XPostCard from '@/shared/components/shared/XPostCard';
 import { SignalFilterRail, type Significance, type AccountType } from '@/features/signals/components/SignalFilterRail';
 import { SectionHeader } from '@/features/signals/components/SectionHeader';

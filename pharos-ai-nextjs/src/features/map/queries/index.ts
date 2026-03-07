@@ -6,8 +6,8 @@ import type { StrikeArc, MissileTrack, Target, Asset, ThreatZone, HeatPoint } fr
 import type { DataArrays } from '@/features/map/lib/map-filter-engine';
 import type { ActorMeta } from '@/data/map-tokens';
 
-import { api } from '../client';
-import { queryKeys } from '../keys';
+import { api } from '@/shared/lib/query/client';
+import { queryKeys } from '@/shared/lib/query/keys';
 
 const CONFLICT_ID = publicConflictId;
 

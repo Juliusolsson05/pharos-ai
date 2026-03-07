@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 
-import { useMapData, useMapStories } from '@/api/map';
+import { useMapData, useMapStories } from '@/features/map/queries';
 
 import { CATEGORY_LABEL, STATUS_META } from '@/data/map-tokens';
 import { fmtDate, fmtTimeZ } from '@/shared/lib/format';

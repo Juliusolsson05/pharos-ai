@@ -1,8 +1,8 @@
 'use client';
 
 import { fmtDate }  from '@/shared/lib/format';
-import { useConflict } from '@/api/conflicts';
-import { useEvents } from '@/api/events';
+import { useConflict } from '@/features/dashboard/queries/conflicts';
+import { useEvents } from '@/features/events/queries';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { Skeleton } from '@/components/ui/skeleton';
 

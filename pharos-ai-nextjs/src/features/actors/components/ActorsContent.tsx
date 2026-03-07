@@ -6,7 +6,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { usePanelLayout } from '@/hooks/use-panel-layout';
 import { useConflictDay } from '@/hooks/use-conflict-day';
-import { useActor, useActors } from '@/api/actors';
+import { useActor, useActors } from '@/features/actors/queries';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';

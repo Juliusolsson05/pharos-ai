@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { IndexCard } from '@/features/economics/components/IndexCard';
 import { FocusedChart } from '@/features/economics/components/FocusedChart';
 import { ECON_CATEGORIES } from '@/data/economic-indexes';
-import { useEconomicIndexes } from '@/api/economics';
+import { useEconomicIndexes } from '@/features/economics/queries';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
 import type { EconCategory, EconomicIndex, MarketResult } from '@/types/domain';

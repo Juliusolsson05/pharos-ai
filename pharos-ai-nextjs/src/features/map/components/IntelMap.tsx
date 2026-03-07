@@ -12,7 +12,7 @@ import type { PickingInfo } from '@deck.gl/core';
 import type { MapViewState } from '@deck.gl/core';
 
 import { Button } from '@/components/ui/button';
-import { useMapData } from '@/api/map';
+import { useMapData } from '@/features/map/queries';
 
 import type {
   StrikeArc,

@@ -10,12 +10,12 @@ import { getConflictForDay, getEventsForDay, getPostsForDay } from '@/shared/lib
 import { CasChip } from '@/features/dashboard/components/CasChip';
 import XPostCard from '@/shared/components/shared/XPostCard';
 
-import { useBootstrap } from '@/api/bootstrap';
-import { useConflictDays } from '@/api/conflicts';
-import { useEvents } from '@/api/events';
-import { useActors } from '@/api/actors';
-import { useXPosts } from '@/api/x-posts';
-import { useMapStories } from '@/api/map';
+import { useBootstrap } from '@/features/dashboard/queries';
+import { useConflictDays } from '@/features/dashboard/queries/conflicts';
+import { useEvents } from '@/features/events/queries';
+import { useActors } from '@/features/actors/queries';
+import { useXPosts } from '@/features/events/queries/x-posts';
+import { useMapStories } from '@/features/map/queries';
 
 import type { XPost } from '@/types/domain';
 

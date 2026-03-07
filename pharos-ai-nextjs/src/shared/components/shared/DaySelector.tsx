@@ -7,8 +7,8 @@ import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { DayPickerDropdown } from '@/shared/components/shared/DayPickerDropdown';
 import { dayLabel, dayShort } from '@/shared/lib/day-filter';
 import { useConflictDay } from '@/hooks/use-conflict-day';
-import { useEvents } from '@/api/events';
-import { useConflictDays } from '@/api/conflicts';
+import { useEvents } from '@/features/events/queries';
+import { useConflictDays } from '@/features/dashboard/queries/conflicts';
 
 type Props = {
   currentDay: string;

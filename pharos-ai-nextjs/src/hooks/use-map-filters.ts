@@ -16,7 +16,7 @@ import {
 } from '@/store/map-slice';
 import { selectFilterState, selectIsFiltered } from '@/store/map-selectors';
 
-import { useMapData } from '@/api/map';
+import { useMapData } from '@/features/map/queries';
 import { applyFilters, extractInitialState, extractTimeExtent } from '@/features/map/lib/map-filter-engine';
 
 import type { ActorMeta } from '@/data/map-tokens';

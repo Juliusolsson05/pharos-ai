@@ -2,9 +2,9 @@
 import Link           from 'next/link';
 import { usePathname } from 'next/navigation';
 import { fmtDate }    from '@/shared/lib/format';
-import { useBootstrap } from '@/api/bootstrap';
-import { useEvents } from '@/api/events';
-import { useConflict } from '@/api/conflicts';
+import { useBootstrap } from '@/features/dashboard/queries';
+import { useEvents } from '@/features/events/queries';
+import { useConflict } from '@/features/dashboard/queries/conflicts';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useLandscapeHeaderVisibility } from '@/hooks/use-landscape-header-visibility';

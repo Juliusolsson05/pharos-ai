@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { NewsTimeline } from '@/features/news/components/NewsTimeline';
-import { useRssFeeds } from '@/api/rss';
+import { useRssFeeds } from '@/features/news/queries';
 import { PERSPECTIVE_COLORS } from '@/features/news/lib/news-colors';
 import { timeAgo } from '@/shared/lib/format';
 import { clientCache, CLIENT_FRESH_TTL } from '@/features/news/lib/client-cache';

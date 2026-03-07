@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { MarketGroup } from '@/types/domain';
-import { api } from '../client';
-import { queryKeys } from '../keys';
+import { api } from '@/shared/lib/query/client';
+import { queryKeys } from '@/shared/lib/query/keys';
 
 export function usePredictionGroups() {
   return useQuery({

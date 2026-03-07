@@ -2,7 +2,7 @@
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionDivider } from '@/shared/components/shared/SectionDivider';
-import { useMilitarySpending, type MilSpendPoint } from '@/api/world-bank';
+import { useMilitarySpending, type MilSpendPoint } from '@/features/actors/queries/world-bank';
 import type { Actor } from '@/types/domain';
 
 type Props = {

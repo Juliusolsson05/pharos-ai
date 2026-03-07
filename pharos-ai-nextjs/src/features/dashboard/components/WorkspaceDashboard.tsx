@@ -22,13 +22,13 @@ import {
 } from '@/store/workspace-slice';
 import { ALL_WIDGET_KEYS, WIDGET_LABELS, PRESETS, type WidgetKey } from '@/store/presets';
 
-import { useBootstrap } from '@/api/bootstrap';
+import { useBootstrap } from '@/features/dashboard/queries';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
-import { useConflict, useConflictDays } from '@/api/conflicts';
-import { useEvents } from '@/api/events';
-import { useActors } from '@/api/actors';
-import { useXPosts } from '@/api/x-posts';
+import { useConflict, useConflictDays } from '@/features/dashboard/queries/conflicts';
+import { useEvents } from '@/features/events/queries';
+import { useActors } from '@/features/actors/queries';
+import { useXPosts } from '@/features/events/queries/x-posts';
 import { MobileOverviewSkeleton, OverviewScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 
 import { MobileOverview } from './MobileOverview';

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ConflictBanner } from '@/features/news/components/ConflictBanner';
 import { ChannelView } from '@/features/news/components/ChannelView';
 import { AllFeedsView } from '@/features/news/components/AllFeedsView';
-import { useRssFeeds, useRssCollections } from '@/api/rss';
+import { useRssFeeds, useRssCollections } from '@/features/news/queries';
 import { clientCache, CLIENT_FRESH_TTL } from '@/features/news/lib/client-cache';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';

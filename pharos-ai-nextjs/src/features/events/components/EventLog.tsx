@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/shared/lib/utils';
 import type { IntelEvent } from '@/types/domain';
-import { useXPosts } from '@/api/x-posts';
+import { useXPosts } from '@/features/events/queries/x-posts';
 import { SEV_C } from '@/shared/lib/severity-colors';
 const SEV_BG: Record<string, string> = {
   CRITICAL: 'var(--danger-dim)', HIGH: 'var(--warning-dim)', STANDARD: 'var(--info-dim)',

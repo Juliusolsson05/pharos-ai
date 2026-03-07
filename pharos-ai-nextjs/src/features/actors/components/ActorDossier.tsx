@@ -9,7 +9,7 @@ import { ActorMilitaryTab } from '@/features/actors/components/ActorMilitaryTab'
 import { ACT_C, STA_C } from '@/data/iran-actors';
 import { ISO2_TO_ISO3 } from '@/features/actors/lib/country-codes';
 import { getActorForDay, dayAbbrev } from '@/shared/lib/day-filter';
-import { useXPostsByActor } from '@/api/x-posts';
+import { useXPostsByActor } from '@/features/events/queries/x-posts';
 import { useConflictDay } from '@/hooks/use-conflict-day';
 import type { Actor, XPost } from '@/types/domain';
 import { cn } from '@/shared/lib/utils';

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { fmtDate, fmtTimeZ } from '@/shared/lib/format';
 import StoryIcon from './StoryIcon';
-import { useMapData } from '@/api/map';
+import { useMapData } from '@/features/map/queries';
 
 import type { StrikeArc, MissileTrack, Target, Asset } from '@/data/map-data';
 import type { MapStory, StoryEvent } from '@/types/domain';

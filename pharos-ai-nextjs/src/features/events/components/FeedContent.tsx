@@ -10,7 +10,7 @@ import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
 import type { Severity, EventType } from '@/types/domain';
-import { useEvent, useEvents } from '@/api/events';
+import { useEvent, useEvents } from '@/features/events/queries';
 import { FeedFilterRail, ALL_TYPES } from '@/features/events/components/FeedFilterRail';
 import { EventLog } from '@/features/events/components/EventLog';
 import { EventDetail } from '@/features/events/components/EventDetail';

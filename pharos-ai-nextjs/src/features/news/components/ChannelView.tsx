@@ -1,6 +1,6 @@
 'use client';
 
-import { useRssFeeds } from '@/api/rss';
+import { useRssFeeds } from '@/features/news/queries';
 import type { ConflictChannel, FeedItem } from '@/types/domain';
 import { NewsFeedColumn } from './NewsFeedColumn';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';

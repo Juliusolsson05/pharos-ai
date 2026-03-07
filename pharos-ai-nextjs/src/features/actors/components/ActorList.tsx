@@ -10,8 +10,8 @@ import { DaySelector } from '@/shared/components/shared/DaySelector';
 import { ACT_C, STA_C } from '@/data/iran-actors';
 import { getActorForDay } from '@/shared/lib/day-filter';
 import type { Actor, ConflictDay } from '@/types/domain';
-import { useActors } from '@/api/actors';
-import { useXPosts } from '@/api/x-posts';
+import { useActors } from '@/features/actors/queries';
+import { useXPosts } from '@/features/events/queries/x-posts';
 import { cn } from '@/shared/lib/utils';
 
 type Props = {
