@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+
+import { publicConflictId } from '@/lib/env';
 import type { RssFeed, ConflictCollection } from '@/types/domain';
+
 import { api, buildUrl } from '../client';
 import { queryKeys } from '../keys';
 
-const CONFLICT_ID = process.env.NEXT_PUBLIC_CONFLICT_ID!;
+const CONFLICT_ID = publicConflictId;
 
 export function useRssFeeds() {
   return useQuery({

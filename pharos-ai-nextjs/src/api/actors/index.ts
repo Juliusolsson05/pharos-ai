@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+
+import { publicConflictId } from '@/lib/env';
 import type { Actor } from '@/types/domain';
+
 import { api, buildUrl } from '../client';
 import { queryKeys } from '../keys';
 
-const CONFLICT_ID = process.env.NEXT_PUBLIC_CONFLICT_ID!;
+const CONFLICT_ID = publicConflictId;
 
 export function useActors(id: string = CONFLICT_ID, day?: string) {
   return useQuery({

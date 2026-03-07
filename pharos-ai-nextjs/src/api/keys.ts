@@ -1,4 +1,6 @@
-const CONFLICT_ID = process.env.NEXT_PUBLIC_CONFLICT_ID!;
+import { publicConflictId } from '@/lib/env';
+
+const CONFLICT_ID = publicConflictId;
 
 export const queryKeys = {
   bootstrap: {
