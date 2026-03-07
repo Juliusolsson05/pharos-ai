@@ -7,14 +7,14 @@ export interface TabItem<T extends string> {
   label: string;
 }
 
-interface IntelTabsProps<T extends string> {
+type IntelTabsProps<T extends string> = {
   value: T;
   onValueChange: (v: T) => void;
   tabs: TabItem<T>[];
   children: React.ReactNode;
   compact?: boolean;
   safeEdges?: boolean;
-}
+};
 
 export function IntelTabBar<T extends string>({
   value, onValueChange, tabs, children, compact = false, safeEdges = false,

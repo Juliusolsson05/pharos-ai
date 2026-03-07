@@ -5,12 +5,12 @@ import type { PredictionMarket, TimePoint, MarketGroup } from '@/types/domain';
 import { getLeadProb, probColor, fmtVol, fmtMarketDate, statusLabel } from './utils';
 import { ProbChart } from './ProbChart';
 
-interface MarketCardProps {
+type MarketCardProps = {
   market: PredictionMarket;
   group: MarketGroup;
   rank: number;
   onFocus: () => void;
-}
+};
 
 export function MarketCard({ market, group, rank, onFocus }: MarketCardProps) {
   const [history, setHistory] = useState<TimePoint[]>([]);

@@ -16,12 +16,12 @@ const RANGES = [
   { key: '5y',  label: '5Y',  interval: '1mo' },
 ] as const;
 
-interface FocusedChartProps {
+type FocusedChartProps = {
   index: EconomicIndex;
   data: MarketResult;        // initial data (from page's current range)
   initialRangeKey?: string;  // which range the page is currently on
   onClose: () => void;
-}
+};
 
 function fmtPrice(v: number, unit: string): string {
   const formatted = v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });

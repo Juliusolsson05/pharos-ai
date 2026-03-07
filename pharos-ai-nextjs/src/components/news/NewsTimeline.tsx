@@ -8,7 +8,7 @@ import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 
 // ─── Types ────────────────────────────────────────────────────
 
-interface TimelineArticle {
+type TimelineArticle = {
   id: string;
   title: string;
   link: string;
@@ -16,11 +16,11 @@ interface TimelineArticle {
   time: Date;
   feed: RssFeed;
   imageUrl?: string;
-}
+};
 
-interface NewsTimelineProps {
+type NewsTimelineProps = {
   feedData: Map<string, FeedItem[]>;
-}
+};
 
 // ─── Colors ───────────────────────────────────────────────────
 

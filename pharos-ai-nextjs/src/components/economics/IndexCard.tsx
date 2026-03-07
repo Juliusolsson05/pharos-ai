@@ -5,12 +5,12 @@ import type { MarketResult } from '@/types/domain';
 import { ECON_CATEGORY_MAP } from '@/data/economic-indexes';
 import { MiniChart } from './MiniChart';
 
-interface IndexCardProps {
+type IndexCardProps = {
   index: EconomicIndex;
   data?: MarketResult;
   loading: boolean;
   onFocus: () => void;
-}
+};
 
 export function IndexCard({ index, data, loading, onFocus }: IndexCardProps) {
   const cat = ECON_CATEGORY_MAP[index.category];

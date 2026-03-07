@@ -3,12 +3,12 @@
 import { useEffect, useRef } from 'react';
 import { createChart, type IChartApi, type UTCTimestamp, ColorType, LineStyle, AreaSeries } from 'lightweight-charts';
 
-interface MiniChartProps {
+type MiniChartProps = {
   data: { time: number; value: number }[];
   color: string;
   positive: boolean;
   height?: number;
-}
+};
 
 export function MiniChart({ data, color, positive, height = 80 }: MiniChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);

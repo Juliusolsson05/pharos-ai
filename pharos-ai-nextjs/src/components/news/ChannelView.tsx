@@ -6,11 +6,11 @@ import { NewsFeedColumn } from './NewsFeedColumn';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 
-interface ChannelViewProps {
+type ChannelViewProps = {
   channel: ConflictChannel;
   showImages: boolean;
   feedData: Map<string, FeedItem[]>;
-}
+};
 
 export function ChannelView({ channel, showImages, feedData }: ChannelViewProps) {
   const { data: allFeeds } = useRssFeeds();

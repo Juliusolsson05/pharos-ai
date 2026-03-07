@@ -3,11 +3,11 @@
 import type { ConflictCollection } from '@/types/domain';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 
-interface ConflictBannerProps {
+type ConflictBannerProps = {
   collection: ConflictCollection;
   activeChannel: number;
   onChannelChange: (idx: number) => void;
-}
+};
 
 export function ConflictBanner({ collection, activeChannel, onChannelChange }: ConflictBannerProps) {
   const isLandscapePhone = useIsLandscapePhone();

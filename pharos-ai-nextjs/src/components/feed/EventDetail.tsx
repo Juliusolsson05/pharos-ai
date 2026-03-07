@@ -25,13 +25,13 @@ function MetaChip({ label, val }: { label: string; val: string }) {
   );
 }
 
-interface Props {
+type Props = {
   event: IntelEvent;
   tab: 'report' | 'signals';
   onTabChange: (t: 'report' | 'signals') => void;
   compact?: boolean;
   pageScroll?: boolean;
-}
+};
 
 export function EventDetail({ event, tab, onTabChange, compact = false, pageScroll = false }: Props) {
   const sc     = SEV_C[event.severity] ?? 'var(--info)';

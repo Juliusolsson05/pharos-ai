@@ -4,13 +4,13 @@ import { useEffect, useRef } from 'react';
 import { createChart, type IChartApi, type UTCTimestamp, ColorType, LineStyle, AreaSeries } from 'lightweight-charts';
 import type { TimePoint } from '@/types/domain';
 
-interface ProbChartProps {
+type ProbChartProps = {
   data: TimePoint[];
   color: string;
   height?: number;
   interactive?: boolean;
   onCrosshair?: (p: number | null) => void;
-}
+};
 
 function getSeriesValue(input: unknown): number | null {
   if (!input || typeof input !== 'object' || !('value' in input)) return null;

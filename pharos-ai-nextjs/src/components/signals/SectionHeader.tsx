@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-interface Props { label: string; count: number; color: string }
+type Props = { label: string; count: number; color: string };
 
 /** Coloured section divider used in the signals feed (BREAKING / HIGH / STANDARD). */
 export function SectionHeader({ label, count, color }: Props) {

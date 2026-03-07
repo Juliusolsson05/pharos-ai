@@ -1,10 +1,10 @@
 import type { LucideIcon } from 'lucide-react';
 
-interface EmptyStateProps {
+type EmptyStateProps = {
   icon?: LucideIcon;
   emoji?: string;
   message: string;
-}
+};
 
 /** Centered empty state with optional icon or emoji. */
 export function EmptyState({ icon: Icon, emoji, message }: EmptyStateProps) {

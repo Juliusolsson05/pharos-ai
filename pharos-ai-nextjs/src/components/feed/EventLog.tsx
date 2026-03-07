@@ -23,13 +23,13 @@ function groupByDate(events: IntelEvent[]) {
   return groups;
 }
 
-interface Props {
+type Props = {
   events: IntelEvent[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   compact?: boolean;
   pageScroll?: boolean;
-}
+};
 
 export function EventLog({ events, selectedId, onSelect, compact = false, pageScroll = false }: Props) {
   const { data: allPosts } = useXPosts();

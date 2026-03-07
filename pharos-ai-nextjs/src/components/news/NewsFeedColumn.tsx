@@ -7,13 +7,13 @@ import { timeAgo } from '@/lib/format';
 import { useIsLandscapePhone } from '@/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/hooks/use-landscape-scroll-emitter';
 
-interface NewsFeedColumnProps {
+type NewsFeedColumnProps = {
   feed: RssFeed;
   color: string;
   showImages?: boolean;
   /** Pre-loaded items from parent batch fetch */
   preloaded?: FeedItem[];
-}
+};
 
 export function NewsFeedColumn({ feed, color, showImages = true, preloaded }: NewsFeedColumnProps) {
   const [items, setItems] = useState<FeedItem[]>(preloaded ?? []);
