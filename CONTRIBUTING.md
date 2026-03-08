@@ -23,30 +23,17 @@ Thanks for your interest in contributing. This document covers the setup process
    cp .env.local.example .env.local
    ```
 
-   Fill in the required values. At minimum you need `DATABASE_URL` pointing to your local Postgres (step 3 provides defaults).
+   Fill in the required values. At minimum you need `DATABASE_URL` pointing to your local Postgres (the next step provides defaults).
 
-3. **Start the local database**
-
-   ```bash
-   npm run docker:up
-   ```
-
-   This starts a PostgreSQL 16 container on port 5434 with user `pharos` / password `pharos`. The default `DATABASE_URL` in `.env` already points here.
-
-4. **Install dependencies**
+3. **Run the setup script**
 
    ```bash
-   npm install
+   npm run setup
    ```
 
-5. **Run database migrations and seed**
+   This single command starts a local PostgreSQL 16 container, installs dependencies, applies all database migrations, and seeds the database with sample conflict data.
 
-   ```bash
-   npm run db:migrate
-   npm run db:seed
-   ```
-
-6. **Start the dev server**
+4. **Start the dev server**
 
    ```bash
    npm run dev

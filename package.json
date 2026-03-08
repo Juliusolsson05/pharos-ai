@@ -24,6 +24,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
+    "setup": "docker compose up -d && npm install && npx prisma migrate deploy && npx prisma db seed",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "electron": "electron .",
