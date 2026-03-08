@@ -2,7 +2,8 @@
 
 export type WidgetKey =
   | 'situation' | 'latest' | 'actors' | 'signals' | 'map'
-  | 'keyfacts' | 'casualties' | 'commanders' | 'predictions' | 'brief';
+  | 'keyfacts' | 'casualties' | 'commanders' | 'predictions' | 'brief'
+  | 'threat' | 'alerts' | 'escalation' | 'livefeed' | 'temporal' | 'sourcenet' | 'strategy';
 
 export type Column = {
   id: string;
@@ -12,6 +13,7 @@ export type Column = {
 export const ALL_WIDGET_KEYS: WidgetKey[] = [
   'situation', 'latest', 'actors', 'signals', 'map',
   'keyfacts', 'casualties', 'commanders', 'predictions', 'brief',
+  'threat', 'alerts', 'escalation', 'livefeed', 'temporal', 'sourcenet', 'strategy',
 ];
 
 export const WIDGET_LABELS: Record<WidgetKey, string> = {
@@ -25,11 +27,18 @@ export const WIDGET_LABELS: Record<WidgetKey, string> = {
   commanders:  'Commanders',
   predictions: 'Prediction Markets',
   brief:       'Daily Brief',
+  threat:      'Threat Assessment',
+  alerts:      'Active Alerts',
+  escalation:  'Escalation Analysis',
+  livefeed:    'Live Event Feed',
+  temporal:    'Temporal Analysis',
+  sourcenet:   'Source Network',
+  strategy:    'Strategic Game',
 };
 
 // Presets
 
-export type PresetId = 'analyst' | 'commander' | 'executive';
+export type PresetId = 'analyst' | 'commander' | 'executive' | 'intelligence';
 
 export type WorkspaceLayout = { columns: Column[] };
 
@@ -69,5 +78,15 @@ export const PRESETS: Record<PresetId, PresetDefinition> = {
       { id: 'col-c', widgets: ['situation'] },
     ],
     columnSizes: { 'col-a': 33.3, 'col-b': 33.3, 'col-c': 33.4 },
+  },
+  intelligence: {
+    label: 'INTEL ENGINE',
+    description: 'Full-spectrum conflict analysis: strategic game model, threat assessment, escalation ladder, temporal patterns, source network, and live event feed',
+    columns: [
+      { id: 'col-a', widgets: ['strategy', 'alerts'] },
+      { id: 'col-b', widgets: ['threat', 'escalation'] },
+      { id: 'col-c', widgets: ['temporal', 'sourcenet', 'livefeed'] },
+    ],
+    columnSizes: { 'col-a': 35, 'col-b': 30, 'col-c': 35 },
   },
 };

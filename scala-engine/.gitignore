@@ -1,0 +1,10 @@
+target/
+.bsp/
+.idea/
+.metals/
+.bloop/
+*.class
+*.log
+*.jar
+project/target/
+project/project/

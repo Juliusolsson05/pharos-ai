@@ -106,7 +106,7 @@ export function WorkspaceDashboard() {
 
         {/* preset selector */}
         <div className="flex items-center gap-0.5 ml-2">
-          {(['analyst', 'commander', 'executive'] as const).map(id => (
+          {(['analyst', 'commander', 'executive', 'intelligence'] as const).map(id => (
             <Button
               key={id}
               variant={activePreset === id ? 'outline' : 'ghost'}

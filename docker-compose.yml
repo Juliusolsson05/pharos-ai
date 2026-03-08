@@ -11,5 +11,23 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  pharos-engine:
+    build:
+      context: ./scala-engine
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4100:4100"
+    environment:
+      PHAROS_DB_HOST: postgres
+      PHAROS_DB_PORT: 5432
+      PHAROS_DB_NAME: pharos
+      PHAROS_DB_USER: pharos
+      PHAROS_DB_PASSWORD: pharos
+      PHAROS_ENGINE_HOST: "0.0.0.0"
+      PHAROS_ENGINE_PORT: 4100
+    depends_on:
+      - postgres
+
 volumes:
   pgdata:
