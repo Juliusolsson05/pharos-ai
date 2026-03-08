@@ -169,9 +169,10 @@ export function Header() {
               href="https://github.com/Juliusolsson05/pharos-ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--t4)] hover:text-[var(--t2)] transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--t1)] text-[var(--bg-app)] hover:bg-[var(--t2)] transition-colors"
             >
-              <Github size={14} />
+              <Github size={13} fill="currentColor" strokeWidth={0} />
+              <span className="mono text-[10px] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
             </a>
           </div>
         </div>
