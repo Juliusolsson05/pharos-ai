@@ -1,7 +1,7 @@
 /** Wrapper around X AI (Grok) Responses API. Requires XAI_API_KEY env. */
 
 const XAI_BASE = 'https://api.x.ai/v1';
-const MODEL = 'grok-3-fast';
+const MODEL = process.env.XAI_MODEL ?? 'grok-4-1-fast-reasoning';
 
 // Types
 
