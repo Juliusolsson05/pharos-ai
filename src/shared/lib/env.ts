@@ -18,6 +18,9 @@ export function getRequiredEnv(name: string): string {
 export const publicConflictId: string =
   process.env.NEXT_PUBLIC_CONFLICT_ID ?? 'iran-2026';
 
+export const publicAppUrl: string =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.conflicts.app';
+
 export const publicPosthogKey: string | undefined =
   process.env.NEXT_PUBLIC_POSTHOG_KEY ?? process.env.NEXT_PUBLIC_POSTHOG_TOKEN;
 

@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from 'next';
 
 import { Toaster } from '@/components/ui/sonner';
 
+import { SITE_URL } from '@/features/browse/constants';
+
 import { PostHogPageView } from '@/shared/lib/posthog-provider';
 import { QueryProvider } from '@/shared/lib/query-provider';
 import { ReduxProvider } from '@/shared/state/redux-provider';
@@ -10,7 +12,7 @@ import { ReduxProvider } from '@/shared/state/redux-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.conflicts.app'),
+  metadataBase: new URL(SITE_URL),
   applicationName: 'Conflicts.app',
   title: {
     default: 'Conflicts.app - Live Geopolitical Intelligence Dashboard',
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
   description: 'Pharos is a live geopolitical intelligence dashboard for conflict tracking across events, actors, signals, briefs, and map-based analysis.',
   openGraph: {
     type: 'website',
-    url: 'https://www.conflicts.app',
+    url: SITE_URL,
     siteName: 'Conflicts.app',
     title: 'Conflicts.app - Live Geopolitical Intelligence Dashboard',
     description: 'Pharos is a live geopolitical intelligence dashboard for conflict tracking across events, actors, signals, briefs, and map-based analysis.',
