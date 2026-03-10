@@ -3,7 +3,7 @@
   "info": {
     "title": "Pharos AI API",
     "version": "1.0.0",
-    "description": "Public API for Pharos AI — real-time conflict intelligence, geopolitical event tracking, prediction markets, and economic indicators.\n\nAll JSON responses use the envelope format `{ ok: true, data }` for success and `{ ok: false, error: { code, message } }` for errors.\n\nBase URL: `https://pharos-ai.com/api/v1`"
+    "description": "Public API for Pharos AI — real-time conflict intelligence, geopolitical event tracking, prediction markets, and economic indicators.\n\nAll JSON responses use the envelope format `{ ok: true, data }` for success and `{ ok: false, error: { code, message } }` for errors.\n\nBase URL: `https://conflicts.app/api/v1`"
   },
   "servers": [
     {
@@ -22,7 +22,8 @@
     { "name": "Economics", "description": "Economic indexes and market data" },
     { "name": "Markets", "description": "Financial market quotes and charts" },
     { "name": "Predictions", "description": "Prediction market data from Polymarket" },
-    { "name": "World Bank", "description": "World Bank development indicators" }
+    { "name": "World Bank", "description": "World Bank development indicators" },
+    { "name": "Media", "description": "Image proxy and media utilities" }
   ],
   "paths": {
     "/bootstrap": {
@@ -627,6 +628,41 @@
           },
           "400": { "$ref": "#/components/responses/BadRequest" }
         }
+      },
+      "post": {
+        "operationId": "prefetchRssFeeds",
+        "tags": ["RSS"],
+        "summary": "Prefetch RSS feed items",
+        "description": "Fetches and caches items from one or more RSS feeds by ID. If no IDs are provided, all configured feeds are prefetched.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Optional list of feed IDs to prefetch"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fetched and cached feed items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_FeedResultArray"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/economics/indexes": {
@@ -660,6 +696,37 @@
               }
             }
           }
+        }
+      }
+    },
+    "/img": {
+      "get": {
+        "operationId": "getImageProxy",
+        "tags": ["Media"],
+        "summary": "Proxy a remote image",
+        "description": "Fetches a remote image over HTTP(S), blocks private hosts, and returns the binary response with caching headers.",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Remote image URL to proxy"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Proxied image",
+            "content": {
+              "image/*": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "400": { "description": "Missing or invalid URL" },
+          "403": { "description": "Blocked private or unsafe host" },
+          "413": { "description": "Upstream image exceeds max allowed size" },
+          "502": { "description": "Upstream fetch failed" }
         }
       }
     },
@@ -1141,7 +1208,11 @@
           "fullName": { "type": "string" },
           "countryCode": { "type": "string" },
           "type": { "type": "string", "enum": ["STATE", "NON-STATE", "ORGANIZATION", "INDIVIDUAL"] },
+          "mapKey": { "type": "string" },
+          "cssVar": { "type": "string" },
+          "colorRgb": { "type": "array", "items": { "type": "number" } },
           "affiliation": { "type": "string", "enum": ["FRIENDLY", "HOSTILE", "NEUTRAL"] },
+          "mapGroup": { "type": "string" },
           "activityLevel": { "type": "string", "enum": ["CRITICAL", "HIGH", "ELEVATED", "MODERATE"] },
           "activityScore": { "type": "number" },
           "stance": { "type": "string", "enum": ["AGGRESSOR", "DEFENDER", "RETALIATING", "PROXY", "NEUTRAL", "CONDEMNING"] },
@@ -1484,7 +1555,9 @@
               "feeds": {
                 "type": "array",
                 "items": { "$ref": "#/components/schemas/FeedResult" }
-              }
+              },
+              "cachedFeeds": { "type": "integer" },
+              "totalFeeds": { "type": "integer" }
             }
           }
         }

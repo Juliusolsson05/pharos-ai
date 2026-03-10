@@ -40,6 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const data = posts.map(p => ({
     id: p.id,
     tweetId: p.tweetId,
+    postType: p.postType,
     handle: p.handle,
     displayName: p.displayName,
     avatar: p.avatar,

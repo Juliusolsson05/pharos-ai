@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+
+import { err, ok } from '@/server/lib/api-utils';
 
 import type { MarketResult } from '@/types/domain';
 
@@ -76,12 +78,12 @@ export async function GET(req: NextRequest) {
   const interval = req.nextUrl.searchParams.get('interval') ?? '15m';
 
   if (tickers.length === 0) {
-    return NextResponse.json({ error: 'Provide ?tickers=BZ=F,GC=F' }, { status: 400 });
+    return err('BAD_REQUEST', 'Provide ?tickers=BZ=F,GC=F');
   }
 
   const results = await Promise.all(tickers.slice(0, 20).map(t => getCached(t, range, interval)));
 
-  return NextResponse.json(
+  return ok(
     { results },
     { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } },
   );

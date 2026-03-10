@@ -19,6 +19,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return ok(posts.map(p => ({
     id: p.id,
     tweetId: p.tweetId,
+    postType: p.postType,
     handle: p.handle,
     displayName: p.displayName,
     avatar: p.avatar,
