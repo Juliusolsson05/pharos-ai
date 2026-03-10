@@ -1,0 +1,1808 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Pharos AI API",
+    "version": "1.0.0",
+    "description": "Public API for Pharos AI — real-time conflict intelligence, geopolitical event tracking, prediction markets, and economic indicators.\n\nAll JSON responses use the envelope format `{ ok: true, data }` for success and `{ ok: false, error: { code, message } }` for errors.\n\nBase URL: `https://conflicts.app/api/v1`"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Pharos AI API v1"
+    }
+  ],
+  "tags": [
+    { "name": "Bootstrap", "description": "Application bootstrap data" },
+    { "name": "Conflicts", "description": "Conflict metadata and daily snapshots" },
+    { "name": "Events", "description": "Intelligence events within a conflict" },
+    { "name": "Actors", "description": "State and non-state actors involved in conflicts" },
+    { "name": "X Posts", "description": "Field signals — social media posts and statements" },
+    { "name": "Map", "description": "Geospatial map data and narrative stories" },
+    { "name": "RSS", "description": "News feeds, collections, and RSS syndication" },
+    { "name": "Economics", "description": "Economic indexes and market data" },
+    { "name": "Markets", "description": "Financial market quotes and charts" },
+    { "name": "Predictions", "description": "Prediction market data from Polymarket" },
+    { "name": "World Bank", "description": "World Bank development indicators" },
+    { "name": "Media", "description": "Image proxy and media utilities" }
+  ],
+  "paths": {
+    "/bootstrap": {
+      "get": {
+        "operationId": "getBootstrap",
+        "tags": ["Bootstrap"],
+        "summary": "Get bootstrap data",
+        "description": "Returns the active conflict ID, available days, status, threat level, and escalation score. Use this on app load to configure the client.",
+        "responses": {
+          "200": {
+            "description": "Bootstrap data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_BootstrapData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}": {
+      "get": {
+        "operationId": "getConflict",
+        "tags": ["Conflicts"],
+        "summary": "Get conflict details",
+        "description": "Returns full metadata for a specific conflict including codename, commanders, objectives, and current status.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conflict details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_Conflict"
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/conflicts/{id}/days": {
+      "get": {
+        "operationId": "getConflictDays",
+        "tags": ["Conflicts"],
+        "summary": "List conflict day snapshots",
+        "description": "Returns an array of day snapshots ordered by date. Use `lite=true` for a compact response (day, label, summary, escalation only).",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "lite",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["true", "false"] },
+            "description": "Return compact snapshots (day, dayLabel, summary, escalation only)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of day snapshots",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ConflictDaySnapshotArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/days/{day}": {
+      "get": {
+        "operationId": "getConflictDay",
+        "tags": ["Conflicts"],
+        "summary": "Get a single day snapshot",
+        "description": "Returns the full snapshot for a specific conflict day including casualties, economic impact, and scenarios.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "date" },
+            "description": "Day in YYYY-MM-DD format",
+            "example": "2026-03-08"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Day snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ConflictDaySnapshot"
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/conflicts/{id}/events": {
+      "get": {
+        "operationId": "getEvents",
+        "tags": ["Events"],
+        "summary": "List intelligence events",
+        "description": "Returns events for a conflict. Filter by day, severity, type, or verification status. Use `lite=true` for compact responses without sources and actor responses.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Filter by day (YYYY-MM-DD)"
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["CRITICAL", "HIGH", "STANDARD"] },
+            "description": "Filter by severity"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["MILITARY", "DIPLOMATIC", "INTELLIGENCE", "ECONOMIC", "HUMANITARIAN", "POLITICAL"] },
+            "description": "Filter by event type"
+          },
+          {
+            "name": "verified",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["true", "false"] },
+            "description": "Filter by verification status"
+          },
+          {
+            "name": "lite",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["true", "false"] },
+            "description": "Compact response (omits sources and actorResponses)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 1000 },
+            "description": "Maximum number of events to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_IntelEventArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/events/{eventId}": {
+      "get": {
+        "operationId": "getEvent",
+        "tags": ["Events"],
+        "summary": "Get a single event",
+        "description": "Returns the full event including sources and actor responses.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Event ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_IntelEvent"
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/conflicts/{id}/actors": {
+      "get": {
+        "operationId": "getActors",
+        "tags": ["Actors"],
+        "summary": "List actors",
+        "description": "Returns all actors in a conflict with their current stance, activity level, and day snapshots. Pass `day` to overlay a specific day's snapshot data.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Overlay day-specific snapshot data (YYYY-MM-DD)"
+          },
+          {
+            "name": "lite",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["true", "false"] },
+            "description": "Compact response"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of actors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ActorArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/actors/{actorId}": {
+      "get": {
+        "operationId": "getActor",
+        "tags": ["Actors"],
+        "summary": "Get a single actor",
+        "description": "Returns full actor data with day snapshots, recent actions, and linked events.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          { "$ref": "#/components/parameters/actorId" },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Overlay day-specific snapshot data (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Actor details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_Actor"
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/conflicts/{id}/actors/{actorId}/actions": {
+      "get": {
+        "operationId": "getActorActions",
+        "tags": ["Actors"],
+        "summary": "Get actor's recent actions",
+        "description": "Returns the recent actions timeline for a specific actor.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          { "$ref": "#/components/parameters/actorId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of actions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_RecentActionArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/x-posts": {
+      "get": {
+        "operationId": "getXPosts",
+        "tags": ["X Posts"],
+        "summary": "List field signals",
+        "description": "Returns X posts (tweets), news articles, and official statements related to a conflict. Filter by day, significance, account type, or Pharos-annotated posts only.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Filter by day (YYYY-MM-DD)"
+          },
+          {
+            "name": "significance",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["BREAKING", "HIGH", "STANDARD"] },
+            "description": "Filter by significance"
+          },
+          {
+            "name": "accountType",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["military", "government", "journalist", "analyst", "official"] },
+            "description": "Filter by account type"
+          },
+          {
+            "name": "pharosOnly",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["true", "false"] },
+            "description": "Only return posts with Pharos analyst annotations"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_XPostArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/x-posts/by-actor/{actorId}": {
+      "get": {
+        "operationId": "getXPostsByActor",
+        "tags": ["X Posts"],
+        "summary": "Get posts linked to an actor",
+        "description": "Returns all field signals associated with a specific actor.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          { "$ref": "#/components/parameters/actorId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_XPostArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/x-posts/by-event/{eventId}": {
+      "get": {
+        "operationId": "getXPostsByEvent",
+        "tags": ["X Posts"],
+        "summary": "Get posts linked to an event",
+        "description": "Returns all field signals associated with a specific intelligence event.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Event ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_XPostArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/map/data": {
+      "get": {
+        "operationId": "getMapData",
+        "tags": ["Map"],
+        "summary": "Get map feature data",
+        "description": "Returns all geospatial features for a conflict: strike arcs, missile tracks, targets, military assets, threat zones, heat points, and actor metadata. Optionally filter by dataset type.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" },
+          {
+            "name": "datasets",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Comma-separated dataset names to include (e.g. `strikes,missiles,targets`)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Map data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_MapData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conflicts/{id}/map/stories": {
+      "get": {
+        "operationId": "getMapStories",
+        "tags": ["Map"],
+        "summary": "Get map narrative stories",
+        "description": "Returns curated narrative stories that highlight specific map features with a camera viewstate, timeline events, and key facts.",
+        "parameters": [
+          { "$ref": "#/components/parameters/conflictId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of map stories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_MapStoryArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rss/feeds": {
+      "get": {
+        "operationId": "getRssFeeds",
+        "tags": ["RSS"],
+        "summary": "List RSS feed sources",
+        "description": "Returns all configured RSS feed sources with their perspective, country, tier, and tags.",
+        "responses": {
+          "200": {
+            "description": "Array of feed sources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_RssFeedArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rss/collections": {
+      "get": {
+        "operationId": "getRssCollections",
+        "tags": ["RSS"],
+        "summary": "List feed collections",
+        "description": "Returns conflict-organized feed collections, each containing channels grouped by editorial perspective.",
+        "parameters": [
+          {
+            "name": "conflictId",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by conflict ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_ConflictCollectionArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rss/events": {
+      "get": {
+        "operationId": "getRssEventsFeed",
+        "tags": ["RSS"],
+        "summary": "Intelligence events RSS feed",
+        "description": "Returns an RSS 2.0 XML feed of intelligence events. Subscribe to this feed in any RSS reader for real-time event updates.",
+        "parameters": [
+          {
+            "name": "conflictId",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Conflict ID (defaults to active conflict)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 500, "default": 100 },
+            "description": "Maximum number of items"
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["CRITICAL", "HIGH", "STANDARD"] }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["MILITARY", "DIPLOMATIC", "INTELLIGENCE", "ECONOMIC", "HUMANITARIAN", "POLITICAL"] }
+          },
+          {
+            "name": "verified",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["true", "false"] }
+          },
+          {
+            "name": "day",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0 XML feed",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rss/briefs": {
+      "get": {
+        "operationId": "getRssBriefsFeed",
+        "tags": ["RSS"],
+        "summary": "Daily briefs RSS feed",
+        "description": "Returns an RSS 2.0 XML feed of daily conflict briefings.",
+        "parameters": [
+          {
+            "name": "conflictId",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Conflict ID (defaults to active conflict)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 30 },
+            "description": "Maximum number of items"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0 XML feed",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rss/fetch": {
+      "get": {
+        "operationId": "fetchRssFeeds",
+        "tags": ["RSS"],
+        "summary": "Fetch RSS feed items",
+        "description": "Fetches and parses items from one or more RSS feeds by their IDs. Returns cached results when available.",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Comma-separated feed IDs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetched feed items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_FeedResultArray"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      },
+      "post": {
+        "operationId": "prefetchRssFeeds",
+        "tags": ["RSS"],
+        "summary": "Prefetch RSS feed items",
+        "description": "Fetches and caches items from one or more RSS feeds by ID. If no IDs are provided, all configured feeds are prefetched.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Optional list of feed IDs to prefetch"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fetched and cached feed items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_FeedResultArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/economics/indexes": {
+      "get": {
+        "operationId": "getEconomicIndexes",
+        "tags": ["Economics"],
+        "summary": "List economic indexes",
+        "description": "Returns tracked economic indexes (oil, gold, equities, etc.) with their ticker symbols, categories, and conflict relevance tiers.",
+        "parameters": [
+          {
+            "name": "tier",
+            "in": "query",
+            "schema": { "type": "integer", "enum": [1, 2, 3] },
+            "description": "Filter by conflict relevance tier (1=critical, 2=important, 3=context)"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ENERGY", "SAFE_HAVEN", "EQUITIES", "VOLATILITY", "CURRENCY", "DEFENSE", "SHIPPING"] },
+            "description": "Filter by economic category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of economic indexes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_EconomicIndexArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/img": {
+      "get": {
+        "operationId": "getImageProxy",
+        "tags": ["Media"],
+        "summary": "Proxy a remote image",
+        "description": "Fetches a remote image over HTTP(S), blocks private hosts, and returns the binary response with caching headers.",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "format": "uri" },
+            "description": "Remote image URL to proxy"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Proxied image",
+            "content": {
+              "image/*": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "400": { "description": "Missing or invalid URL" },
+          "403": { "description": "Blocked private or unsafe host" },
+          "413": { "description": "Upstream image exceeds max allowed size" },
+          "502": { "description": "Upstream fetch failed" }
+        }
+      }
+    },
+    "/markets": {
+      "get": {
+        "operationId": "getMarkets",
+        "tags": ["Markets"],
+        "summary": "Get financial market data",
+        "description": "Returns current price, change, and intraday chart data for the specified ticker symbols via Yahoo Finance.",
+        "parameters": [
+          {
+            "name": "tickers",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Comma-separated Yahoo Finance ticker symbols (e.g. `BZ=F,GC=F,^VIX`)",
+            "example": "BZ=F,GC=F"
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "schema": { "type": "string", "default": "5d" },
+            "description": "Chart time range (e.g. `5d`, `1mo`, `3mo`)"
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "schema": { "type": "string", "default": "15m" },
+            "description": "Chart data interval (e.g. `15m`, `1h`, `1d`)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Market results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_MarketResults"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/predictions/groups": {
+      "get": {
+        "operationId": "getPredictionGroups",
+        "tags": ["Predictions"],
+        "summary": "List prediction market groups",
+        "description": "Returns the categorization groups used to organize prediction markets (e.g. Military Escalation, Diplomatic, Nuclear).",
+        "responses": {
+          "200": {
+            "description": "Array of market groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_MarketGroupArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predictions/markets": {
+      "get": {
+        "operationId": "getPredictionMarkets",
+        "tags": ["Predictions"],
+        "summary": "List prediction markets",
+        "description": "Returns all tracked prediction markets from Polymarket with current prices, volume, and sub-markets.",
+        "responses": {
+          "200": {
+            "description": "Prediction markets with fetch timestamp",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_PredictionMarketsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predictions/history": {
+      "get": {
+        "operationId": "getPredictionHistory",
+        "tags": ["Predictions"],
+        "summary": "Get price history for a prediction token",
+        "description": "Returns time-series price history for a specific prediction market token.",
+        "parameters": [
+          {
+            "name": "tokenId",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "YES token ID from a prediction market"
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["1d", "7d", "1mo", "3mo", "max"], "default": "7d" },
+            "description": "Time range for history"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Price history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_TimePointArray"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/predictions/chart": {
+      "get": {
+        "operationId": "getPredictionChart",
+        "tags": ["Predictions"],
+        "summary": "Get chart data for a prediction market",
+        "description": "Returns time-series chart data for a prediction market by condition ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Condition ID of the prediction market"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chart data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_TimePointArray"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/world-bank/military": {
+      "get": {
+        "operationId": "getWorldBankMilitary",
+        "tags": ["World Bank"],
+        "summary": "Get military and economic indicators",
+        "description": "Returns World Bank development indicators for specified countries: military spending, GDP %, armed forces, inflation, GDP growth, refugee population, and Gini coefficient.",
+        "parameters": [
+          {
+            "name": "countries",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Comma-separated ISO3 country codes",
+            "example": "USA,IRN,ISR"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicators by country",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_WorldBankData"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "conflictId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Conflict ID",
+        "example": "iran-2026"
+      },
+      "actorId": {
+        "name": "actorId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Actor ID"
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad request — missing or invalid parameters",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorEnvelope" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ErrorEnvelope": {
+        "type": "object",
+        "required": ["ok", "error"],
+        "properties": {
+          "ok": { "type": "boolean", "const": false },
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      },
+      "Envelope_BootstrapData": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": { "$ref": "#/components/schemas/BootstrapData" }
+        }
+      },
+      "BootstrapData": {
+        "type": "object",
+        "properties": {
+          "conflictId": { "type": "string", "example": "iran-2026" },
+          "conflictName": { "type": "string", "example": "Iran Crisis 2026" },
+          "days": {
+            "type": "array",
+            "items": { "type": "string", "format": "date" },
+            "example": ["2026-03-01", "2026-03-02", "2026-03-03"]
+          },
+          "status": { "type": "string", "example": "ONGOING" },
+          "threatLevel": { "type": "string", "example": "CRITICAL" },
+          "escalation": { "type": "number", "example": 87 }
+        }
+      },
+      "Envelope_Conflict": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": { "$ref": "#/components/schemas/Conflict" }
+        }
+      },
+      "Conflict": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "codename": { "type": "string" },
+          "startDate": { "type": "string", "format": "date" },
+          "status": { "type": "string", "enum": ["ONGOING", "PAUSED", "CEASEFIRE", "RESOLVED"] },
+          "threatLevel": { "type": "string", "enum": ["CRITICAL", "HIGH", "ELEVATED", "MONITORING"] },
+          "region": { "type": "string" },
+          "escalation": { "type": "number" },
+          "summary": { "type": "string" },
+          "keyFacts": { "type": "array", "items": { "type": "string" } },
+          "objectives": { "type": "array", "items": { "type": "string" } },
+          "commanders": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Envelope_ConflictDaySnapshotArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConflictDaySnapshot" }
+          }
+        }
+      },
+      "Envelope_ConflictDaySnapshot": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": { "$ref": "#/components/schemas/ConflictDaySnapshot" }
+        }
+      },
+      "ConflictDaySnapshot": {
+        "type": "object",
+        "properties": {
+          "day": { "type": "string", "format": "date" },
+          "dayLabel": { "type": "string", "example": "Day 8" },
+          "summary": { "type": "string" },
+          "keyFacts": { "type": "array", "items": { "type": "string" } },
+          "escalation": { "type": "number" },
+          "casualties": { "$ref": "#/components/schemas/Casualties" },
+          "economicImpact": { "$ref": "#/components/schemas/EconomicImpact" },
+          "scenarios": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Scenario" }
+          }
+        }
+      },
+      "Casualties": {
+        "type": "object",
+        "properties": {
+          "us": {
+            "type": "object",
+            "properties": {
+              "kia": { "type": "integer" },
+              "wounded": { "type": "integer" },
+              "civilians": { "type": "integer" }
+            }
+          },
+          "israel": {
+            "type": "object",
+            "properties": {
+              "kia": { "type": "integer" },
+              "wounded": { "type": "integer" },
+              "civilians": { "type": "integer" },
+              "injured": { "type": "integer" }
+            }
+          },
+          "iran": {
+            "type": "object",
+            "properties": {
+              "killed": { "type": "integer" },
+              "injured": { "type": "integer" }
+            }
+          },
+          "lebanon": {
+            "type": "object",
+            "properties": {
+              "killed": { "type": "integer" },
+              "injured": { "type": "integer" }
+            }
+          },
+          "regional": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "killed": { "type": "integer" },
+                "injured": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "EconomicImpact": {
+        "type": "object",
+        "properties": {
+          "chips": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "val": { "type": "string" },
+                "sub": { "type": "string" },
+                "color": { "type": "string" }
+              }
+            }
+          },
+          "narrative": { "type": "string" }
+        }
+      },
+      "Scenario": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "subtitle": { "type": "string" },
+          "color": { "type": "string" },
+          "prob": { "type": "string" },
+          "body": { "type": "string" }
+        }
+      },
+      "Envelope_IntelEventArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/IntelEvent" }
+          }
+        }
+      },
+      "Envelope_IntelEvent": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": { "$ref": "#/components/schemas/IntelEvent" }
+        }
+      },
+      "IntelEvent": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "STANDARD"] },
+          "type": { "type": "string", "enum": ["MILITARY", "DIPLOMATIC", "INTELLIGENCE", "ECONOMIC", "HUMANITARIAN", "POLITICAL"] },
+          "title": { "type": "string" },
+          "location": { "type": "string" },
+          "summary": { "type": "string" },
+          "fullContent": { "type": "string" },
+          "verified": { "type": "boolean" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "sources": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Source" }
+          },
+          "actorResponses": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ActorResponse" }
+          }
+        }
+      },
+      "Source": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "tier": { "type": "integer", "minimum": 1, "maximum": 3 },
+          "reliability": { "type": "number", "minimum": 0, "maximum": 1 },
+          "url": { "type": "string", "nullable": true }
+        }
+      },
+      "ActorResponse": {
+        "type": "object",
+        "properties": {
+          "actorId": { "type": "string" },
+          "actorName": { "type": "string" },
+          "stance": { "type": "string", "enum": ["SUPPORTING", "OPPOSING", "NEUTRAL", "UNKNOWN"] },
+          "type": { "type": "string" },
+          "statement": { "type": "string" }
+        }
+      },
+      "Envelope_ActorArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Actor" }
+          }
+        }
+      },
+      "Envelope_Actor": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": { "$ref": "#/components/schemas/Actor" }
+        }
+      },
+      "Actor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "fullName": { "type": "string" },
+          "countryCode": { "type": "string" },
+          "type": { "type": "string", "enum": ["STATE", "NON-STATE", "ORGANIZATION", "INDIVIDUAL"] },
+          "mapKey": { "type": "string" },
+          "cssVar": { "type": "string" },
+          "colorRgb": { "type": "array", "items": { "type": "number" } },
+          "affiliation": { "type": "string", "enum": ["FRIENDLY", "HOSTILE", "NEUTRAL"] },
+          "mapGroup": { "type": "string" },
+          "activityLevel": { "type": "string", "enum": ["CRITICAL", "HIGH", "ELEVATED", "MODERATE"] },
+          "activityScore": { "type": "number" },
+          "stance": { "type": "string", "enum": ["AGGRESSOR", "DEFENDER", "RETALIATING", "PROXY", "NEUTRAL", "CONDEMNING"] },
+          "saying": { "type": "string" },
+          "doing": { "type": "array", "items": { "type": "string" } },
+          "assessment": { "type": "string" },
+          "recentActions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecentAction" }
+          },
+          "keyFigures": { "type": "array", "items": { "type": "string" } },
+          "linkedEventIds": { "type": "array", "items": { "type": "string" } },
+          "daySnapshots": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/components/schemas/ActorDaySnapshot" }
+          }
+        }
+      },
+      "ActorDaySnapshot": {
+        "type": "object",
+        "properties": {
+          "activityLevel": { "type": "string" },
+          "activityScore": { "type": "number" },
+          "stance": { "type": "string" },
+          "saying": { "type": "string" },
+          "doing": { "type": "array", "items": { "type": "string" } },
+          "assessment": { "type": "string" }
+        }
+      },
+      "Envelope_RecentActionArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecentAction" }
+          }
+        }
+      },
+      "RecentAction": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string" },
+          "type": { "type": "string", "enum": ["MILITARY", "DIPLOMATIC", "POLITICAL", "ECONOMIC", "INTELLIGENCE"] },
+          "description": { "type": "string" },
+          "verified": { "type": "boolean" },
+          "significance": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] }
+        }
+      },
+      "Envelope_XPostArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/XPost" }
+          }
+        }
+      },
+      "XPost": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "tweetId": { "type": "string" },
+          "postType": { "type": "string", "enum": ["XPOST", "NEWS_ARTICLE", "OFFICIAL_STATEMENT", "PRESS_RELEASE", "ANALYSIS"] },
+          "handle": { "type": "string" },
+          "displayName": { "type": "string" },
+          "avatar": { "type": "string" },
+          "avatarColor": { "type": "string" },
+          "verified": { "type": "boolean" },
+          "accountType": { "type": "string", "enum": ["military", "government", "journalist", "analyst", "official"] },
+          "significance": { "type": "string", "enum": ["BREAKING", "HIGH", "STANDARD"] },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "content": { "type": "string" },
+          "images": { "type": "array", "items": { "type": "string" } },
+          "videoThumb": { "type": "string", "nullable": true },
+          "likes": { "type": "integer" },
+          "retweets": { "type": "integer" },
+          "replies": { "type": "integer" },
+          "views": { "type": "integer" },
+          "eventId": { "type": "string", "nullable": true },
+          "actorId": { "type": "string", "nullable": true },
+          "actorCssVar": { "type": "string", "nullable": true },
+          "actorColorRgb": { "type": "array", "items": { "type": "number" } },
+          "pharosNote": { "type": "string", "nullable": true },
+          "verificationStatus": { "type": "string", "enum": ["UNVERIFIED", "VERIFIED", "FAILED", "PARTIAL", "SKIPPED"] },
+          "verifiedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "xaiCitations": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Envelope_MapData": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": { "$ref": "#/components/schemas/MapData" }
+        }
+      },
+      "MapData": {
+        "type": "object",
+        "properties": {
+          "strikes": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MapArcFeature" }
+          },
+          "missiles": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MapArcFeature" }
+          },
+          "targets": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MapPointFeature" }
+          },
+          "assets": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MapPointFeature" }
+          },
+          "threatZones": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ThreatZone" }
+          },
+          "heatPoints": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/HeatPoint" }
+          },
+          "actorMeta": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/components/schemas/ActorMeta" }
+          }
+        }
+      },
+      "MapArcFeature": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "actor": { "type": "string" },
+          "priority": { "type": "integer" },
+          "category": { "type": "string" },
+          "type": { "type": "string" },
+          "status": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "from": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "[longitude, latitude]"
+          },
+          "to": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "[longitude, latitude]"
+          },
+          "label": { "type": "string" },
+          "severity": { "type": "string" }
+        }
+      },
+      "MapPointFeature": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "actor": { "type": "string" },
+          "priority": { "type": "integer" },
+          "category": { "type": "string" },
+          "type": { "type": "string" },
+          "status": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "position": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "[longitude, latitude]"
+          },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "ThreatZone": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "actor": { "type": "string" },
+          "priority": { "type": "integer" },
+          "category": { "type": "string" },
+          "type": { "type": "string" },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "description": "Array of [longitude, latitude] pairs forming the zone polygon"
+          },
+          "name": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      },
+      "HeatPoint": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "weight": { "type": "number" }
+        }
+      },
+      "ActorMeta": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "cssVar": { "type": "string" },
+          "rgb": { "type": "array", "items": { "type": "number" } },
+          "affiliation": { "type": "string" },
+          "group": { "type": "string" }
+        }
+      },
+      "Envelope_MapStoryArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MapStory" }
+          }
+        }
+      },
+      "MapStory": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "tagline": { "type": "string" },
+          "iconName": { "type": "string" },
+          "category": { "type": "string", "enum": ["STRIKE", "RETALIATION", "NAVAL", "INTEL", "DIPLOMATIC"] },
+          "narrative": { "type": "string" },
+          "highlightStrikeIds": { "type": "array", "items": { "type": "string" } },
+          "highlightMissileIds": { "type": "array", "items": { "type": "string" } },
+          "highlightTargetIds": { "type": "array", "items": { "type": "string" } },
+          "highlightAssetIds": { "type": "array", "items": { "type": "string" } },
+          "viewState": {
+            "type": "object",
+            "properties": {
+              "longitude": { "type": "number" },
+              "latitude": { "type": "number" },
+              "zoom": { "type": "number" }
+            }
+          },
+          "keyFacts": { "type": "array", "items": { "type": "string" } },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "events": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/StoryEvent" }
+          }
+        }
+      },
+      "StoryEvent": {
+        "type": "object",
+        "properties": {
+          "time": { "type": "string" },
+          "label": { "type": "string" },
+          "type": { "type": "string", "enum": ["STRIKE", "RETALIATION", "INTEL", "NAVAL", "POLITICAL"] }
+        }
+      },
+      "Envelope_RssFeedArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RssFeed" }
+          }
+        }
+      },
+      "RssFeed": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "perspective": { "type": "string", "enum": ["WESTERN", "US_GOV", "ISRAELI", "IRANIAN", "ARAB", "RUSSIAN", "CHINESE", "INDEPENDENT", "INTL_ORG"] },
+          "country": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "stateFunded": { "type": "boolean" },
+          "tier": { "type": "integer", "minimum": 1, "maximum": 4 }
+        }
+      },
+      "Envelope_ConflictCollectionArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConflictCollection" }
+          }
+        }
+      },
+      "ConflictCollection": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "channels": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConflictChannel" }
+          }
+        }
+      },
+      "ConflictChannel": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "perspective": { "type": "string" },
+          "color": { "type": "string" },
+          "feedIds": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Envelope_FeedResultArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "object",
+            "properties": {
+              "feeds": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/FeedResult" }
+              },
+              "cachedFeeds": { "type": "integer" },
+              "totalFeeds": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "FeedResult": {
+        "type": "object",
+        "properties": {
+          "feedId": { "type": "string" },
+          "feedTitle": { "type": "string" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FeedItem" }
+          },
+          "cachedAt": { "type": "number", "description": "Unix timestamp (ms)" },
+          "fresh": { "type": "boolean" },
+          "error": { "type": "string" }
+        }
+      },
+      "FeedItem": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "link": { "type": "string", "format": "uri" },
+          "pubDate": { "type": "string" },
+          "contentSnippet": { "type": "string" },
+          "creator": { "type": "string" },
+          "categories": { "type": "array", "items": { "type": "string" } },
+          "isoDate": { "type": "string", "format": "date-time" },
+          "imageUrl": { "type": "string" }
+        }
+      },
+      "Envelope_EconomicIndexArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/EconomicIndex" }
+          }
+        }
+      },
+      "EconomicIndex": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "ticker": { "type": "string", "example": "BZ=F" },
+          "name": { "type": "string" },
+          "shortName": { "type": "string" },
+          "category": { "type": "string", "enum": ["ENERGY", "SAFE_HAVEN", "EQUITIES", "VOLATILITY", "CURRENCY", "DEFENSE", "SHIPPING"] },
+          "tier": { "type": "integer", "minimum": 1, "maximum": 3 },
+          "unit": { "type": "string", "example": "$" },
+          "description": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      },
+      "Envelope_MarketResults": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "object",
+            "properties": {
+              "results": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/MarketResult" }
+              }
+            }
+          }
+        }
+      },
+      "MarketResult": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" },
+          "price": { "type": "number" },
+          "previousClose": { "type": "number" },
+          "change": { "type": "number" },
+          "changePct": { "type": "number" },
+          "currency": { "type": "string" },
+          "chart": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "time": { "type": "number", "description": "Unix timestamp" },
+                "value": { "type": "number" }
+              }
+            }
+          },
+          "error": { "type": "string" }
+        }
+      },
+      "Envelope_MarketGroupArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MarketGroup" }
+          }
+        }
+      },
+      "MarketGroup": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "color": { "type": "string" },
+          "bg": { "type": "string" },
+          "border": { "type": "string" },
+          "titleMatches": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Envelope_PredictionMarketsResponse": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "object",
+            "properties": {
+              "markets": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/PredictionMarket" }
+              },
+              "fetchedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      },
+      "PredictionMarket": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string" },
+          "outcomes": { "type": "array", "items": { "type": "string" } },
+          "prices": { "type": "array", "items": { "type": "number" } },
+          "lastTradePrice": { "type": "number" },
+          "bestBid": { "type": "number" },
+          "bestAsk": { "type": "number" },
+          "spread": { "type": "number" },
+          "volume": { "type": "number" },
+          "volume24hr": { "type": "number" },
+          "volume1wk": { "type": "number" },
+          "volume1mo": { "type": "number" },
+          "volume1yr": { "type": "number" },
+          "liquidity": { "type": "number" },
+          "openInterest": { "type": "number" },
+          "competitive": { "type": "number" },
+          "active": { "type": "boolean" },
+          "closed": { "type": "boolean" },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "image": { "type": "string" },
+          "polyUrl": { "type": "string", "format": "uri" },
+          "conditionId": { "type": "string" },
+          "yesTokenId": { "type": "string" },
+          "subMarkets": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SubMarket" }
+          }
+        }
+      },
+      "SubMarket": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "question": { "type": "string" },
+          "groupItemTitle": { "type": "string" },
+          "outcomes": { "type": "array", "items": { "type": "string" } },
+          "prices": { "type": "array", "items": { "type": "number" } },
+          "lastTradePrice": { "type": "number" },
+          "bestBid": { "type": "number" },
+          "bestAsk": { "type": "number" },
+          "spread": { "type": "number" },
+          "volume": { "type": "number" },
+          "volume24hr": { "type": "number" },
+          "volume1wk": { "type": "number" },
+          "volume1mo": { "type": "number" },
+          "active": { "type": "boolean" },
+          "closed": { "type": "boolean" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "yesTokenId": { "type": "string" },
+          "conditionId": { "type": "string" }
+        }
+      },
+      "Envelope_TimePointArray": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "object",
+            "properties": {
+              "history": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/TimePoint" }
+              }
+            }
+          }
+        }
+      },
+      "TimePoint": {
+        "type": "object",
+        "properties": {
+          "t": { "type": "number", "description": "Unix timestamp (seconds)" },
+          "p": { "type": "number", "description": "Price / probability (0–1)" }
+        }
+      },
+      "Envelope_WorldBankData": {
+        "type": "object",
+        "required": ["ok", "data"],
+        "properties": {
+          "ok": { "type": "boolean", "const": true },
+          "data": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/components/schemas/CountryIndicators" }
+          }
+        }
+      },
+      "CountryIndicators": {
+        "type": "object",
+        "properties": {
+          "spending": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } },
+          "gdpPct": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } },
+          "armedForces": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } },
+          "inflation": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } },
+          "gdpGrowth": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } },
+          "refugeePopulation": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } },
+          "gini": { "type": "array", "items": { "$ref": "#/components/schemas/YearValue" } }
+        }
+      },
+      "YearValue": {
+        "type": "object",
+        "properties": {
+          "year": { "type": "integer" },
+          "value": { "type": "number" }
+        }
+      }
+    }
+  }
+}

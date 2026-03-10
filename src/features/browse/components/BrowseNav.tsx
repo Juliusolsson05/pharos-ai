@@ -45,6 +45,16 @@ export function BrowseNav({ hamburgerSlot }: Props) {
                 </Link>
               );
             })}
+            <Link
+              href="/browse/api/reference"
+              className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
+                pathname.startsWith('/browse/api/reference')
+                  ? 'text-[var(--t1)] border-[var(--blue)]'
+                  : 'text-[var(--t3)] border-transparent hover:text-[var(--t1)]'
+              }`}
+            >
+              API
+            </Link>
           </nav>
         </div>
 

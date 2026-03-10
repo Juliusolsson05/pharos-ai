@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 import Parser from 'rss-parser';
 
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 
 import type { FeedResult } from '@/types/domain';
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
 
   const feeds = results.map(r => r.status === 'fulfilled' ? r.value : { feedId: '?', items: [], error: 'fetch failed' });
 
-  return NextResponse.json(
+  return ok(
     { feeds, cachedFeeds: cache.size, totalFeeds: allFeeds.length },
     { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } },
   );
@@ -159,7 +160,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const feedIds = req.nextUrl.searchParams.get('ids');
   if (!feedIds) {
-    return NextResponse.json({ error: 'Provide ?ids=id1,id2' }, { status: 400 });
+    return err('BAD_REQUEST', 'Provide ?ids=id1,id2');
   }
 
   const allFeeds = await prisma.rssFeed.findMany();
@@ -175,7 +176,7 @@ export async function GET(req: NextRequest) {
     urlsToFetch.map(({ id, url }) => getFeedCached(id, url)),
   );
 
-  return NextResponse.json(
+  return ok(
     { feeds: results },
     { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } },
   );

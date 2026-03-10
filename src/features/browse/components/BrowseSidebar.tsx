@@ -119,6 +119,17 @@ export function BrowseSidebar({ onNavigate, mobileSheet = false }: Props) {
             </Link>
           );
         })}
+        <Link
+          href="/browse/api/reference"
+          onClick={onNavigate}
+          className={`no-underline px-4 py-3 md:py-1.5 text-[13px] md:text-[11px] font-semibold tracking-[0.06em] transition-colors ${
+            path.startsWith('/browse/api/reference')
+              ? 'text-[var(--t1)] bg-[var(--bg-sel)]'
+              : 'text-[var(--t3)] hover:text-[var(--t1)] hover:bg-[var(--bg-3)]'
+          }`}
+        >
+          API
+        </Link>
       </nav>
 
       {activeSection?.href === '/browse/events' && (

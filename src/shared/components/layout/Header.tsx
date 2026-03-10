@@ -208,6 +208,9 @@ function MoreDropdown() {
         <DropdownMenuItem asChild>
           <Link href="/browse" className="no-underline">Browse</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/browse/api/reference" className="no-underline">API</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
