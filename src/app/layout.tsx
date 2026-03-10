@@ -3,9 +3,6 @@ import type { Metadata, Viewport } from 'next';
 
 import { Toaster } from '@/components/ui/sonner';
 
-import { Header } from '@/shared/components/layout/Header';
-import { ViewportHeightSync } from '@/shared/components/layout/ViewportHeightSync';
-
 import { PostHogPageView } from '@/shared/lib/posthog-provider';
 import { QueryProvider } from '@/shared/lib/query-provider';
 import { ReduxProvider } from '@/shared/state/redux-provider';
@@ -60,13 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PostHogPageView />
         <ReduxProvider>
           <QueryProvider>
-            <ViewportHeightSync />
-            <div className="flex flex-col min-h-0 overflow-hidden" style={{ height: 'var(--app-height)' }}>
-              <Header />
-              <div className="flex flex-1 min-h-0 overflow-hidden pb-[var(--safe-bottom)]">
-                {children}
-              </div>
-            </div>
+            {children}
             <Toaster theme="dark" position="bottom-right" />
           </QueryProvider>
         </ReduxProvider>
