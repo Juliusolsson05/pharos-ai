@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { publicConflictId } from '@/shared/lib/env';
 import { api } from '@/shared/lib/query/client';
-import { queryKeys, STALE } from '@/shared/lib/query/keys';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 import type { Conflict, ConflictDaySnapshot } from '@/types/domain';
 
@@ -13,6 +13,7 @@ export function useConflict(id: string = CONFLICT_ID) {
     queryKey: queryKeys.conflicts.detail(id),
     queryFn: () => api.get<Conflict>(`/conflicts/${id}`),
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }
 
@@ -21,6 +22,7 @@ export function useConflictDays(id: string = CONFLICT_ID) {
     queryKey: queryKeys.conflicts.days(id),
     queryFn: () => api.get<ConflictDaySnapshot[]>(`/conflicts/${id}/days`),
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }
 
@@ -30,5 +32,6 @@ export function useConflictDaySnapshot(id: string = CONFLICT_ID, day?: string) {
     queryFn: () => api.get<ConflictDaySnapshot>(`/conflicts/${id}/days/${day}`),
     enabled: !!day,
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }

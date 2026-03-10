@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { api, buildUrl } from '@/shared/lib/query/client';
-import { queryKeys, STALE } from '@/shared/lib/query/keys';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 import type { MarketGroup, PredictionMarket, TimePoint } from '@/types/domain';
 
@@ -10,6 +10,7 @@ export function usePredictionGroups() {
     queryKey: queryKeys.predictions.groups(),
     queryFn: () => api.get<MarketGroup[]>('/predictions/groups'),
     staleTime: STALE.LONG,
+    refetchInterval: REFETCH.SLOW,
   });
 }
 
@@ -21,6 +22,7 @@ export function usePredictionMarkets() {
         '/predictions/markets',
       ),
     staleTime: STALE.LONG,
+    refetchInterval: REFETCH.SLOW,
   });
 }
 
@@ -32,6 +34,7 @@ export function usePredictionHistory(tokenId: string, range: string) {
         buildUrl('/predictions/history', { tokenId, range }),
       ),
     staleTime: STALE.LONG,
+    refetchInterval: REFETCH.SLOW,
     enabled: !!tokenId,
   });
 }
@@ -44,6 +47,7 @@ export function usePredictionChart(tokenId: string) {
         `/predictions/chart?id=${tokenId}`,
       ),
     staleTime: STALE.LONG,
+    refetchInterval: REFETCH.SLOW,
     enabled: !!tokenId,
   });
 }

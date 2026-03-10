@@ -12,6 +12,16 @@ export const STALE = {
   DAY: 24 * 60 * 60_000,
 } as const;
 
+/** Background refetch intervals (must be >= corresponding staleTime) */
+export const REFETCH = {
+  /** 2 min — real-time intel (events, x-posts, conflicts, actors) */
+  FAST: 2 * 60_000,
+  /** 5 min — operational data (map, bootstrap) */
+  NORMAL: 5 * 60_000,
+  /** 15 min — reference data (RSS, economics, predictions) */
+  SLOW: 15 * 60_000,
+} as const;
+
 const CONFLICT_ID = publicConflictId;
 
 export const queryKeys = {
@@ -50,7 +60,7 @@ export const queryKeys = {
   rss: {
     feeds: () => ['rss-feeds'] as const,
     collections: (id = CONFLICT_ID) => ['rss-collections', id] as const,
-    fetchItems: (ids: string[]) => ['rss-fetch', ...ids.sort()] as const,
+    fetchItems: (ids: string[]) => ['rss-fetch', ...[...ids].sort()] as const,
   },
   economics: {
     indexes: (filters?: object) =>

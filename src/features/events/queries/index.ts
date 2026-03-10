@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { publicConflictId } from '@/shared/lib/env';
 import { api, buildUrl } from '@/shared/lib/query/client';
-import { queryKeys, STALE } from '@/shared/lib/query/keys';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 import type { EventFilters,IntelEvent } from '@/types/domain';
 
@@ -22,6 +22,7 @@ export function useEvents(id: string = CONFLICT_ID, filters?: EventFilters) {
         }),
       ),
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }
 
@@ -31,5 +32,6 @@ export function useEvent(id: string = CONFLICT_ID, eventId?: string) {
     queryFn: () => api.get<IntelEvent>(`/conflicts/${id}/events/${eventId}`),
     enabled: !!eventId,
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }

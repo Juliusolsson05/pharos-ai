@@ -4,7 +4,7 @@ import type { DataArrays } from '@/features/map/lib/map-filter-engine';
 
 import { publicConflictId } from '@/shared/lib/env';
 import { api } from '@/shared/lib/query/client';
-import { queryKeys, STALE } from '@/shared/lib/query/keys';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 import type { Asset, HeatPoint,MissileTrack, StrikeArc, Target, ThreatZone } from '@/data/map-data';
 import type { ActorMeta } from '@/data/map-tokens';
@@ -41,6 +41,7 @@ export function useMapData(id: string = CONFLICT_ID) {
     queryKey: queryKeys.map.data(id),
     queryFn: () => api.get<MapDataResponse>(`/conflicts/${id}/map/data`),
     staleTime: STALE.MEDIUM,
+    refetchInterval: REFETCH.NORMAL,
     select: toDataArrays,
   });
 }
@@ -50,5 +51,6 @@ export function useMapStories(id: string = CONFLICT_ID) {
     queryKey: queryKeys.map.stories(id),
     queryFn: () => api.get<MapStory[]>(`/conflicts/${id}/map/stories`),
     staleTime: STALE.MEDIUM,
+    refetchInterval: REFETCH.NORMAL,
   });
 }
