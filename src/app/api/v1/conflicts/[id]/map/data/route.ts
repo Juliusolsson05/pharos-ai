@@ -84,7 +84,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const props = f.properties as Props;
       return {
         id: f.id, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
-        status: f.status,
+        status: f.status, timestamp: f.timestamp?.toISOString() ?? '',
         position: geo.position, name: props.name, description: props.description,
       };
     });
@@ -96,7 +96,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const props = f.properties as Props;
       return {
         id: f.id, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
-        coordinates: geo.coordinates, name: props.name, color: props.color,
+        timestamp: f.timestamp?.toISOString() ?? '', coordinates: geo.coordinates, name: props.name, color: props.color,
       };
     });
 

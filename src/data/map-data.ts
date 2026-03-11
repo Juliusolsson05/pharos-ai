@@ -59,6 +59,7 @@ export type Asset = {
   category:    Extract<MarkerCategory, 'INSTALLATION'>;
   type:        Extract<InstallationType, 'CARRIER' | 'AIR_BASE' | 'NAVAL_BASE' | 'ARMY_BASE'>;
   status:      InstallationStatus;
+  timestamp?:  string;
   name:        string;
   position:    [number, number];
   description?: string;
@@ -70,6 +71,7 @@ export type ThreatZone = {
   priority:    Priority;
   category:    Extract<MarkerCategory, 'ZONE'>;
   type:        ZoneType;
+  timestamp?:  string;
   name:        string;
   coordinates: [number, number][];
   color:       [number, number, number, number];

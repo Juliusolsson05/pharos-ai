@@ -4,8 +4,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 import type { MapViewState, PickingInfo } from '@deck.gl/core';
 
-import { track } from '@/shared/lib/analytics';
-
 import type { OverlayVisibility } from '@/features/map/components/MapVisibilityMenu';
 import type { SelectedItem } from '@/features/map/components/types';
 import { useMapFilters } from '@/features/map/hooks/use-map-filters';
@@ -21,6 +19,8 @@ import {
   setViewState    as setViewStateAction,
   toggleSidebar   as toggleSidebarAction,
 } from '@/features/map/state/map-slice';
+
+import { track } from '@/shared/lib/analytics';
 
 import type { Asset, MissileTrack, StrikeArc, Target, ThreatZone } from '@/data/map-data';
 
@@ -52,6 +52,8 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     filtered:    f.filtered,
     actorMeta:   f.actorMeta,
     activeStory,
+    selectedItem,
+    viewState,
     isSatellite: mapStyle === 'satellite',
     isMobile,
   });

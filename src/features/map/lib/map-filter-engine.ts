@@ -109,12 +109,12 @@ export function extractInitialState(data: DataArrays): FilterState {
   return { datasets, types, actors, statuses, priorities, heat: true, timeRange: null };
 }
 
-/** Derive min/max timestamps from timestamped data only (strikes, missiles, targets).
+/** Derive min/max timestamps from timestamped data only.
  *  Max is always at least "now" so the timeline extends to the current time. */
 export function extractTimeExtent(data: DataArrays): [number, number] {
   let min = Infinity;
   let max = -Infinity;
-  for (const dk of ['strikes', 'missiles', 'targets'] as const) {
+  for (const dk of ['strikes', 'missiles', 'targets', 'assets', 'zones'] as const) {
     for (const d of datasetItems(data, dk)) {
       if (!d.timestamp) continue;
       const t = new Date(d.timestamp).getTime();
@@ -144,7 +144,7 @@ export function applyFilters(
 
   const inTime = (item: DataItem): boolean => {
     if (!state.timeRange) return true;
-    if (!item.timestamp) return true; // static items (assets, zones) always visible
+    if (!item.timestamp) return true;
     const t = new Date(item.timestamp).getTime();
     return t >= state.timeRange[0] && t <= state.timeRange[1];
   };

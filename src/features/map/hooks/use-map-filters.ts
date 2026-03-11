@@ -39,7 +39,7 @@ export const DATASET_LABEL: Record<DatasetName, string> = {
 function buildFingerprint(rawData: DataArrays): string {
   let minTs = Number.POSITIVE_INFINITY;
   let maxTs = Number.NEGATIVE_INFINITY;
-  for (const entry of [...rawData.strikes, ...rawData.missiles, ...rawData.targets]) {
+  for (const entry of [...rawData.strikes, ...rawData.missiles, ...rawData.targets, ...rawData.assets, ...rawData.zones]) {
     if (!entry.timestamp) continue;
     const ts = new Date(entry.timestamp).getTime();
     if (!Number.isFinite(ts)) continue;
