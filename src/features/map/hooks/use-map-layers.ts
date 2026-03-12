@@ -3,7 +3,11 @@
 import { useMemo } from 'react';
 
 import { HeatmapLayer } from '@deck.gl/aggregation-layers';
+import type { Layer, MapViewState } from '@deck.gl/core';
 import { ArcLayer, PolygonLayer,ScatterplotLayer, TextLayer } from '@deck.gl/layers';
+
+import type { SelectedItem } from '@/features/map/components/types';
+import { selectVisibleLabels } from '@/features/map/lib/label-visibility';
 
 import type { Asset, HeatPoint,MissileTrack, StrikeArc, Target, ThreatZone } from '@/data/map-data';
 import type { ActorMeta } from '@/data/map-tokens';
@@ -23,6 +27,8 @@ type Props = {
   filtered:    FilteredData;
   actorMeta:   Record<string, ActorMeta>;
   activeStory: MapStory | null;
+  selectedItem: SelectedItem | null;
+  viewState: MapViewState;
   isSatellite: boolean;
   isMobile?:   boolean;
 };
@@ -62,8 +68,16 @@ function statusFill(status: Target['status'] | Asset['status']): [number, number
 
 // Hook
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useMapLayers({ filtered, actorMeta, activeStory, isSatellite, isMobile = false }: Props): any[] {
+ 
+export function useMapLayers({
+  filtered,
+  actorMeta,
+  activeStory,
+  selectedItem,
+  viewState,
+  isSatellite,
+  isMobile = false,
+}: Props): Layer[] {
   return useMemo(() => {
     const alpha    = activeAlpha(isSatellite);
     const dimActive = activeStory !== null;
@@ -75,6 +89,13 @@ export function useMapLayers({ filtered, actorMeta, activeStory, isSatellite, is
     const labelWeight  = isSatellite ? 700 : 400;
     const labelBg: RGBA = isSatellite ? [10, 14, 22, 230] : [28, 33, 39, 200];
     const strokeWidth  = isSatellite ? 2 : 1;
+    const visibleLabels = selectVisibleLabels(
+      filtered.targets,
+      filtered.assets,
+      viewState,
+      selectedItem,
+      activeStory,
+    );
 
     // Heat map
     const heatLayer = filtered.heat.length > 0 && new HeatmapLayer<HeatPoint>({
@@ -203,9 +224,9 @@ export function useMapLayers({ filtered, actorMeta, activeStory, isSatellite, is
     });
 
     // Target labels
-    const targetLabels = !isMobile && filtered.targets.length > 0 && new TextLayer<Target>({
+    const targetLabels = !isMobile && visibleLabels.targets.length > 0 && new TextLayer<Target>({
       id: 'target-labels',
-      data: filtered.targets,
+      data: visibleLabels.targets,
       getPosition:       (d: Target): [number, number] => d.position,
       getText:           (d: Target): string => d.name,
       getSize:           labelSize,
@@ -222,9 +243,9 @@ export function useMapLayers({ filtered, actorMeta, activeStory, isSatellite, is
     });
 
     // Asset labels
-    const assetLabels = !isMobile && filtered.assets.length > 0 && new TextLayer<Asset>({
+    const assetLabels = !isMobile && visibleLabels.assets.length > 0 && new TextLayer<Asset>({
       id: 'asset-labels',
-      data: filtered.assets,
+      data: visibleLabels.assets,
       getPosition:       (d: Asset): [number, number] => d.position,
       getText:           (d: Asset): string => d.name,
       getSize:           isSatellite ? 11 : 10,
@@ -243,8 +264,10 @@ export function useMapLayers({ filtered, actorMeta, activeStory, isSatellite, is
       updateTriggers:    { getColor: [isSatellite], getBackgroundColor: [isSatellite] },
     });
 
-    return [heatLayer, zoneLayer, strikeLayer, missileLayer, targetLayer, assetLayer, targetLabels, assetLabels].filter(Boolean);
-  }, [filtered, actorMeta, activeStory, isSatellite, isMobile]);
+    const layers = [heatLayer, zoneLayer, strikeLayer, missileLayer, targetLayer, assetLayer, targetLabels, assetLabels].filter(Boolean);
+
+    return layers as Layer[];
+  }, [filtered, actorMeta, activeStory, selectedItem, viewState, isSatellite, isMobile]);
 }
 
 // Re-export so tooltip handler can share STATUS_META without another import

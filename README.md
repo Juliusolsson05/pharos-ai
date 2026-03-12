@@ -36,6 +36,12 @@ Named after the [Lighthouse of Alexandria](https://en.wikipedia.org/wiki/Lightho
 
 Next.js 16 · React 19 · TypeScript · DeckGL · MapLibre · Prisma 7 · PostgreSQL · Tailwind CSS · Vercel
 
+## Open-source scope
+
+Pharos is being open-sourced in stages. This repository currently includes the application layer — the dashboard, interface, and supporting app code.
+
+The internal agent layer that ingests and prepares data for the application is not yet included. The goal is to open-source the agent layer around March 12th.
+
 ## License
 
 [AGPL-3.0-only](LICENSE)

@@ -33,6 +33,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.local.example
+!.env.vps.example
 
 # prisma generated client
 /src/generated/prisma
@@ -46,6 +47,7 @@ next-env.d.ts
 
 # temp / scratch files
 temp.txt
+temp/
 API-diff.diff
 
 # Electron build output

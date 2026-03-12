@@ -11,9 +11,13 @@ import {
   STORY_ICON_NAMES,
   ZONE_TYPES,
 } from '@/server/lib/admin-validate';
-import { buildAgentManual } from '@/server/lib/agent-manual';
-import { err,ok } from '@/server/lib/api-utils';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
+import {
+  buildPharosInstructionsMarkdown,
+  PHAROS_RUNTIME_POLICY,
+} from '@/server/lib/pharos-doctrine';
+import { getConflictDayRange, getConflictLocalNow, getConflictTimezone } from '@/server/lib/pharos-time';
 
 export async function GET(
   req: NextRequest,
@@ -24,12 +28,22 @@ export async function GET(
 
   const { conflictId } = await params;
 
-  const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
+  const conflict = await prisma.conflict.findUnique({
+    where: { id: conflictId },
+    select: {
+      id: true,
+      name: true,
+      escalation: true,
+      timezone: true,
+      status: true,
+      threatLevel: true,
+    },
+  });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
 
-  // Fetch live context in parallel
-  const today = new Date().toISOString().slice(0, 10);
-  const todayDate = new Date(today + 'T00:00:00Z');
+  const timezone = getConflictTimezone(conflict);
+  const localNow = getConflictLocalNow(timezone);
+  const { today, dayDate } = getConflictDayRange(timezone);
 
   const [actors, eventCount, storyCount, todaySnapshot, lastEvent] = await Promise.all([
     prisma.actor.findMany({
@@ -40,7 +54,7 @@ export async function GET(
     prisma.intelEvent.count({ where: { conflictId } }),
     prisma.mapStory.count({ where: { conflictId } }),
     prisma.conflictDaySnapshot.findFirst({
-      where: { conflictId, day: todayDate },
+      where: { conflictId, day: dayDate },
       select: { escalation: true },
     }),
     prisma.intelEvent.findFirst({
@@ -51,15 +65,18 @@ export async function GET(
   ]);
 
   const generatedAt = new Date().toISOString();
-
-  // Resolve base URL from request
   const reqUrl = new URL(req.url);
   const baseUrl = `${reqUrl.protocol}//${reqUrl.host}`;
+  const adminBaseUrl = `${baseUrl}/api/v1/admin`;
+  const dashboardUrl = 'https://www.conflicts.app/dashboard';
 
-  const markdown = buildAgentManual({
+  const markdown = buildPharosInstructionsMarkdown({
     conflictId,
-    baseUrl,
-    actors: actors.map(a => ({ id: a.id, name: a.name, mapKey: a.mapKey ?? a.id.toUpperCase() })),
+    adminBaseUrl,
+    dashboardUrl,
+    timezone,
+    today,
+    generatedAt,
     currentState: {
       eventCount,
       storyCount,
@@ -67,16 +84,23 @@ export async function GET(
       hasTodaySnapshot: !!todaySnapshot,
       escalation: todaySnapshot?.escalation ?? conflict.escalation ?? null,
       lastEventAt: lastEvent?.timestamp.toISOString() ?? null,
-      today,
     },
-    generatedAt,
   });
 
   return ok({
+    runtimePolicy: {
+      ...PHAROS_RUNTIME_POLICY,
+      timezone,
+      conflictId,
+      dashboardUrl,
+      adminBaseUrl: `${adminBaseUrl}/${conflictId}`,
+      localNow: localNow.label,
+    },
     markdown,
     meta: {
       conflictId,
       generatedAt,
+      timezone,
       currentState: {
         eventCount,
         storyCount,

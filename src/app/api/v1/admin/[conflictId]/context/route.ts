@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { err,ok } from '@/server/lib/api-utils';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
+import { getConflictDayRange, getConflictLocalNow, getConflictTimezone } from '@/server/lib/pharos-time';
 
 export async function GET(
   req: NextRequest,
@@ -13,29 +14,20 @@ export async function GET(
 
   const { conflictId } = await params;
   const sp = req.nextUrl.searchParams;
-  const hours = Math.min(Number(sp.get('hours')) || 48, 168); // max 7 days
+  const hours = Math.min(Number(sp.get('hours')) || 48, 168);
 
   const conflict = await prisma.conflict.findUnique({
     where: { id: conflictId },
-    select: { id: true, name: true, status: true, threatLevel: true, escalation: true },
+    select: { id: true, name: true, status: true, threatLevel: true, escalation: true, timezone: true },
   });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
 
+  const timezone = getConflictTimezone(conflict);
   const now = new Date();
   const from = new Date(now.getTime() - hours * 60 * 60 * 1000);
-  const today = now.toISOString().slice(0, 10);
-  const todayDate = new Date(today + 'T00:00:00Z');
+  const { today, dayDate } = getConflictDayRange(timezone, now);
 
-  // Run queries in parallel
-  const [
-    recentEvents,
-    recentXPosts,
-    recentMapFeatures,
-    actors,
-    mapStoryAgg,
-    todaySnapshot,
-    latestDay,
-  ] = await Promise.all([
+  const [recentEvents, recentXPosts, recentMapFeatures, actors, mapStoryAgg, todaySnapshot, latestDay] = await Promise.all([
     prisma.intelEvent.findMany({
       where: { conflictId, timestamp: { gte: from } },
       orderBy: { timestamp: 'desc' },
@@ -62,7 +54,7 @@ export async function GET(
     prisma.mapFeature.findMany({
       where: { conflictId, createdAt: { gte: from } },
       orderBy: { createdAt: 'desc' },
-      select: { id: true, featureType: true, actor: true },
+      select: { id: true, featureType: true, actor: true, sourceEventId: true },
     }),
     prisma.actor.findMany({
       where: { conflictId },
@@ -85,7 +77,7 @@ export async function GET(
       _max: { timestamp: true },
     }),
     prisma.conflictDaySnapshot.findFirst({
-      where: { conflictId, day: todayDate },
+      where: { conflictId, day: dayDate },
       select: { id: true },
     }),
     prisma.conflictDaySnapshot.findFirst({
@@ -95,59 +87,60 @@ export async function GET(
     }),
   ]);
 
-  // Build hints
   const eventsWithoutSources = recentEvents
-    .filter(e => e._count.sources === 0)
-    .map(e => e.id);
-  const unlinkedXPosts = recentXPosts.filter(p => !p.eventId).length;
+    .filter(event => event._count.sources === 0)
+    .map(event => event.id);
+  const unlinkedXPosts = recentXPosts.filter(post => !post.eventId).length;
   const actorsWithoutTodaySnapshot = actors
-    .filter(a => {
-      const snap = a.daySnapshots[0];
-      return !snap || snap.day.toISOString().slice(0, 10) !== today;
+    .filter(actor => {
+      const snapshot = actor.daySnapshots[0];
+      return !snapshot || snapshot.day.toISOString().slice(0, 10) !== today;
     })
-    .map(a => a.id);
+    .map(actor => actor.id);
 
   return ok({
     conflict,
     window: { from: from.toISOString(), to: now.toISOString(), hours },
     currentDay: {
       today,
+      timezone,
+      localNow: getConflictLocalNow(timezone, now).label,
       snapshotExists: !!todaySnapshot,
       latestDay: latestDay?.day.toISOString().slice(0, 10) ?? null,
     },
     recentEvents: {
       total: recentEvents.length,
-      items: recentEvents.map(e => ({
-        id: e.id,
-        timestamp: e.timestamp.toISOString(),
-        severity: e.severity,
-        type: e.type,
-        title: e.title,
-        sourceCount: e._count.sources,
-        xPostCount: e._count.xPosts,
+      items: recentEvents.map(event => ({
+        id: event.id,
+        timestamp: event.timestamp.toISOString(),
+        severity: event.severity,
+        type: event.type,
+        title: event.title,
+        sourceCount: event._count.sources,
+        xPostCount: event._count.xPosts,
       })),
     },
     recentXPosts: {
       total: recentXPosts.length,
-      items: recentXPosts.map(p => ({
-        id: p.id,
-        timestamp: p.timestamp.toISOString(),
-        handle: p.handle,
-        significance: p.significance,
-        eventId: p.eventId,
+      items: recentXPosts.map(post => ({
+        id: post.id,
+        timestamp: post.timestamp.toISOString(),
+        handle: post.handle,
+        significance: post.significance,
+        eventId: post.eventId,
       })),
     },
     recentMapFeatures: {
       total: recentMapFeatures.length,
       items: recentMapFeatures,
     },
-    actors: actors.map(a => ({
-      id: a.id,
-      name: a.name,
-      type: a.type,
-      activityLevel: a.activityLevel,
-      stance: a.stance,
-      latestSnapshotDay: a.daySnapshots[0]?.day.toISOString().slice(0, 10) ?? null,
+    actors: actors.map(actor => ({
+      id: actor.id,
+      name: actor.name,
+      type: actor.type,
+      activityLevel: actor.activityLevel,
+      stance: actor.stance,
+      latestSnapshotDay: actor.daySnapshots[0]?.day.toISOString().slice(0, 10) ?? null,
     })),
     mapStories: {
       total: mapStoryAgg._count,

@@ -3,8 +3,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { Toaster } from '@/components/ui/sonner';
 
-import { Header } from '@/shared/components/layout/Header';
-import { ViewportHeightSync } from '@/shared/components/layout/ViewportHeightSync';
+import { SITE_URL } from '@/features/browse/constants';
 
 import { PostHogPageView } from '@/shared/lib/posthog-provider';
 import { QueryProvider } from '@/shared/lib/query-provider';
@@ -13,7 +12,7 @@ import { ReduxProvider } from '@/shared/state/redux-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.conflicts.today'),
+  metadataBase: new URL(SITE_URL),
   applicationName: 'Conflicts.app',
   title: {
     default: 'Conflicts.app - Live Geopolitical Intelligence Dashboard',
@@ -22,7 +21,7 @@ export const metadata: Metadata = {
   description: 'Pharos is a live geopolitical intelligence dashboard for conflict tracking across events, actors, signals, briefs, and map-based analysis.',
   openGraph: {
     type: 'website',
-    url: 'https://www.conflicts.today',
+    url: SITE_URL,
     siteName: 'Conflicts.app',
     title: 'Conflicts.app - Live Geopolitical Intelligence Dashboard',
     description: 'Pharos is a live geopolitical intelligence dashboard for conflict tracking across events, actors, signals, briefs, and map-based analysis.',
@@ -60,13 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PostHogPageView />
         <ReduxProvider>
           <QueryProvider>
-            <ViewportHeightSync />
-            <div className="flex flex-col min-h-0 overflow-hidden" style={{ height: 'var(--app-height)' }}>
-              <Header />
-              <div className="flex flex-1 min-h-0 overflow-hidden pb-[var(--safe-bottom)]">
-                {children}
-              </div>
-            </div>
+            {children}
             <Toaster theme="dark" position="bottom-right" />
           </QueryProvider>
         </ReduxProvider>

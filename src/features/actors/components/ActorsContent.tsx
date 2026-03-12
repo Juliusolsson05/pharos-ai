@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { ArrowLeft,Users } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { track } from '@/shared/lib/analytics';
+import { ArrowLeft, Users } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { ResizableHandle,ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -16,6 +16,7 @@ import { ListDetailScreenSkeleton } from '@/shared/components/loading/screen-ske
 import { DaySelector } from '@/shared/components/shared/DaySelector';
 import { EmptyState } from '@/shared/components/shared/EmptyState';
 
+import { track } from '@/shared/lib/analytics';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
@@ -23,23 +24,34 @@ import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-e
 import { usePanelLayout } from '@/shared/hooks/use-panel-layout';
 
 export function ActorsContent() {
-  const initActor = useMemo(() => {
-    if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('actor');
-  }, []);
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentDay, setDay } = useConflictDay();
   const isMobile = useIsMobile(1024);
   const isLandscapePhone = useIsLandscapePhone();
   const usePageScroll = isMobile && isLandscapePhone;
   const onLandscapeScroll = useLandscapeScrollEmitter(usePageScroll);
 
-  const [selId, setSelId] = useState<string | null>(() => initActor);
+  const selId = searchParams.get('actor');
   const [tab,   setTab]   = useState<'intel' | 'signals' | 'military'>('intel');
   const { defaultLayout, onLayoutChanged } = usePanelLayout({ id: 'actors' });
 
   const { data: actors, isLoading } = useActors(undefined, currentDay || undefined);
   const { data: actorDetail } = useActor(undefined, selId ?? undefined);
   const selected = actorDetail ?? actors?.find(a => a.id === selId) ?? null;
+
+  const handleSelect = useCallback((id: string | null) => {
+    const next = new URLSearchParams(searchParams.toString());
+    if (id) next.set('actor', id);
+    else next.delete('actor');
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    if (id) {
+      setTab('intel');
+      track('actor_selected', { actor_id: id });
+    }
+  }, [pathname, router, searchParams]);
 
   if (isLoading) return <ListDetailScreenSkeleton />;
 
@@ -55,7 +67,7 @@ export function ActorsContent() {
               <Button
                 variant="ghost"
                 size="xs"
-                onClick={() => setSelId(null)}
+                onClick={() => handleSelect(null)}
                 className="mono h-7 px-2 text-[9px] font-bold tracking-[0.06em]"
               >
                 <ArrowLeft size={12} />
@@ -70,7 +82,7 @@ export function ActorsContent() {
         ) : (
           <ActorList
             selectedId={selId}
-            onSelect={id => { setSelId(id); if (id) { setTab('intel'); track('actor_selected', { actor_id: id }); } }}
+            onSelect={handleSelect}
             currentDay={currentDay}
             onDayChange={setDay}
             compact={usePageScroll}
@@ -86,7 +98,7 @@ export function ActorsContent() {
       <ResizablePanel id="list" defaultSize="22%" minSize="15%" maxSize="40%" className="flex flex-col overflow-hidden min-w-[180px]">
         <ActorList
           selectedId={selId}
-          onSelect={id => { setSelId(id); if (id) { setTab('intel'); track('actor_selected', { actor_id: id }); } }}
+          onSelect={handleSelect}
           currentDay={currentDay}
           onDayChange={setDay}
         />

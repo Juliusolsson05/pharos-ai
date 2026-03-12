@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
-import { ArrowRight, BookOpen, Map as MapIcon, TrendingUp,Users, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, Map as MapIcon, TrendingUp, Users, Zap } from 'lucide-react';
 
 import { useActors } from '@/features/actors/queries';
 import { CasChip } from '@/features/dashboard/components/CasChip';
@@ -56,7 +56,21 @@ export function MobileOverview() {
   const totalStories = stories.length;
   const critCount = recentEvents.filter(e => e.severity === 'CRITICAL').length;
   const [expandedSummary, setExpandedSummary] = useState(false);
-  const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
+  const feedHref = (eventId?: string) => {
+    const params = new URLSearchParams();
+    if (latestDay) params.set('day', latestDay);
+    if (eventId) params.set('event', eventId);
+    const qs = params.toString();
+    return qs ? `/dashboard/feed?${qs}` : '/dashboard/feed';
+  };
+  const mapHref = (storyId?: string) => {
+    const params = new URLSearchParams();
+    if (storyId) params.set('story', storyId);
+    const qs = params.toString();
+    return qs ? `/dashboard/map?${qs}` : '/dashboard/map';
+  };
+  const actorsHref = latestDay ? `/dashboard/actors?day=${latestDay}` : '/dashboard/actors';
+  const briefHref = latestDay ? `/dashboard/brief?day=${latestDay}` : '/dashboard/brief';
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto bg-[var(--bg-1)] safe-pb">
@@ -91,7 +105,7 @@ export function MobileOverview() {
       )}
 
       {/* ── GO TO MAP hero ── */}
-      <Link href="/dashboard/map" className="no-underline">
+      <Link href={mapHref()} className="no-underline">
         <div className="safe-px my-3 py-4 bg-[var(--blue-dim)] border border-[var(--blue)] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MapIcon size={20} strokeWidth={2} className="text-[var(--blue-l)]" />
@@ -123,7 +137,7 @@ export function MobileOverview() {
       <div className="border-t border-[var(--bd)]">
         <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
           <span className="section-title">Latest Events</span>
-          <Link href="/dashboard/feed" className="no-underline flex items-center gap-1">
+          <Link href={feedHref()} className="no-underline flex items-center gap-1">
             <span className="mono text-[9px] text-[var(--blue-l)] font-bold">See all</span>
             <ArrowRight size={10} className="text-[var(--blue-l)]" />
           </Link>
@@ -131,7 +145,7 @@ export function MobileOverview() {
         {recentEvents.map((evt, i) => {
           const sc = SEV_C[evt.severity] ?? 'var(--info)';
           return (
-            <Link key={evt.id} href={`/dashboard/feed?event=${evt.id}`} className="no-underline">
+            <Link key={evt.id} href={feedHref(evt.id)} className="no-underline">
               <div
                 className="flex gap-2.5 items-start safe-px py-2 hover:bg-[var(--bg-3)] transition-colors"
                 style={{
@@ -159,7 +173,7 @@ export function MobileOverview() {
         <div className="border-t border-[var(--bd)] mt-0">
           <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
             <span className="section-title">Active Stories</span>
-            <Link href="/dashboard/map" className="no-underline flex items-center gap-1">
+            <Link href={mapHref()} className="no-underline flex items-center gap-1">
               <span className="mono text-[9px] text-[var(--blue-l)] font-bold">Map</span>
               <ArrowRight size={10} className="text-[var(--blue-l)]" />
             </Link>
@@ -171,7 +185,7 @@ export function MobileOverview() {
             };
             const c = catColor[story.category] ?? 'var(--t3)';
             return (
-              <Link key={story.id} href="/dashboard/map" className="no-underline">
+              <Link key={story.id} href={mapHref(story.id)} className="no-underline">
                 <div
                   className="flex gap-2.5 items-start safe-px py-2.5 hover:bg-[var(--bg-3)] transition-colors"
                   style={{
@@ -222,8 +236,9 @@ export function MobileOverview() {
       <div className="border-t border-[var(--bd)] safe-px py-3">
         <div className="grid grid-cols-2 gap-2">
           {[
-            { href: '/dashboard/actors', label: 'ACTORS', icon: Users, color: 'var(--teal)' },
+            { href: actorsHref, label: 'ACTORS', icon: Users, color: 'var(--teal)' },
             { href: '/dashboard/predictions', label: 'PREDICTIONS', icon: TrendingUp, color: 'var(--warning)' },
+            { href: briefHref, label: 'BRIEF', icon: BookOpen, color: 'var(--info)' },
           ].map(nav => (
             <Link key={nav.href} href={nav.href} className="no-underline">
               <div className="flex items-center gap-2.5 px-3 py-3 border border-[var(--bd)] bg-[var(--bg-2)] hover:bg-[var(--bg-3)] transition-colors">

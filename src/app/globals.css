@@ -77,12 +77,69 @@
   --radius:                2px;
 }
 
+/* ── Browse light theme (follows OS preference) ───────────────────────────
+   Only applies inside [data-theme="auto"]. Dashboard stays dark always.
+──────────────────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] {
+    --bg-app:    #FFFFFF;
+    --bg-1:      #FFFFFF;
+    --bg-2:      #FFFFFF;
+    --bg-3:      #F0F0F0;
+    --bg-sel:    #E3ECFF;
+
+    --bd:        #D5D5D5;
+    --bd-s:      #E5E5E5;
+
+    --t1:        #111111;
+    --t2:        #444444;
+    --t3:        #666666;
+    --t4:        #888888;
+
+    --blue:      #0066CC;
+    --blue-l:    #0066CC;
+    --blue-dim:  rgba(0, 102, 204, 0.06);
+
+    --danger:    #CC0000;
+    --warning:   #CC6600;
+    --success:   #008800;
+    --info:      #0066CC;
+
+    --danger-dim:  rgba(204, 0, 0, 0.08);
+    --danger-bd:   rgba(204, 0, 0, 0.25);
+    --warning-dim: rgba(204, 102, 0, 0.08);
+    --warning-bd:  rgba(204, 102, 0, 0.25);
+    --success-dim: rgba(0, 136, 0, 0.08);
+    --success-bd:  rgba(0, 136, 0, 0.25);
+    --info-dim:    rgba(0, 102, 204, 0.08);
+    --info-bd:     rgba(0, 102, 204, 0.25);
+    --blue-sel:    rgba(0, 102, 204, 0.06);
+
+    --background:            #FFFFFF;
+    --foreground:            #111111;
+    --muted:                 #F4F4F4;
+    --muted-foreground:      #666666;
+    --border:                #D5D5D5;
+    --input:                 #EAEAEA;
+    --primary:               #0066CC;
+    --primary-foreground:    #FFFFFF;
+    --secondary:             #F4F4F4;
+    --secondary-foreground:  #444444;
+    --accent:                #EAEAEA;
+    --accent-foreground:     #111111;
+    --destructive:           #CC0000;
+
+    color-scheme: light;
+  }
+}
+
+
 /* ── Base — resets and body defaults ────────────────────────────────────────
    Wrapped in @layer base so Tailwind utilities always win.
 ──────────────────────────────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
+  html, body { height: 100%; }
 
   @supports (height: 100dvh) {
     :root { --app-height: 100dvh; }
@@ -305,6 +362,12 @@
   }
   [data-slot="resizable-handle"][aria-orientation="horizontal"] {
     height: 1px !important;
+  }
+
+  /* Critical timeline pulse */
+  @keyframes pulse-danger {
+    0%, 100% { box-shadow: 0 0 6px var(--danger), 0 0 12px var(--danger-dim); }
+    50% { box-shadow: 0 0 8px var(--danger), 0 0 20px var(--danger-dim); }
   }
 
   /* Hide map attribution / copyright */

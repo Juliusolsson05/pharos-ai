@@ -1,0 +1,53 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false # never cancel an in-flight migration
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  migrate:
+    name: Migrate Production DB
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check pending migrations
+        id: status
+        run: |
+          OUTPUT=$(npx prisma migrate status 2>&1) || true
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "Database schema is up to date"; then
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
+
+      - name: Apply pending migrations
+        if: steps.status.outputs.pending == 'true'
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
+
+      - name: Verify migration status
+        run: npx prisma migrate status
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}

@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { MapViewState, PickingInfo } from '@deck.gl/core';
-
-import { track } from '@/shared/lib/analytics';
 
 import type { OverlayVisibility } from '@/features/map/components/MapVisibilityMenu';
 import type { SelectedItem } from '@/features/map/components/types';
@@ -22,12 +22,17 @@ import {
   toggleSidebar   as toggleSidebarAction,
 } from '@/features/map/state/map-slice';
 
+import { track } from '@/shared/lib/analytics';
+
 import type { Asset, MissileTrack, StrikeArc, Target, ThreatZone } from '@/data/map-data';
 
-import { useAppDispatch,useAppSelector } from '@/shared/state';
+import { useAppDispatch, useAppSelector } from '@/shared/state';
 
 export function useMapPage({ isMobile }: { isMobile: boolean }) {
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const viewState    = useAppSelector(s => s.map.viewState);
   const activeStory  = useAppSelector(s => s.map.activeStory);
   const selectedItem = useAppSelector(s => s.map.selectedItem);
@@ -52,6 +57,8 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     filtered:    f.filtered,
     actorMeta:   f.actorMeta,
     activeStory,
+    selectedItem,
+    viewState,
     isSatellite: mapStyle === 'satellite',
     isMobile,
   });
@@ -78,6 +85,29 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
   const showTimeline = overlayVisibility.timeline && !(isMobile && !!selectedItem);
   const isLoading = storiesLoading || f.isLoading;
 
+  const storyId = searchParams.get('story');
+
+  useEffect(() => {
+    if (!storyId) {
+      if (activeStory) dispatch(setActiveStoryAction(null));
+      return;
+    }
+
+    const nextStory = stories.find(story => story.id === storyId) ?? null;
+    if (!nextStory) return;
+    if (activeStory?.id === nextStory.id) return;
+
+    dispatch(activateStoryAction(nextStory));
+  }, [activeStory, dispatch, stories, storyId]);
+
+  const syncStoryQuery = useCallback((story: Parameters<typeof activateStoryAction>[0] | null) => {
+    const next = new URLSearchParams(searchParams.toString());
+    if (story) next.set('story', story.id);
+    else next.delete('story');
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams]);
+
   return {
     dispatch,
     viewState,
@@ -96,8 +126,15 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     isLoading,
     // Actions (pre-bound for convenience)
     setViewState:    (vs: MapViewState) => { dispatch(setViewStateAction(vs)); },
-    activateStory:   (story: Parameters<typeof activateStoryAction>[0]) => { track('map_story_activated', { story_id: story?.id }); return dispatch(activateStoryAction(story)); },
-    setActiveStory:  (story: Parameters<typeof setActiveStoryAction>[0]) => dispatch(setActiveStoryAction(story)),
+    activateStory:   (story: Parameters<typeof activateStoryAction>[0]) => {
+      syncStoryQuery(story);
+      track('map_story_activated', { story_id: story?.id });
+      return dispatch(activateStoryAction(story));
+    },
+    setActiveStory:  (story: Parameters<typeof setActiveStoryAction>[0]) => {
+      syncStoryQuery(story);
+      return dispatch(setActiveStoryAction(story));
+    },
     setSelectedItem: (item: Parameters<typeof setSelectedItemAction>[0]) => dispatch(setSelectedItemAction(item)),
     toggleSidebar:   () => dispatch(toggleSidebarAction()),
     setSidebarOpen:  (open: boolean) => dispatch(setSidebarOpenAction(open)),

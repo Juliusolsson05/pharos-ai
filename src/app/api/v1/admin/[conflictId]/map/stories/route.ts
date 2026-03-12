@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
+import { validateOptionalEventId, validateOptionalEventIds } from '@/server/lib/admin-relations';
 import { assertEnum, assertRequired, parseISODate, safeJson, STORY_ICON_NAMES } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
@@ -48,6 +49,12 @@ export async function POST(
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
 
+  const primaryErr = await validateOptionalEventId(conflictId, body.primaryEventId ?? null);
+  if (primaryErr) return err('VALIDATION', primaryErr);
+
+  const sourceIdsErr = await validateOptionalEventIds(conflictId, body.sourceEventIds ?? []);
+  if (sourceIdsErr) return err('VALIDATION', sourceIdsErr);
+
   // Enforcement dry-run — quality checks, no DB write
   if (isEnforcementMode(req)) {
     const existingTitles = (
@@ -64,6 +71,8 @@ export async function POST(
     data: {
       id: body.id,
       conflictId,
+      primaryEventId: body.primaryEventId ?? null,
+      sourceEventIds: body.sourceEventIds ?? [],
       title: body.title,
       tagline: body.tagline,
       iconName: body.iconName,

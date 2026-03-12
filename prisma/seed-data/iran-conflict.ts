@@ -9,6 +9,7 @@ export const CONFLICT = {
   threatLevel:   'CRITICAL' as const,
   startDate:     '2026-02-28T04:30:00Z',  // first strikes, Tehran
   region:        'Iran / Persian Gulf / Middle East',
+  timezone:      'Europe/Stockholm',
   escalation:    94,
 
   summary: `On February 28, 2026, the United States and Israel launched a coordinated joint strike on Iran — the most ambitious Western military operation against the Islamic Republic since its founding. Codenamed Operation Epic Fury by the Pentagon and Operation Roaring Lion by the IDF, the campaign targeted Iranian nuclear facilities, ballistic missile infrastructure, air defense networks, and regime leadership. Supreme Leader Ali Khamenei was killed when his compound in Tehran was struck. 48 Iranian leaders have been killed. Iran responded with Operation True Promise 4 — launching 700+ drones and hundreds of missiles at targets in 9+ countries, killing 6 US service members and 11 Israeli civilians. On Day 3, Hezbollah entered the war and Israel launched a ground incursion into southern Lebanon (40 killed, 246 injured, 30K displaced). Iran struck the US Embassy in Riyadh with drones, forcing the US to close embassies in Saudi Arabia and Kuwait. QatarEnergy halted ALL LNG production. The IDF "struck and dismantled" Iran's state broadcaster IRIB and bombed the Assembly of Experts in Qom — the body that appoints the next Supreme Leader. Iran's death toll stands at 787 across 131+ cities. Brent crude hit a 19-month high approaching $80/bbl. Trump laid out 4 objectives and estimated 4–5 weeks but said the US could go "far longer." Operations are ongoing on Day 4.`,
@@ -325,4 +326,3 @@ export const CONFLICT = {
     },
   ] as ConflictDaySnapshot[],
 };
-

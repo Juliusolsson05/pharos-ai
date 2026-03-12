@@ -44,6 +44,7 @@ export async function PUT(
   if (body.name !== undefined) data.name = body.name;
   if (body.summary !== undefined) data.summary = body.summary;
   if (body.keyFacts !== undefined) data.keyFacts = body.keyFacts;
+  if (body.timezone !== undefined) data.timezone = body.timezone;
 
   const updated = await prisma.conflict.update({ where: { id: conflictId }, data });
 

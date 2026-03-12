@@ -8,8 +8,16 @@ import { fmtDate, fmtTimeZ } from '@/shared/lib/format';
 
 import type { Asset, MissileTrack, StrikeArc, Target, ThreatZone } from '@/data/map-data';
 import type { ActorMeta } from '@/data/map-tokens';
-import { CATEGORY_LABEL, STATUS_META } from '@/data/map-tokens';
+import { CATEGORY_LABEL, STATUS_META, type MarkerStatus } from '@/data/map-tokens';
 import type { MapStory } from '@/types/domain';
+
+const FALLBACK_STATUS = { label: 'Unknown', cssVar: 'var(--t4)' } as const;
+
+/** Safe STATUS_META lookup — returns fallback for null/unknown status values. */
+function statusMeta(status: string | null | undefined) {
+  if (!status) return FALLBACK_STATUS;
+  return STATUS_META[status as MarkerStatus] ?? FALLBACK_STATUS;
+}
 
 import { StoryIcon } from './StoryIcon';
 import type { SelectedItem } from './types';
@@ -132,7 +140,7 @@ export function StrikeContent({ d, onSelectItem, onActivateStory }: {
   const { rawData, stories, actorMeta } = useMapCrossRefData();
   const relatedTarget  = rawData ? targetForStrike(d, rawData.targets) : null;
   const relatedStories = storiesFor([d.id], 'highlightStrikeIds', stories);
-  const statusMeta     = STATUS_META[d.status];
+  const sMeta          = statusMeta(d.status);
 
   return (
     <>
@@ -140,7 +148,7 @@ export function StrikeContent({ d, onSelectItem, onActivateStory }: {
       <div className="flex gap-1 flex-wrap" style={{ marginBottom: 14 }}>
         <Badge label={d.type.replace('_', ' ')} color={am(d.actor, actorMeta).cssVar} />
         <Badge label={d.severity}               color={d.severity === 'CRITICAL' ? 'var(--danger)' : 'var(--warning)'} />
-        <Badge label={statusMeta.label}          color={statusMeta.cssVar} />
+        <Badge label={sMeta.label}               color={sMeta.cssVar} />
       </div>
       {d.timestamp && <Row label="TIME" value={`${fmtDate(d.timestamp)} · ${fmtTimeZ(d.timestamp)}`} color="var(--blue-l)" />}
       <Row label="ORIGIN"        value={`[${d.from[1].toFixed(2)}°N, ${d.from[0].toFixed(2)}°E]`} />
@@ -152,7 +160,7 @@ export function StrikeContent({ d, onSelectItem, onActivateStory }: {
           <Button variant="ghost" onClick={() => onSelectItem({ type: 'target', data: relatedTarget })}
             className="flex items-center gap-2 w-full text-left hover:border-[var(--bd)] transition-colors" style={{ background: 'var(--bg-1)', border: '1px solid var(--bd-s)', borderRadius: 2, padding: '8px 10px' }}
           >
-            <span className="dot" style={{ background: STATUS_META[relatedTarget.status].cssVar }} />
+            <span className="dot" style={{ background: statusMeta(relatedTarget.status).cssVar }} />
             <div className="flex-1 min-w-0">
               <p style={{ fontSize: 11, color: 'var(--t2)', fontWeight: 600 }}>{relatedTarget.name}</p>
               <p className="mono" style={{ fontSize: 9, color: 'var(--t4)', marginTop: 1 }}>
@@ -209,7 +217,7 @@ export function TargetContent({ d, onSelectItem, onActivateStory }: {
   onActivateStory: (s: MapStory) => void;
 }) {
   const { rawData, stories, actorMeta } = useMapCrossRefData();
-  const statusMeta     = STATUS_META[d.status];
+  const tStatusMeta    = statusMeta(d.status);
   const m              = am(d.actor, actorMeta);
   const incomingStrikes = rawData ? strikesForTarget(d, rawData.strikes) : [];
   const relatedStories = storiesFor([d.id], 'highlightTargetIds', stories);
@@ -219,7 +227,7 @@ export function TargetContent({ d, onSelectItem, onActivateStory }: {
       <HierarchyBreadcrumb actor={d.actor} category={d.category} type={d.type} actorMeta={actorMeta} />
       <div className="flex gap-1 flex-wrap" style={{ marginBottom: 12 }}>
         <Badge label={d.type.replace('_', ' ')} color={m.cssVar} />
-        <Badge label={d.status}                 color={statusMeta.cssVar} />
+        <Badge label={tStatusMeta.label}        color={tStatusMeta.cssVar} />
       </div>
       <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>{d.description}</p>
       {d.timestamp && <Row label="TIME" value={`${fmtDate(d.timestamp)} · ${fmtTimeZ(d.timestamp)}`} color="var(--blue-l)" />}
@@ -269,7 +277,7 @@ export function AssetContent({ d, onActivateStory }: {
       <div className="flex gap-1 flex-wrap" style={{ marginBottom: 12 }}>
         <Badge label={m.label}                    color={m.cssVar} />
         <Badge label={d.type.replace('_', ' ')}   color="var(--t3)" />
-        <Badge label={STATUS_META[d.status].label} color={STATUS_META[d.status].cssVar} />
+        <Badge label={statusMeta(d.status).label} color={statusMeta(d.status).cssVar} />
         {d.type === 'CARRIER' && <Badge label="CARRIER STRIKE GROUP" color="var(--warning)" />}
       </div>
       {d.description && (

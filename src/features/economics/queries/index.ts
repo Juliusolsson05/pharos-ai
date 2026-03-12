@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { api, buildUrl } from '@/shared/lib/query/client';
-import { queryKeys, STALE } from '@/shared/lib/query/keys';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 import type { EconFilters, EconomicIndex, MarketResult } from '@/types/domain';
 
@@ -16,6 +16,7 @@ export function useEconomicIndexes(filters?: EconFilters) {
         }),
       ),
     staleTime: STALE.LONG,
+    refetchInterval: REFETCH.SLOW,
   });
 }
 
@@ -36,6 +37,6 @@ export function useMarketData(
       ),
     staleTime: STALE.LONG,
     enabled: tickers.length > 0,
-    refetchInterval: 2 * 60_000,
+    refetchInterval: REFETCH.FAST,
   });
 }

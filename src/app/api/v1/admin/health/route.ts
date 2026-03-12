@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (denied) return denied;
 
   try {
-    await prisma.$queryRawUnsafe('SELECT 1');
+    await prisma.$queryRaw`SELECT 1`;
     return ok({ status: 'healthy', db: 'connected', timestamp: new Date().toISOString() });
   } catch {
     return err('DB_ERROR', 'Database connection failed', 503);

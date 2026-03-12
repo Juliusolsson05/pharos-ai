@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { STALE } from '@/shared/lib/query/keys';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: STALE.SHORT } },
+  defaultOptions: { queries: { staleTime: STALE.SHORT, refetchOnWindowFocus: true } },
 });
 
 type Props = { children: React.ReactNode };

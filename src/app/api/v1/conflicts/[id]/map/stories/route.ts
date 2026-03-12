@@ -20,6 +20,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   const data = stories.map(s => ({
     id: s.id,
+    primaryEventId: s.primaryEventId,
+    sourceEventIds: s.sourceEventIds,
     title: s.title,
     tagline: s.tagline,
     iconName: s.iconName,

@@ -1,23 +1,23 @@
 'use client';
 
-import { useCallback, useEffect, useMemo,useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
-import { track } from '@/shared/lib/analytics';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 
 import { AllFeedsView } from '@/features/news/components/AllFeedsView';
 import { ChannelView } from '@/features/news/components/ChannelView';
 import { ConflictBanner } from '@/features/news/components/ConflictBanner';
-import { CLIENT_FRESH_TTL,clientCache } from '@/features/news/lib/client-cache';
-import { fetchFeedItems,useRssCollections, useRssFeeds } from '@/features/news/queries';
+import { useRssCollections, useRssFeedItems, useRssFeeds } from '@/features/news/queries';
 
+import { track } from '@/shared/lib/analytics';
+import { queryKeys } from '@/shared/lib/query/keys';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
-
-import type { FeedItem } from '@/types/domain';
+import { useNow } from '@/shared/hooks/use-now';
 
 type ViewMode = 'conflict' | 'all';
 
@@ -25,92 +25,28 @@ export function NewsContent() {
   const [viewMode, setViewMode] = useState<ViewMode>('conflict');
   const [activeChannel, setActiveChannel] = useState(0);
   const [showImages, setShowImages] = useState(true);
-  const [feedData, setFeedData] = useState<Map<string, FeedItem[]>>(new Map());
-  const [lastRefresh, setLastRefresh] = useState<number>(0);
-  const [refreshing, setRefreshing] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isLandscapePhone = useIsLandscapePhone();
   const onLandscapeScroll = useLandscapeScrollEmitter(isLandscapePhone);
+  const now = useNow();
+  const queryClient = useQueryClient();
 
   const { data: feeds } = useRssFeeds();
   const { data: collections } = useRssCollections();
   const allFeeds = useMemo(() => feeds ?? [], [feeds]);
+  const feedIds = useMemo(() => allFeeds.map(f => f.id), [allFeeds]);
+
+  const { data: feedData, isFetching, dataUpdatedAt } = useRssFeedItems(feedIds);
 
   const collection = collections?.[0];
   const channel = collection?.channels[activeChannel];
 
-  const fetchFeeds = useCallback(async (ids?: string[]) => {
-    setRefreshing(true);
-    try {
-      const feedIds = ids ?? allFeeds.map(f => f.id);
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.rss.fetchItems(feedIds) });
+    track('news_manual_refresh');
+  };
 
-      // Only fetch stale feeds
-      const staleIds = feedIds.filter(id => {
-        const cached = clientCache.get(id);
-        return !cached || Date.now() - cached.fetchedAt > CLIENT_FRESH_TTL;
-      });
-
-      if (staleIds.length === 0) {
-        const map = new Map<string, FeedItem[]>();
-        feedIds.forEach(id => {
-          const cached = clientCache.get(id);
-          if (cached) map.set(id, cached.items);
-        });
-        setFeedData(map);
-        setRefreshing(false);
-        return;
-      }
-
-      // Fetch stale from server
-      const feeds = await fetchFeedItems(staleIds);
-
-      // Update client cache — always update if items present; for empty/error
-      // feeds, only update if we don't already have cached items (preserve stale data)
-      const now = Date.now();
-      for (const feed of feeds) {
-        if (feed.items?.length > 0) {
-          clientCache.set(feed.feedId, {
-            feedId: feed.feedId,
-            items: feed.items,
-            fetchedAt: now,
-          });
-        } else if (!clientCache.has(feed.feedId)) {
-          clientCache.set(feed.feedId, {
-            feedId: feed.feedId,
-            items: [],
-            fetchedAt: now,
-          });
-        }
-      }
-
-      const map = new Map<string, FeedItem[]>();
-      feedIds.forEach(id => {
-        const cached = clientCache.get(id);
-        if (cached) map.set(id, cached.items);
-      });
-      setFeedData(map);
-      setLastRefresh(now);
-    } catch (err) {
-    } finally {
-      setRefreshing(false);
-    }
-  }, [allFeeds]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchFeeds();
-  }, [fetchFeeds]);
-
-  // Auto-refresh every 5 minutes
-  useEffect(() => {
-    intervalRef.current = setInterval(() => fetchFeeds(), 5 * 60 * 1000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [fetchFeeds]);
-
-  const timeSinceRefresh = lastRefresh
-    ? `${Math.floor((Date.now() - lastRefresh) / 1000)}s ago`
+  const timeSinceRefresh = dataUpdatedAt
+    ? `${Math.floor((now - dataUpdatedAt) / 1000)}s ago`
     : 'loading...';
 
   return (
@@ -181,13 +117,13 @@ export function NewsContent() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => { fetchFeeds(); track('news_manual_refresh'); }}
-            disabled={refreshing}
+            onClick={handleRefresh}
+            disabled={isFetching}
             className="flex items-center gap-2 h-auto px-2 py-1 text-[9px] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
           >
             <svg
               width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"
-              className={refreshing ? 'animate-spin' : ''}
+              className={isFetching ? 'animate-spin' : ''}
             >
               <path d="M1 6a5 5 0 0 1 9-3M11 6a5 5 0 0 1-9 3" />
               <path d="M1 1v4h4M11 11v-4h-4" />
@@ -196,9 +132,9 @@ export function NewsContent() {
           </Button>
 
           <div className="flex items-center gap-2">
-            <div className={`dot ${refreshing ? 'dot-warn' : 'dot-live'}`} />
+            <div className={`dot ${isFetching ? 'dot-warn' : 'dot-live'}`} />
             <span className="mono text-[9px] text-[var(--t4)]">
-              {refreshing ? 'refreshing...' : timeSinceRefresh}
+              {isFetching ? 'refreshing...' : timeSinceRefresh}
             </span>
           </div>
           </div>
@@ -212,11 +148,11 @@ export function NewsContent() {
             activeChannel={activeChannel}
             onChannelChange={setActiveChannel}
           />
-          <ChannelView channel={channel} showImages={showImages} feedData={feedData} />
+          <ChannelView channel={channel} showImages={showImages} feedData={feedData ?? new Map()} />
         </>
       )}
 
-      {viewMode === 'all' && <AllFeedsView showImages={showImages} feedData={feedData} />}
+      {viewMode === 'all' && <AllFeedsView showImages={showImages} feedData={feedData ?? new Map()} />}
     </div>
   );
 }

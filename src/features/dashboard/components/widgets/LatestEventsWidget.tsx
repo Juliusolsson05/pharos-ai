@@ -29,7 +29,7 @@ export function LatestEventsWidget() {
       {events.map((evt, i) => {
         const sc = SEV_C[evt.severity] ?? 'var(--info)';
         return (
-          <Link key={evt.id} href={`/dashboard/feed?event=${evt.id}`} className="no-underline">
+          <Link key={evt.id} href={`/dashboard/feed?day=${day}&event=${evt.id}`} className="no-underline">
             <div
               className="flex gap-3 items-start px-4 py-2 cursor-pointer hover:bg-[var(--bg-3)] transition-colors"
               style={{ borderBottom: i < events.length - 1 ? '1px solid var(--bd-s)' : 'none' }}

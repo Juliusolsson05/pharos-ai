@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
+import { validateOptionalEventId, validateOptionalEventIds } from '@/server/lib/admin-relations';
 import { assertEnum, parseISODate, safeJson, STORY_ICON_NAMES } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
@@ -39,6 +40,16 @@ export async function PUT(
     const e = assertEnum(body.iconName, STORY_ICON_NAMES, 'iconName');
     if (e) return err('VALIDATION', e);
     data.iconName = body.iconName;
+  }
+  if (body.primaryEventId !== undefined) {
+    const primaryErr = await validateOptionalEventId(conflictId, body.primaryEventId);
+    if (primaryErr) return err('VALIDATION', primaryErr);
+    data.primaryEventId = body.primaryEventId;
+  }
+  if (body.sourceEventIds !== undefined) {
+    const sourceErr = await validateOptionalEventIds(conflictId, body.sourceEventIds);
+    if (sourceErr) return err('VALIDATION', sourceErr);
+    data.sourceEventIds = body.sourceEventIds;
   }
   if (body.timestamp !== undefined) {
     const ts = parseISODate(body.timestamp, 'timestamp');

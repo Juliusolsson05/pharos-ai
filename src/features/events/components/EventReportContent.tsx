@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 import { ArrowRight } from 'lucide-react';
 
@@ -34,6 +35,8 @@ type Props = {
 
 export function EventReportContent({ event, compact = false, pageScroll = false }: Props) {
   const sc = SEV_C[event.severity] ?? 'var(--info)';
+  const searchParams = useSearchParams();
+  const day = searchParams.get('day');
 
   return (
     <div className={cn(compact ? (pageScroll ? 'safe-px py-3' : 'px-3 py-3') : 'px-6 py-5')}>
@@ -103,8 +106,11 @@ export function EventReportContent({ event, compact = false, pageScroll = false 
           <div className="flex flex-col gap-1.5">
             {event.actorResponses.map((r, i) => {
               const stC = STANCE_C[r.stance] ?? 'var(--t2)';
+              const actorHref = day
+                ? `/dashboard/actors?day=${day}&actor=${r.actorId}`
+                : `/dashboard/actors?actor=${r.actorId}`;
               return (
-                <Link key={i} href={`/dashboard/actors?actor=${r.actorId}`} className="no-underline">
+                <Link key={i} href={actorHref} className="no-underline">
                   <div
                     className="px-3 py-2 border border-[var(--bd)] cursor-pointer hover:bg-[var(--bg-3)] transition-colors"
                     style={{ borderLeft: `3px solid ${stC}` }}

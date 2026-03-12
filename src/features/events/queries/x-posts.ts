@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { publicConflictId } from '@/shared/lib/env';
 import { api, buildUrl } from '@/shared/lib/query/client';
-import { queryKeys, STALE } from '@/shared/lib/query/keys';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 import type { XPost, XPostFilters } from '@/types/domain';
 
@@ -21,6 +21,7 @@ export function useXPosts(id: string = CONFLICT_ID, filters?: XPostFilters) {
         }),
       ),
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }
 
@@ -31,6 +32,7 @@ export function useXPostsByEvent(id: string = CONFLICT_ID, eventId?: string) {
       api.get<XPost[]>(`/conflicts/${id}/x-posts/by-event/${eventId}`),
     enabled: !!eventId,
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }
 
@@ -41,5 +43,6 @@ export function useXPostsByActor(id: string = CONFLICT_ID, actorId?: string) {
       api.get<XPost[]>(`/conflicts/${id}/x-posts/by-actor/${actorId}`),
     enabled: !!actorId,
     staleTime: STALE.SHORT,
+    refetchInterval: REFETCH.FAST,
   });
 }

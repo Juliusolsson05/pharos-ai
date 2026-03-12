@@ -213,14 +213,28 @@ export function checkEventEnforcement(
     });
   }
 
-  // No sources
+  // No sources — stronger for HIGH/CRITICAL
   const sources = Array.isArray(body.sources) ? body.sources : [];
   if (sources.length === 0) {
+    const isHighValue = body.severity === 'CRITICAL' || body.severity === 'HIGH';
     issues.push({
       code: 'EVENT_NO_SOURCES',
       field: 'sources',
+      severity: isHighValue ? 'error' : 'warning',
+      message: isHighValue
+        ? `No sources on a ${body.severity} event. Sources are required — add at least one inline (name, tier, reliability, url) on create. A ${body.severity} event without sources is incomplete product.`
+        : 'No sources provided. Add at least one source inline (name, tier 1–5, reliability 0–100) or via POST /events/{id}/sources afterward.',
+    });
+  }
+
+  // No actor responses on HIGH/CRITICAL
+  const actorResponses = Array.isArray(body.actorResponses) ? body.actorResponses : [];
+  if (actorResponses.length === 0 && (body.severity === 'CRITICAL' || body.severity === 'HIGH')) {
+    issues.push({
+      code: 'EVENT_NO_RESPONSES_HIGH_VALUE',
+      field: 'actorResponses',
       severity: 'warning',
-      message: 'No sources provided. Add at least one source inline (name, tier 1–5, reliability 0–100) or via POST /events/{id}/sources afterward. Events without sources fail the /validate check.',
+      message: `No actor responses on a ${body.severity} event. For HIGH and CRITICAL events, actor responses are expected — who reacted, what did they say or do? Add inline actorResponses or create via POST /actors/{actorId}/responses.`,
     });
   }
 
@@ -356,8 +370,8 @@ export function checkDaySnapshotEnforcement(body: Record<string, unknown>): Enfo
     issues.push({
       code: 'DAY_NO_SCENARIOS',
       field: 'scenarios',
-      severity: 'warning',
-      message: 'No scenario forecasts provided. Add 2–3 scenarios (Full Escalation, Contained Response, Diplomatic Off-ramp) with probability estimates — these are key for the intelligence dashboard.',
+      severity: 'error',
+      message: 'No scenario forecasts provided. Add 2–3 scenarios (Full Escalation, Contained Response, Diplomatic Off-ramp) with probability estimates — these are key for the intelligence dashboard. A day snapshot without scenarios is incomplete product.',
     });
   }
 
@@ -367,8 +381,10 @@ export function checkDaySnapshotEnforcement(body: Record<string, unknown>): Enfo
     issues.push({
       code: 'DAY_TOO_FEW_KEY_FACTS',
       field: 'keyFacts',
-      severity: 'warning',
-      message: `Only ${keyFacts.length} key fact(s). Add at least 3 — concrete data points like casualty numbers, specific strikes, diplomatic moves, economic figures.`,
+      severity: keyFacts.length === 0 ? 'error' : 'warning',
+      message: keyFacts.length === 0
+        ? 'No key facts provided. A day snapshot must have concrete data points — casualty numbers, specific strikes, diplomatic moves, economic figures. Aim for 5+.'
+        : `Only ${keyFacts.length} key fact(s). Add at least 3–5 concrete data points.`,
     });
   }
 
@@ -378,8 +394,30 @@ export function checkDaySnapshotEnforcement(body: Record<string, unknown>): Enfo
     issues.push({
       code: 'DAY_NO_CASUALTIES',
       field: 'casualties',
+      severity: 'error',
+      message: 'No casualty summary provided. Include casualties for all relevant factions — even if count is 0, state it explicitly. A day snapshot without casualties is incomplete product.',
+    });
+  }
+
+  // No economic chips
+  const economicChips = Array.isArray(body.economicChips) ? body.economicChips : [];
+  if (economicChips.length === 0) {
+    issues.push({
+      code: 'DAY_NO_ECONOMIC_CHIPS',
+      field: 'economicChips',
       severity: 'warning',
-      message: 'No casualty summary provided. Include casualties for all relevant factions — even if count is 0, state it explicitly.',
+      message: 'No economic impact chips provided. Add labeled metric cards (oil price, shipping costs, market impact, sanctions status) — these appear as the economic dashboard section.',
+    });
+  }
+
+  // No economic narrative
+  const economicNarrative = typeof body.economicNarrative === 'string' ? body.economicNarrative : '';
+  if (economicNarrative.length < 20) {
+    issues.push({
+      code: 'DAY_NO_ECONOMIC_NARRATIVE',
+      field: 'economicNarrative',
+      severity: 'warning',
+      message: 'Economic narrative is empty or too short. Write an analytical paragraph covering economic consequences of the day\'s events (energy, shipping, markets, sanctions).',
     });
   }
 
@@ -388,7 +426,7 @@ export function checkDaySnapshotEnforcement(body: Record<string, unknown>): Enfo
     issues.push({
       code: 'DAY_HIGH_ESCALATION_NO_FACTS',
       field: 'keyFacts',
-      severity: 'warning',
+      severity: 'error',
       message: `Escalation is ${body.escalation}/100 but no key facts are provided. High escalation scores need supporting evidence — what specific events drove it this high?`,
     });
   }

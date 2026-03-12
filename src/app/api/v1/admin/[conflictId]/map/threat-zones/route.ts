@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
+import { validateOptionalEventId } from '@/server/lib/admin-relations';
 import { assertEnum, assertRequired, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, safeJson, ZONE_TYPES } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
@@ -36,6 +37,9 @@ export async function POST(
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
 
+  const eventErr = await validateOptionalEventId(conflictId, body.sourceEventId ?? null);
+  if (eventErr) return err('VALIDATION', eventErr);
+
   const existing = await prisma.mapFeature.findUnique({ where: { id: body.id } });
   if (existing) return err('DUPLICATE', `Map feature ${body.id} already exists`, 409);
 
@@ -51,6 +55,7 @@ export async function POST(
       id: body.id,
       conflictId,
       featureType: 'THREAT_ZONE',
+      sourceEventId: body.sourceEventId ?? null,
       actor: body.actor,
       priority: body.priority,
       category: body.category,

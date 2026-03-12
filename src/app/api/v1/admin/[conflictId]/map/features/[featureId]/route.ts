@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
+import { validateOptionalEventId } from '@/server/lib/admin-relations';
 import { assertEnum, INSTALLATION_STATUSES,INSTALLATION_TYPES, KINETIC_STATUSES, KINETIC_TYPES, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, safeJson, ZONE_TYPES } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
@@ -61,6 +62,11 @@ export async function PUT(
       if (typeof ts === 'string') return err('VALIDATION', ts);
       data.timestamp = ts;
     }
+  }
+  if (body.sourceEventId !== undefined) {
+    const eventErr = await validateOptionalEventId(conflictId, body.sourceEventId);
+    if (eventErr) return err('VALIDATION', eventErr);
+    data.sourceEventId = body.sourceEventId;
   }
 
   const updated = await prisma.mapFeature.update({ where: { id: featureId }, data });

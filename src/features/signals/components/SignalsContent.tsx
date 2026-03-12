@@ -1,20 +1,19 @@
 'use client';
 
-import { useMemo,useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-
-import { track } from '@/shared/lib/analytics';
-import { ResizableHandle,ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { useXPosts } from '@/features/events/queries/x-posts';
 import { SectionHeader } from '@/features/signals/components/SectionHeader';
-import { type AccountType,SignalFilterRail, type Significance } from '@/features/signals/components/SignalFilterRail';
+import { type AccountType, SignalFilterRail, type Significance } from '@/features/signals/components/SignalFilterRail';
 import { ListDetailScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
 
-import { getPostsForDay } from '@/shared/lib/day-filter';
+import { track } from '@/shared/lib/analytics';
+import { dayLabel, dayShort, getDayFromTimestamp, getPostsForDay } from '@/shared/lib/day-filter';
 import { timeAgo } from '@/shared/lib/format';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
@@ -51,9 +50,19 @@ export function SignalsContent() {
     });
   }, [sigFilter, acctFilter, pharosOnly, verifiedOnly, currentDay, showAll, allPosts, allDays]);
 
-  const breaking = filtered.filter(p => p.significance === 'BREAKING');
-  const high     = filtered.filter(p => p.significance === 'HIGH');
-  const standard = filtered.filter(p => p.significance === 'STANDARD');
+  const dayGroups = useMemo(() => {
+    const grouped = new Map<string, XPost[]>();
+    for (const p of filtered) {
+      const day = getDayFromTimestamp(p.timestamp, allDays);
+      const arr = grouped.get(day);
+      if (arr) arr.push(p as XPost);
+      else grouped.set(day, [p as XPost]);
+    }
+    return [...grouped.keys()].sort().reverse().map(day => ({
+      day,
+      posts: grouped.get(day)!,
+    }));
+  }, [filtered, allDays]);
 
   const lastUpdated = useMemo(() => {
     const posts = allPosts ?? [];
@@ -68,24 +77,39 @@ export function SignalsContent() {
 
   const signalsList = (
     <>
-      {breaking.length > 0 && (
-        <div className="mb-5">
-          <SectionHeader label="BREAKING" count={breaking.length} color="var(--danger)" />
-          {breaking.map(p => <XPostCard key={p.id} post={p as XPost} />)}
-        </div>
-      )}
-      {high.length > 0 && (
-        <div className="mb-5">
-          <SectionHeader label="HIGH SIGNIFICANCE" count={high.length} color="var(--warning)" />
-          {high.map(p => <XPostCard key={p.id} post={p as XPost} />)}
-        </div>
-      )}
-      {standard.length > 0 && (
-        <div className="mb-5">
-          <SectionHeader label="STANDARD" count={standard.length} color="var(--info)" />
-          {standard.map(p => <XPostCard key={p.id} post={p as XPost} />)}
-        </div>
-      )}
+      {dayGroups.map(({ day, posts }) => {
+        const breaking = posts.filter(p => p.significance === 'BREAKING');
+        const high     = posts.filter(p => p.significance === 'HIGH');
+        const standard = posts.filter(p => p.significance === 'STANDARD');
+        return (
+          <div key={day} className="mb-6">
+            {(showAll || dayGroups.length > 1) && (
+              <div className="panel-header mb-3 sticky top-0 z-10">
+                <span className="section-title">{dayLabel(day, allDays)} — {dayShort(day)}</span>
+                <span className="label ml-auto text-[var(--t4)]">{posts.length} signals</span>
+              </div>
+            )}
+            {breaking.length > 0 && (
+              <div className="mb-5">
+                <SectionHeader label="BREAKING" count={breaking.length} color="var(--danger)" />
+                {breaking.map(p => <XPostCard key={p.id} post={p} />)}
+              </div>
+            )}
+            {high.length > 0 && (
+              <div className="mb-5">
+                <SectionHeader label="HIGH SIGNIFICANCE" count={high.length} color="var(--warning)" />
+                {high.map(p => <XPostCard key={p.id} post={p} />)}
+              </div>
+            )}
+            {standard.length > 0 && (
+              <div className="mb-5">
+                <SectionHeader label="STANDARD" count={standard.length} color="var(--info)" />
+                {standard.map(p => <XPostCard key={p.id} post={p} />)}
+              </div>
+            )}
+          </div>
+        );
+      })}
       {filtered.length === 0 && (
         <div className="p-[60px] text-center">
           <span className="text-2xl text-[var(--t3)]">𝕏</span>
@@ -174,22 +198,24 @@ export function SignalsContent() {
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged} className="flex-1 min-h-0 min-w-0">
-      <ResizablePanel id="filters" defaultSize="22%" minSize="15%" maxSize="35%" className="flex flex-col overflow-hidden min-w-[180px]">
-        {filterRail}
-      </ResizablePanel>
-      <ResizableHandle />
-      <ResizablePanel id="content" defaultSize="78%" minSize="50%" className="flex flex-col overflow-hidden">
-        <div className="panel-header">
-          <span className="section-title">Field Signals — Operation Epic Fury</span>
-          <span className="label ml-auto text-[var(--t4)]">PHAROS-CURATED</span>
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="px-4 py-3">
-            {signalsList}
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden">
+      <ResizablePanelGroup orientation="horizontal" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged} className="flex-1 min-h-0 min-w-0 w-full">
+        <ResizablePanel id="filters" defaultSize="22%" minSize="15%" maxSize="35%" className="flex flex-col overflow-hidden min-w-[180px]">
+          {filterRail}
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel id="content" defaultSize="78%" minSize="50%" className="flex flex-col overflow-hidden min-w-0">
+          <div className="panel-header">
+            <span className="section-title">Field Signals — Operation Epic Fury</span>
+            <span className="label ml-auto text-[var(--t4)]">PHAROS-CURATED</span>
           </div>
-        </ScrollArea>
-      </ResizablePanel>
-    </ResizablePanelGroup>
+          <ScrollArea className="flex-1 min-w-0">
+            <div className="px-4 py-3 min-w-0">
+              {signalsList}
+            </div>
+          </ScrollArea>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }

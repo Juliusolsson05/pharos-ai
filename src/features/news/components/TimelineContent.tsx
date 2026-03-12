@@ -1,21 +1,24 @@
 'use client';
 
-import { useCallback, useEffect, useMemo,useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { Button } from '@/components/ui/button';
 
 import { NewsTimeline } from '@/features/news/components/NewsTimeline';
-import { CLIENT_FRESH_TTL,clientCache } from '@/features/news/lib/client-cache';
 import { PERSPECTIVE_COLORS } from '@/features/news/lib/news-colors';
-import { fetchFeedItems,useRssFeeds } from '@/features/news/queries';
+import { useRssFeedItems, useRssFeeds } from '@/features/news/queries';
 
 import { timeAgo } from '@/shared/lib/format';
+import { queryKeys } from '@/shared/lib/query/keys';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
+import { useNow } from '@/shared/hooks/use-now';
 
 import type { FeedItem } from '@/types/domain';
 
@@ -24,59 +27,23 @@ type ViewMode = 'feed' | 'timeline';
 export function TimelineContent() {
   const { data: feeds } = useRssFeeds();
   const allFeeds = useMemo(() => feeds ?? [], [feeds]);
-  const [feedData,    setFeedData]    = useState<Map<string, FeedItem[]>>(new Map());
-  const [refreshing,  setRefreshing]  = useState(false);
-  const [lastRefresh, setLastRefresh] = useState<number>(0);
-  const [view,        setView]        = useState<ViewMode>('feed');
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const feedIds = useMemo(() => allFeeds.map(f => f.id), [allFeeds]);
+  const [view, setView] = useState<ViewMode>('feed');
   const isLandscapePhone = useIsLandscapePhone();
   const isMobile = useIsMobile();
   const onLandscapeScroll = useLandscapeScrollEmitter(isLandscapePhone);
+  const now = useNow();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (isMobile && view !== 'feed') setView('feed');
-  }, [isMobile, view]);
+  const { data: feedData, isFetching, dataUpdatedAt } = useRssFeedItems(feedIds);
+  const activeView = isMobile ? 'feed' : view;
 
-  const fetchFeeds = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      const allIds = allFeeds.map(f => f.id);
-      const staleIds = allIds.filter(id => {
-        const cached = clientCache.get(id);
-        return !cached || Date.now() - cached.fetchedAt > CLIENT_FRESH_TTL;
-      });
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.rss.fetchItems(feedIds) });
+  };
 
-      if (staleIds.length === 0) {
-        const map = new Map<string, FeedItem[]>();
-        allIds.forEach(id => { const c = clientCache.get(id); if (c) map.set(id, c.items); });
-        setFeedData(map);
-        setRefreshing(false);
-        return;
-      }
-
-      const feeds = await fetchFeedItems(staleIds);
-      const now = Date.now();
-      for (const feed of feeds) {
-        if (feed.items?.length > 0) clientCache.set(feed.feedId, { feedId: feed.feedId, items: feed.items, fetchedAt: now });
-      }
-      const map = new Map<string, FeedItem[]>();
-      allIds.forEach(id => { const c = clientCache.get(id); if (c) map.set(id, c.items); });
-      setFeedData(map);
-      setLastRefresh(now);
-    } catch (err) {
-    } finally {
-      setRefreshing(false);
-    }
-  }, [allFeeds]);
-
-  useEffect(() => { fetchFeeds(); }, [fetchFeeds]);
-  useEffect(() => {
-    intervalRef.current = setInterval(() => fetchFeeds(), 5 * 60 * 1000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [fetchFeeds]);
-
-  // Flatten + sort all articles newest first for the feed view
   const allArticles = useMemo(() => {
+    if (!feedData) return [];
     const items: { item: FeedItem; feedId: string }[] = [];
     feedData.forEach((feedItems, feedId) => {
       for (const item of feedItems) {
@@ -119,28 +86,28 @@ export function TimelineContent() {
           <div className="flex items-center gap-3">
           {/* View toggle */}
           <div className="flex border border-[var(--bd)] overflow-hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setView('feed')}
-              className={`px-3 py-1 h-auto rounded-none mono text-[9px] font-bold tracking-wider ${
-                view === 'feed' ? 'bg-white/10 text-white' : 'text-[var(--t4)] hover:text-[var(--t2)]'
-              }`}
-            >
-              ☰ FEED
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setView('feed')}
+                className={`px-3 py-1 h-auto rounded-none mono text-[9px] font-bold tracking-wider ${
+                  activeView === 'feed' ? 'bg-white/10 text-white' : 'text-[var(--t4)] hover:text-[var(--t2)]'
+                }`}
+              >
+                ☰ FEED
             </Button>
             {!isMobile && (
               <>
                 <div className="w-px bg-[var(--bd)]" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setView('timeline')}
-                  className={`px-3 py-1 h-auto rounded-none mono text-[9px] font-bold tracking-wider ${
-                    view === 'timeline' ? 'bg-white/10 text-white' : 'text-[var(--t4)] hover:text-[var(--t2)]'
-                  }`}
-                >
-                  ↔ TIMELINE
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setView('timeline')}
+                    className={`px-3 py-1 h-auto rounded-none mono text-[9px] font-bold tracking-wider ${
+                      activeView === 'timeline' ? 'bg-white/10 text-white' : 'text-[var(--t4)] hover:text-[var(--t2)]'
+                    }`}
+                  >
+                    ↔ TIMELINE
                 </Button>
               </>
             )}
@@ -149,11 +116,11 @@ export function TimelineContent() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => fetchFeeds()}
-            disabled={refreshing}
+            onClick={handleRefresh}
+            disabled={isFetching}
             className="flex items-center gap-2 h-auto px-2 py-1 mono text-[9px] text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className={refreshing ? 'animate-spin' : ''}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className={isFetching ? 'animate-spin' : ''}>
               <path d="M1 6a5 5 0 0 1 9-3M11 6a5 5 0 0 1-9 3" />
               <path d="M1 1v4h4M11 11v-4h-4" />
             </svg>
@@ -161,9 +128,9 @@ export function TimelineContent() {
           </Button>
 
           <div className="flex items-center gap-2">
-            <div className={`dot ${refreshing ? 'dot-warn' : 'dot-live'}`} />
+            <div className={`dot ${isFetching ? 'dot-warn' : 'dot-live'}`} />
             <span className="mono text-[9px] text-[var(--t4)]">
-              {refreshing ? 'loading…' : lastRefresh ? `${Math.floor((Date.now() - lastRefresh) / 1000)}s ago` : '…'}
+              {isFetching ? 'loading…' : dataUpdatedAt ? `${Math.floor((now - dataUpdatedAt) / 1000)}s ago` : '…'}
             </span>
           </div>
           </div>
@@ -171,11 +138,11 @@ export function TimelineContent() {
       </div>
 
       {/* Content */}
-      {!isMobile && view === 'timeline' ? (
-        <NewsTimeline feedData={feedData} />
+      {activeView === 'timeline' ? (
+        <NewsTimeline feedData={feedData ?? new Map()} />
       ) : (
         <div className={isLandscapePhone ? '' : 'flex-1 overflow-y-auto min-h-0'}>
-          {refreshing && allArticles.length === 0 ? (
+          {isFetching && allArticles.length === 0 ? (
             <div className="flex items-center justify-center py-20">
               <div className="w-5 h-5 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" />
             </div>

@@ -2,8 +2,9 @@ import { NextRequest } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { MAP_ACTOR_KEYS, MAP_PRIORITIES } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
+import { getConflictDayRange, getConflictTimezone } from '@/server/lib/pharos-time';
 
 export async function GET(
   req: NextRequest,
@@ -14,11 +15,14 @@ export async function GET(
 
   const { conflictId } = await params;
 
-  const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
+  const conflict = await prisma.conflict.findUnique({
+    where: { id: conflictId },
+    select: { id: true, timezone: true },
+  });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const todayDate = new Date(today + 'T00:00:00Z');
+  const timezone = getConflictTimezone(conflict);
+  const { today, dayDate } = getConflictDayRange(timezone);
 
   const [
     eventsWithoutSources,
@@ -32,7 +36,6 @@ export async function GET(
     allMapFeatures,
     allMapStories,
   ] = await Promise.all([
-    // Events with no sources
     prisma.intelEvent.findMany({
       where: {
         conflictId,
@@ -40,7 +43,6 @@ export async function GET(
       },
       select: { id: true, title: true, timestamp: true },
     }),
-    // Events with no actor responses
     prisma.intelEvent.findMany({
       where: {
         conflictId,
@@ -48,25 +50,21 @@ export async function GET(
       },
       select: { id: true, title: true, timestamp: true },
     }),
-    // X posts not linked to any event
     prisma.xPost.findMany({
       where: { conflictId, eventId: null },
       select: { id: true, handle: true, timestamp: true },
     }),
-    // Actors without a snapshot for today
     prisma.actor.findMany({
       where: {
         conflictId,
-        daySnapshots: { none: { day: todayDate } },
+        daySnapshots: { none: { day: dayDate } },
       },
       select: { id: true, name: true },
     }),
-    // Whether today's day snapshot exists
     prisma.conflictDaySnapshot.findFirst({
-      where: { conflictId, day: todayDate },
+      where: { conflictId, day: dayDate },
       select: { id: true },
     }),
-    // X posts referencing non-existent events (orphaned eventId)
     prisma.$queryRaw<{ id: string; eventId: string }[]>`
       SELECT xp.id, xp."eventId"
       FROM "XPost" xp
@@ -75,29 +73,27 @@ export async function GET(
         AND xp."eventId" IS NOT NULL
         AND ie.id IS NULL
     `,
-    // Unverified X posts (verification coverage)
     prisma.xPost.groupBy({
       by: ['verificationStatus'],
       where: { conflictId },
       _count: true,
     }),
-    // Failed verification posts
     prisma.xPost.findMany({
       where: { conflictId, verificationStatus: 'FAILED' },
       select: { id: true, handle: true, tweetId: true, postType: true, timestamp: true },
       orderBy: { timestamp: 'desc' },
     }),
-    // All map features — for actor/priority integrity check
     prisma.mapFeature.findMany({
       where: { conflictId },
-      select: { id: true, actor: true, priority: true, type: true },
+      select: { id: true, actor: true, priority: true, type: true, sourceEventId: true },
     }),
-    // All map stories — for highlight ref integrity check
     prisma.mapStory.findMany({
       where: { conflictId },
       select: {
         id: true,
         title: true,
+        primaryEventId: true,
+        sourceEventIds: true,
         highlightStrikeIds: true,
         highlightMissileIds: true,
         highlightTargetIds: true,
@@ -106,20 +102,23 @@ export async function GET(
     }),
   ]);
 
-  // Map feature integrity: check for invalid actor or priority values
-  const featureIdSet = new Set(allMapFeatures.map(f => f.id));
-  const invalidActorFeatures = allMapFeatures.filter(f => !(MAP_ACTOR_KEYS as readonly string[]).includes(f.actor));
-  const invalidPriorityFeatures = allMapFeatures.filter(f => !(MAP_PRIORITIES as readonly string[]).includes(f.priority));
+  const featureIdSet = new Set(allMapFeatures.map(feature => feature.id));
+  const invalidActorFeatures = allMapFeatures.filter(
+    feature => !(MAP_ACTOR_KEYS as readonly string[]).includes(feature.actor),
+  );
+  const invalidPriorityFeatures = allMapFeatures.filter(
+    feature => !(MAP_PRIORITIES as readonly string[]).includes(feature.priority),
+  );
 
-  // Story highlight ref integrity: check each highlight ID exists as a MapFeature
   const brokenStoryHighlights: { storyId: string; storyTitle: string; field: string; missingId: string }[] = [];
   for (const story of allMapStories) {
     const checks: [string, string[]][] = [
-      ['highlightStrikeIds',  story.highlightStrikeIds],
+      ['highlightStrikeIds', story.highlightStrikeIds],
       ['highlightMissileIds', story.highlightMissileIds],
-      ['highlightTargetIds',  story.highlightTargetIds],
-      ['highlightAssetIds',   story.highlightAssetIds],
+      ['highlightTargetIds', story.highlightTargetIds],
+      ['highlightAssetIds', story.highlightAssetIds],
     ];
+
     for (const [field, ids] of checks) {
       for (const id of ids) {
         if (!featureIdSet.has(id)) {
@@ -131,30 +130,31 @@ export async function GET(
 
   return ok({
     today,
+    timezone,
     missingDaySnapshot: !todaySnapshot,
     issues: {
       eventsWithoutSources: {
         count: eventsWithoutSources.length,
-        items: eventsWithoutSources.map(e => ({
-          id: e.id,
-          title: e.title,
-          timestamp: e.timestamp.toISOString(),
+        items: eventsWithoutSources.map(event => ({
+          id: event.id,
+          title: event.title,
+          timestamp: event.timestamp.toISOString(),
         })),
       },
       eventsWithoutResponses: {
         count: eventsWithoutResponses.length,
-        items: eventsWithoutResponses.map(e => ({
-          id: e.id,
-          title: e.title,
-          timestamp: e.timestamp.toISOString(),
+        items: eventsWithoutResponses.map(event => ({
+          id: event.id,
+          title: event.title,
+          timestamp: event.timestamp.toISOString(),
         })),
       },
       unlinkedXPosts: {
         count: unlinkedXPosts.length,
-        items: unlinkedXPosts.map(p => ({
-          id: p.id,
-          handle: p.handle,
-          timestamp: p.timestamp.toISOString(),
+        items: unlinkedXPosts.map(post => ({
+          id: post.id,
+          handle: post.handle,
+          timestamp: post.timestamp.toISOString(),
         })),
       },
       actorsWithoutTodaySnapshot: {
@@ -167,28 +167,46 @@ export async function GET(
       },
       invalidActorOnMapFeatures: {
         count: invalidActorFeatures.length,
-        items: invalidActorFeatures.map(f => ({ id: f.id, actor: f.actor, validActors: MAP_ACTOR_KEYS })),
+        items: invalidActorFeatures.map(feature => ({
+          id: feature.id,
+          actor: feature.actor,
+          validActors: MAP_ACTOR_KEYS,
+          sourceEventId: feature.sourceEventId,
+        })),
       },
       invalidPriorityOnMapFeatures: {
         count: invalidPriorityFeatures.length,
-        items: invalidPriorityFeatures.map(f => ({ id: f.id, priority: f.priority })),
+        items: invalidPriorityFeatures.map(feature => ({
+          id: feature.id,
+          priority: feature.priority,
+          sourceEventId: feature.sourceEventId,
+        })),
       },
       brokenStoryHighlightRefs: {
         count: brokenStoryHighlights.length,
         items: brokenStoryHighlights,
       },
+      storyEventLinkCoverage: {
+        count: allMapStories.length,
+        items: allMapStories.map(story => ({
+          id: story.id,
+          title: story.title,
+          primaryEventId: story.primaryEventId,
+          sourceEventIds: story.sourceEventIds,
+        })),
+      },
       verificationCoverage: {
         breakdown: Object.fromEntries(
-          verificationCoverage.map(g => [g.verificationStatus, g._count]),
+          verificationCoverage.map(group => [group.verificationStatus, group._count]),
         ),
         failedPosts: {
           count: failedVerificationPosts.length,
-          items: failedVerificationPosts.map(p => ({
-            id: p.id,
-            handle: p.handle,
-            tweetId: p.tweetId,
-            postType: p.postType,
-            timestamp: p.timestamp.toISOString(),
+          items: failedVerificationPosts.map(post => ({
+            id: post.id,
+            handle: post.handle,
+            tweetId: post.tweetId,
+            postType: post.postType,
+            timestamp: post.timestamp.toISOString(),
           })),
         },
       },

@@ -78,7 +78,7 @@ export function BriefWidget() {
         {topEvents.map((evt, i) => {
           const sc = SEV_C[evt.severity] ?? 'var(--info)';
           return (
-            <Link key={evt.id} href={`/dashboard/feed?event=${evt.id}`} className="no-underline">
+            <Link key={evt.id} href={`/dashboard/feed?day=${day}&event=${evt.id}`} className="no-underline">
               <div
                 className="flex gap-2.5 items-start py-1.5 hover:bg-[var(--bg-3)] transition-colors"
                 style={{ borderBottom: i < topEvents.length - 1 ? '1px solid var(--bd-s)' : 'none', borderLeft: `3px solid ${sc}` }}
@@ -114,7 +114,7 @@ export function BriefWidget() {
 
       {/* link to full brief */}
       <div className="px-4 py-2.5">
-        <Link href="/dashboard/brief" className="no-underline flex items-center gap-1">
+        <Link href={`/dashboard/brief?day=${day}`} className="no-underline flex items-center gap-1">
           <span className="text-[9px] text-[var(--blue-l)] font-semibold">Read Full Brief →</span>
         </Link>
       </div>

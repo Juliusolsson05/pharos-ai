@@ -179,6 +179,7 @@ model Conflict {
   threatLevel ThreatLevel?
   startDate   DateTime       @db.Date
   region      String
+  timezone    String         @default("UTC")
   escalation  Int
   summary     String
   keyFacts    String[]
@@ -471,6 +472,7 @@ model MapFeature {
   id          String         @id
   conflictId  String
   featureType MapFeatureType
+  sourceEventId String?
   actor       String
   priority    String
   category    String
@@ -490,6 +492,8 @@ model MapFeature {
   @@index([timestamp])
   @@index([conflictId, timestamp])
   @@index([conflictId, featureType, timestamp])
+  @@index([sourceEventId])
+  @@index([conflictId, sourceEventId])
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -499,6 +503,8 @@ model MapFeature {
 model MapStory {
   id                   String        @id
   conflictId           String
+  primaryEventId       String?
+  sourceEventIds       String[]
   title                String
   tagline              String
   iconName             String
@@ -519,6 +525,7 @@ model MapStory {
   events   MapStoryEvent[]
 
   @@index([conflictId, timestamp])
+  @@index([primaryEventId])
 }
 
 model MapStoryEvent {

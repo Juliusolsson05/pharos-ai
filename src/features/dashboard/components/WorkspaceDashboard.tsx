@@ -39,13 +39,13 @@ import { widgetComponents } from './widgets';
 
 import { useAppDispatch,useAppSelector } from '@/shared/state';
 
-const WIDGET_LINKS: Partial<Record<WidgetKey, { href: string; label: string }>> = {
-  latest:      { href: '/dashboard/feed',        label: 'View All' },
-  actors:      { href: '/dashboard/actors',      label: 'Dossiers' },
+const WIDGET_LINKS: Partial<Record<WidgetKey, { href: string; label: string; preserveDay?: boolean }>> = {
+  latest:      { href: '/dashboard/feed',        label: 'View All', preserveDay: true },
+  actors:      { href: '/dashboard/actors',      label: 'Dossiers', preserveDay: true },
   signals:     { href: '/dashboard/signals',     label: 'All Signals' },
   map:         { href: '/dashboard/map',         label: 'Full Map' },
   predictions: { href: '/dashboard/predictions', label: 'All Markets' },
-  brief:       { href: '/dashboard/brief',       label: 'Full Brief' },
+  brief:       { href: '/dashboard/brief',       label: 'Full Brief', preserveDay: true },
 };
 
 export function WorkspaceDashboard() {
@@ -58,6 +58,14 @@ export function WorkspaceDashboard() {
   const allDays = bootstrap?.days ?? [];
   const [dashDay, setDashDay] = useState<string>('');
   const effectiveDashDay = dashDay || allDays[allDays.length - 1] || '';
+  const widgetLinks = Object.fromEntries(
+    Object.entries(WIDGET_LINKS).map(([key, value]) => {
+      const href = effectiveDashDay && value!.preserveDay
+        ? `${value!.href}?day=${effectiveDashDay}`
+        : value!.href;
+      return [key, { ...value!, href }];
+    }),
+  ) as typeof WIDGET_LINKS;
 
   const { data: conflict, isLoading: conflictLoading } = useConflict();
   const { data: snapshots, isLoading: snapshotsLoading } = useConflictDays();
@@ -257,9 +265,9 @@ export function WorkspaceDashboard() {
                               </div>
                             )}
 
-                            {!editing && WIDGET_LINKS[widget] && (
-                              <Link href={WIDGET_LINKS[widget]!.href} className="no-underline ml-auto flex items-center gap-1">
-                                <span className="text-[9px] text-[var(--blue-l)] font-semibold">{WIDGET_LINKS[widget]!.label}</span>
+                            {!editing && widgetLinks[widget] && (
+                              <Link href={widgetLinks[widget]!.href} className="no-underline ml-auto flex items-center gap-1">
+                                <span className="text-[9px] text-[var(--blue-l)] font-semibold">{widgetLinks[widget]!.label}</span>
                                 <ArrowRight size={10} strokeWidth={2} className="text-[var(--blue-l)]" />
                               </Link>
                             )}

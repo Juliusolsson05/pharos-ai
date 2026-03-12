@@ -22,7 +22,7 @@ export function ActorsWidget() {
         const actC = ACT_C[snap.activityLevel] ?? 'var(--t2)';
         const staC = STA_C[snap.stance] ?? 'var(--t2)';
         return (
-          <Link key={actor.id} href={`/dashboard/actors?actor=${actor.id}`} className="no-underline">
+          <Link key={actor.id} href={`/dashboard/actors?day=${day}&actor=${actor.id}`} className="no-underline">
             <div
               className="flex items-start gap-2.5 px-3 py-2 cursor-pointer hover:bg-[var(--bg-3)] transition-colors"
               style={{

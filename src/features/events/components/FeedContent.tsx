@@ -1,21 +1,22 @@
 'use client';
 
-import { useMemo,useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { ArrowLeft,FileText } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { track } from '@/shared/lib/analytics';
+import { ArrowLeft, FileText } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { ResizableHandle,ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 import { EventDetail } from '@/features/events/components/EventDetail';
 import { EventLog } from '@/features/events/components/EventLog';
-import { ALL_TYPES,FeedFilterRail } from '@/features/events/components/FeedFilterRail';
+import { ALL_TYPES, FeedFilterRail } from '@/features/events/components/FeedFilterRail';
 import { useEvent, useEvents } from '@/features/events/queries';
 import { ListDetailScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 import { EmptyState } from '@/shared/components/shared/EmptyState';
 
+import { track } from '@/shared/lib/analytics';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
@@ -25,10 +26,9 @@ import { usePanelLayout } from '@/shared/hooks/use-panel-layout';
 import type { EventType,Severity } from '@/types/domain';
 
 export function FeedContent() {
-  const initEvent = useMemo(() => {
-    if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('event');
-  }, []);
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const isMobile = useIsMobile(1024);
   const isLandscapePhone = useIsLandscapePhone();
   const usePageScroll = isMobile && isLandscapePhone;
@@ -42,7 +42,7 @@ export function FeedContent() {
     Object.fromEntries(ALL_TYPES.map(t => [t, true])) as Record<EventType, boolean>,
   );
   const [verOnly, setVerOnly] = useState(false);
-  const [selId,   setSelId]   = useState<string | null>(() => initEvent);
+  const selId = searchParams.get('event');
   const [tab,     setTab]     = useState<'report' | 'signals'>('report');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { defaultLayout, onLayoutChanged } = usePanelLayout({ id: 'feed', panelIds: ['filters', 'log', 'detail'] });
@@ -60,6 +60,18 @@ export function FeedContent() {
 
   const selected = selectedEvent ?? allEvents?.find(e => e.id === selId) ?? null;
 
+  const handleSelect = useCallback((id: string | null) => {
+    const next = new URLSearchParams(searchParams.toString());
+    if (id) next.set('event', id);
+    else next.delete('event');
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    if (id) {
+      setTab('report');
+      track('event_selected', { event_id: id });
+    }
+  }, [pathname, router, searchParams]);
+
   if (isLoading) return <ListDetailScreenSkeleton />;
 
   if (isMobile) {
@@ -74,7 +86,7 @@ export function FeedContent() {
               <Button
                 variant="ghost"
                 size="xs"
-                onClick={() => setSelId(null)}
+                onClick={() => handleSelect(null)}
                 className="mono h-7 px-2 text-[9px] font-bold tracking-[0.06em]"
               >
                 <ArrowLeft size={12} />
@@ -129,7 +141,7 @@ export function FeedContent() {
               <EventLog
                 events={filtered}
                 selectedId={selId}
-                onSelect={id => { setSelId(id); if (id) { setTab('report'); track('event_selected', { event_id: id }); } }}
+                onSelect={handleSelect}
                 compact={usePageScroll}
                 pageScroll={usePageScroll}
               />
@@ -163,7 +175,7 @@ export function FeedContent() {
         <EventLog
           events={filtered}
           selectedId={selId}
-          onSelect={id => { setSelId(id); if (id) { setTab('report'); track('event_selected', { event_id: id }); } }}
+          onSelect={handleSelect}
         />
       </ResizablePanel>
       <ResizableHandle />

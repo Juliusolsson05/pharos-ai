@@ -13,6 +13,7 @@ export type { ActorKey };
 
 export type StrikeArc = {
   id:        string;
+  sourceEventId?: string | null;
   actor:     ActorKey;
   priority:  Priority;
   category:  Extract<MarkerCategory, 'KINETIC'>;
@@ -27,6 +28,7 @@ export type StrikeArc = {
 
 export type MissileTrack = {
   id:        string;
+  sourceEventId?: string | null;
   actor:     ActorKey;
   priority:  Priority;
   category:  Extract<MarkerCategory, 'KINETIC'>;
@@ -41,6 +43,7 @@ export type MissileTrack = {
 
 export type Target = {
   id:          string;
+  sourceEventId?: string | null;
   actor:       ActorKey;
   priority:    Priority;
   category:    Extract<MarkerCategory, 'INSTALLATION'>;
@@ -54,11 +57,13 @@ export type Target = {
 
 export type Asset = {
   id:          string;
+  sourceEventId?: string | null;
   actor:       ActorKey;
   priority:    Priority;
   category:    Extract<MarkerCategory, 'INSTALLATION'>;
   type:        Extract<InstallationType, 'CARRIER' | 'AIR_BASE' | 'NAVAL_BASE' | 'ARMY_BASE'>;
   status:      InstallationStatus;
+  timestamp?:  string;
   name:        string;
   position:    [number, number];
   description?: string;
@@ -66,16 +71,22 @@ export type Asset = {
 
 export type ThreatZone = {
   id:          string;
+  sourceEventId?: string | null;
   actor:       ActorKey;
   priority:    Priority;
   category:    Extract<MarkerCategory, 'ZONE'>;
   type:        ZoneType;
+  timestamp?:  string;
   name:        string;
   coordinates: [number, number][];
   color:       [number, number, number, number];
 };
 
 export type HeatPoint = {
-  position: [number, number];
-  weight:   number;
+  id:             string;
+  sourceEventId?: string | null;
+  actor:          string;
+  priority:       string;
+  position:       [number, number];
+  weight:         number;
 };

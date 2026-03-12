@@ -10,7 +10,13 @@ import type { PickingInfo } from '@deck.gl/core';
 
 import type { Asset, MissileTrack, StrikeArc, Target, ThreatZone } from '@/data/map-data';
 import type { ActorMeta } from '@/data/map-tokens';
-import { STATUS_META } from '@/data/map-tokens';
+import { STATUS_META, type MarkerStatus } from '@/data/map-tokens';
+
+const FALLBACK_STATUS = { label: 'Unknown', cssVar: 'var(--t4)' } as const;
+function safeStatus(status: string | null | undefined) {
+  if (!status) return FALLBACK_STATUS;
+  return STATUS_META[status as MarkerStatus] ?? FALLBACK_STATUS;
+}
 
 // Inline timestamp formatter (no import to keep file pure .ts)
 
@@ -54,7 +60,7 @@ export function createBuildTooltip(am: Record<string, ActorMeta>) {
       <div style="font-weight:700;font-size:11px;color:var(--t1);margin-bottom:5px">${d.label}</div>
       ${ts ? `<div style="font-size:9px;color:var(--blue-l);font-weight:700;margin-bottom:5px;letter-spacing:0.04em">⏱ ${ts}</div>` : ''}
       <div style="margin-bottom:4px">${pill(m.label, m.cssVar)}${pill(d.type.replace('_', ' '), m.cssVar)}${pill(d.severity, sevColor)}</div>
-      <div style="font-size:10px;color:var(--t3)">STATUS: <span style="color:${STATUS_META[d.status].cssVar}">${STATUS_META[d.status].label}</span></div>
+      <div style="font-size:10px;color:var(--t3)">STATUS: <span style="color:${safeStatus(d.status).cssVar}">${safeStatus(d.status).label}</span></div>
     `;
   }
 
@@ -73,25 +79,25 @@ export function createBuildTooltip(am: Record<string, ActorMeta>) {
 
   function targetTooltip(d: Target): string {
     const m = meta(d.actor);
-    const statusMeta = STATUS_META[d.status];
+    const sm = safeStatus(d.status);
     const ts = fmtTs(d.timestamp);
     return `
       <div style="font-weight:700;font-size:12px;color:var(--t1);margin-bottom:5px">${d.name}</div>
       ${ts ? `<div style="font-size:9px;color:var(--blue-l);font-weight:700;margin-bottom:5px;letter-spacing:0.04em">⏱ ${ts}</div>` : ''}
-      <div style="margin-bottom:6px">${pill(m.label, m.cssVar)}${pill(d.type.replace('_', ' '), m.cssVar)}${pill(d.status, statusMeta.cssVar)}</div>
+      <div style="margin-bottom:6px">${pill(m.label, m.cssVar)}${pill(d.type.replace('_', ' '), m.cssVar)}${pill(sm.label, sm.cssVar)}</div>
       <div style="color:var(--t2);font-size:10px;line-height:1.5">${d.description}</div>
     `;
   }
 
   function assetTooltip(d: Asset): string {
     const m = meta(d.actor);
-    const statusMeta = STATUS_META[d.status];
+    const sm = safeStatus(d.status);
     const extra = d.type === 'CARRIER'
       ? `<div style="color:var(--warning);font-size:10px;margin-top:4px;font-weight:700">▶ CARRIER STRIKE GROUP</div>`
       : '';
     return `
       <div style="font-weight:700;font-size:12px;color:var(--t1);margin-bottom:6px">${d.name}</div>
-      <div style="margin-bottom:4px">${pill(m.label, m.cssVar)}${pill(d.type.replace('_', ' '), 'var(--t3)')}${pill(statusMeta.label, statusMeta.cssVar)}</div>
+      <div style="margin-bottom:4px">${pill(m.label, m.cssVar)}${pill(d.type.replace('_', ' '), 'var(--t3)')}${pill(sm.label, sm.cssVar)}</div>
       ${d.description ? `<div style="color:var(--t2);font-size:10px;line-height:1.5;margin-top:4px">${d.description}</div>` : ''}
       ${extra}
     `;

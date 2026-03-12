@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'crypto';
+
 import { NextRequest } from 'next/server';
 
 import { err } from './api-utils';
@@ -17,7 +19,9 @@ export function requireAdmin(req: NextRequest) {
   if (!expected) {
     return err('SERVER_ERROR', 'Admin API key not configured', 500);
   }
-  if (token !== expected) {
+  const tokenBuf = Buffer.from(token);
+  const expectedBuf = Buffer.from(expected);
+  if (tokenBuf.length !== expectedBuf.length || !timingSafeEqual(tokenBuf, expectedBuf)) {
     return err('FORBIDDEN', 'Invalid API key', 403);
   }
   return null; // access granted

@@ -2,6 +2,16 @@
 import Link           from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Github, MoreHorizontal } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
 import { useBootstrap } from '@/features/dashboard/queries';
 import { useConflict } from '@/features/dashboard/queries/conflicts';
 import { useEvents } from '@/features/events/queries';
@@ -80,6 +90,7 @@ export function Header() {
                 </Link>
               );
             })}
+            <MoreDropdown />
           </nav>
         </div>
       )}
@@ -143,6 +154,7 @@ export function Header() {
                 </Link>
               );
             })}
+            <MoreDropdown />
           </nav>
 
           {/* ── Right side ── */}
@@ -162,9 +174,44 @@ export function Header() {
             <span className="mono text-[10px] text-[var(--t4)] tracking-[0.02em]">
               {displayDate} · UTC
             </span>
+
+            {/* GitHub link */}
+            <a
+              href="https://github.com/Juliusolsson05/pharos-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--t1)] text-[var(--bg-app)] hover:bg-[var(--t2)] transition-colors"
+            >
+              <Github size={13} fill="currentColor" strokeWidth={0} />
+              <span className="mono text-[10px] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
+            </a>
           </div>
         </div>
       )}
     </header>
+  );
+}
+
+function MoreDropdown() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="nav-item flex items-center shrink-0 px-3" aria-label="More">
+          <MoreHorizontal className="size-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        data-theme="auto"
+        className="bg-[var(--bg-1)] border-[var(--bd)] text-[var(--t1)] [--accent:var(--bg-3)] [--accent-foreground:var(--t1)]"
+      >
+        <DropdownMenuItem asChild>
+          <Link href="/browse" className="no-underline">Browse</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/browse/api/reference" className="no-underline">API</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
