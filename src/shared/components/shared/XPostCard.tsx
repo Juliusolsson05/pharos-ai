@@ -5,7 +5,7 @@ import { Tweet } from 'react-tweet';
 
 import type { XPost } from '@/types/domain';
 
-import { EmbedSkeleton,PharosView } from './PharosView';
+import { EmbedSkeleton, PharosView } from './PharosView';
 import { ACCT, SIG_BORDER, xUrl } from './x-post-constants';
 
 type Props = { post: XPost; compact?: boolean };
@@ -20,9 +20,7 @@ export function XPostCard({ post, compact }: Props) {
     <div className="card mb-2" style={{ borderLeft: `3px solid ${border}` }}>
 
       {hasEmbed ? (
-        /* ── Side-by-side: Original (left) | Pharos (right) ── */
-        <div className="grid grid-cols-[1fr_1fr] min-h-0">
-          {/* LEFT — Original embed */}
+        <div className="grid grid-cols-[1fr_1fr] min-h-0 min-w-0 overflow-hidden">
           <div
             data-theme="dark"
             className="border-r border-[var(--bd-s)] px-1 py-2 [&_>_div]:!my-0 overflow-hidden"
@@ -35,18 +33,14 @@ export function XPostCard({ post, compact }: Props) {
             </Suspense>
           </div>
 
-          {/* RIGHT — Pharos intel view */}
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col overflow-hidden">
             <div className="flex items-center gap-1 px-3 py-1.5">
               <span className="mono text-[8px] text-[var(--blue-l)] tracking-[0.08em]">PHAROS INTEL</span>
             </div>
             <PharosView post={post} acct={acct} postUrl={postUrl} />
           </div>
         </div>
-      ) : (
-        /* ── Standard single-column view ── */
-        <PharosView post={post} acct={acct} postUrl={postUrl} compact={compact} />
-      )}
+      ) : <PharosView post={post} acct={acct} postUrl={postUrl} compact={compact} />}
     </div>
   );
 }

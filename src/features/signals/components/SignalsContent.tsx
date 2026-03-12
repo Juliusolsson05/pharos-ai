@@ -1,20 +1,19 @@
 'use client';
 
-import { useMemo,useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-
-import { track } from '@/shared/lib/analytics';
-import { ResizableHandle,ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { useXPosts } from '@/features/events/queries/x-posts';
 import { SectionHeader } from '@/features/signals/components/SectionHeader';
-import { type AccountType,SignalFilterRail, type Significance } from '@/features/signals/components/SignalFilterRail';
+import { type AccountType, SignalFilterRail, type Significance } from '@/features/signals/components/SignalFilterRail';
 import { ListDetailScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
 
-import { dayLabel, dayShort,getDayFromTimestamp, getPostsForDay } from '@/shared/lib/day-filter';
+import { track } from '@/shared/lib/analytics';
+import { dayLabel, dayShort, getDayFromTimestamp, getPostsForDay } from '@/shared/lib/day-filter';
 import { timeAgo } from '@/shared/lib/format';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
@@ -199,22 +198,24 @@ export function SignalsContent() {
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged} className="flex-1 min-h-0 min-w-0">
-      <ResizablePanel id="filters" defaultSize="22%" minSize="15%" maxSize="35%" className="flex flex-col overflow-hidden min-w-[180px]">
-        {filterRail}
-      </ResizablePanel>
-      <ResizableHandle />
-      <ResizablePanel id="content" defaultSize="78%" minSize="50%" className="flex flex-col overflow-hidden">
-        <div className="panel-header">
-          <span className="section-title">Field Signals — Operation Epic Fury</span>
-          <span className="label ml-auto text-[var(--t4)]">PHAROS-CURATED</span>
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="px-4 py-3">
-            {signalsList}
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden">
+      <ResizablePanelGroup orientation="horizontal" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged} className="flex-1 min-h-0 min-w-0 w-full">
+        <ResizablePanel id="filters" defaultSize="22%" minSize="15%" maxSize="35%" className="flex flex-col overflow-hidden min-w-[180px]">
+          {filterRail}
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel id="content" defaultSize="78%" minSize="50%" className="flex flex-col overflow-hidden min-w-0">
+          <div className="panel-header">
+            <span className="section-title">Field Signals — Operation Epic Fury</span>
+            <span className="label ml-auto text-[var(--t4)]">PHAROS-CURATED</span>
           </div>
-        </ScrollArea>
-      </ResizablePanel>
-    </ResizablePanelGroup>
+          <ScrollArea className="flex-1 min-w-0">
+            <div className="px-4 py-3 min-w-0">
+              {signalsList}
+            </div>
+          </ScrollArea>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }
