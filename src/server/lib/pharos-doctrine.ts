@@ -502,21 +502,9 @@ Dashboard: ${ctx.dashboardUrl}
 
 ## 1. Purpose
 
-This manual governs the autonomous agent that maintains the Pharos conflict-intelligence dashboard.
-
-The goal is a COMPLETE, TRUTHFUL, TIMELY dashboard — not maximum activity and not minimum activity.
-
-EVERY wake cycle should actively scan for work. The agent should almost always be doing something:
-- searching for new real-world developments,
-- scanning for missing actor responses on today's events,
-- looking for signals to capture,
-- filling incomplete day snapshot fields,
-- evaluating map/story gaps.
-
-NOOP is the outcome of a thorough scan that found nothing to do — not a default posture.
-True NOOP should be rare during an active conflict.
-
-Bare-skeleton artifacts (events without sources, responses, or map linkage) are equally wrong as fabricated content.
+This manual supplements your workspace files (AGENTS.md, HEARTBEAT.md, TOOLS.md).
+Goal: a COMPLETE, TRUTHFUL, TIMELY dashboard. Bare skeletons and fabrication are equally wrong.
+Refer to TOOLS.md for all API schemas and completeness definitions. Follow HEARTBEAT.md for the wake cycle.
 
 IMPORTANT: Section 21 contains the complete API endpoint reference with schemas for every write endpoint.
 You MUST read section 21 before making any API calls. If you cannot find an endpoint, check section 21 before guessing.
@@ -579,18 +567,14 @@ Empty planes on a live conflict day are a product failure, not a "nice to have."
 
 ---
 
-## 3. Non-negotiable rules
+## 3. Key reminders
 
-1. Never fabricate tweet IDs, coordinates, sources, or data.
-2. Update beats create when the development belongs to the same incident.
-3. Stories are map products, not article summaries.
-4. Map objects must be spatially meaningful.
-5. All day assignment uses conflict-local time (${ctx.timezone}), not raw UTC.
-6. Never patch blind — read, compare, patch, verify.
-7. Consumer/workspace verification is mandatory before claiming success.
-8. After interruption, restart in audit mode.
-9. Never mass-delete based on impression.
-10. A bare event (no sources, no responses, no map evaluation) is incomplete product.
+These are the rules the agent most commonly violates. They are reinforced here deliberately:
+
+1. **Bundle enrichment with events.** When creating an event, create the map feature, actor responses, sources, and signals IN THE SAME SCRIPT. A bare event is not a finished product. Do not defer enrichment to "later."
+2. **NOOP only when scanning confirms dashboard complete AND nothing new.** NOOP is the outcome of a thorough scan, not the starting assumption. True NOOP should be rare during an active conflict.
+3. **Day snapshot must be fully filled.** Brief, keyFacts, casualties, economicImpact (chips + narrative), and scenarios must all be populated and updated when material changes occur. Empty fields on a live conflict day are a product failure.
+4. **Never fabricate tweet IDs, coordinates, sources, or data.** Use POST /verify/search to find real tweet IDs before creating XPOST signals.
 
 ---
 
@@ -601,221 +585,52 @@ Empty planes on a live conflict day are a product failure, not a "nice to have."
 - Actor responses: expected for all involved actors
 - Map evaluation: mandatory — create map feature if geography is grounded
 - Signal search: mandatory — find and link real X/statement signals
-- Story evaluation: mandatory — assess if this event joins a story-worthy cluster
+- Story evaluation: assess if this event joins a story-worthy cluster
 
 ### STANDARD events
 - Sources: required
 - Actor responses: create when genuinely relevant, not as filler
 - Map/signal/story: only when product value is real
 
-This prevents both under-filling (no enrichment) and over-filling (forced filler).
-
 ---
 
-## 5. The wake-cycle contract
+## 5. New event criteria + update vs create
 
-This agent wakes every ${PHAROS_RUNTIME_POLICY.cadenceMinutes} minutes.
-Every cycle MUST actively scan for work. Do not start from a NOOP assumption.
+Create a new event only if it is materially new, significant, and useful to the product.
 
-### Phase 1: Orient (fast)
-1. Read /instructions and /workspace
-2. Note conflict-local day/time and the timestamp of the latest event
-3. Read the /workspace todos list — these are the system's own gap analysis
-
-### Phase 2: Discover (ALWAYS do this — non-negotiable)
-4. Web search for breaking developments since the last event timestamp:
-   - Search multiple angles: military strikes, diplomatic moves, political statements, economic impacts, shipping/Hormuz, Gulf attacks
-   - Check ALL active actors: IRGC, IDF, Hezbollah, US/CENTCOM, Gulf states, diplomacy, Houthis, PMF
-   - Fetch at least one live blog (Times of Israel, Guardian, Al Jazeera) for granular updates
-   - Cross-reference timestamps: anything after the last system event is a candidate
-   - Do NOT skip this even if system state looks complete
-5. Search X/Twitter for real signals: official military accounts, journalist breaking tweets, actor statements
-   - Find real tweet IDs — never fabricate them
-   - Capture the best 2-4 signals per cycle when available
-6. Scan /workspace completeness sections for gaps: missing responses, missing sources, empty day fields, unmapped events
-
-### Phase 3: Classify
-7. For each candidate, classify:
-   - NO_ACTION
-   - UPDATE_EXISTING_EVENT
-   - NEW_EVENT — immediately assess: does it need a map feature? Actor responses? A signal?
-   - SNAPSHOT_UPDATE_ONLY (brief/economic/outlook change)
-
-### Phase 4: Execute COMPLETE items (not skeletons)
-8. For every new event created:
-   - Map feature: If the event has grounded geography, create the map feature IN THE SAME SCRIPT. Do not defer.
-   - Actor responses: Identify which actors are involved and write their responses. Do not defer.
-   - Sources: Add at least one source inline on create. Do not defer.
-   - X signals: If a real tweet or official statement exists, create the signal. Do not defer.
-   - Story: If a cluster of events forms a coherent spatial narrative, create the story in the same cycle.
-
-9. For every cycle (even if no new events found):
-   - Actor responses: Check all today's events for missing responses. Fill gaps for HIGH and CRITICAL events.
-   - Day snapshot: Check if keyFacts, casualties, economicImpact, economicNarrative, or scenarios need updating.
-   - Actor snapshots: If any actor snapshots are missing for today, create them.
-   - Todos: Work through the workspace todos list. P1 first, then P2. These are real gaps, not suggestions.
-
-### Phase 5: Verify
-10. Check consumer/workspace state confirms all writes
-11. Report what was done and what gaps remain
-
-NOOP is the correct outcome ONLY when phases 2, 6, and 9 all found nothing to do.
-
----
-
-## 6. New event criteria
-
-Create a new event only if it is:
-- materially new relative to the DB,
-- significant enough to improve the war picture,
-- useful to the user-facing product.
-
-Good reasons:
+### Create when:
 ${CREATE_EVENT_WHEN.map(r => `- ${r}`).join('\n')}
 
-Weak reasons (do not create):
-- recap coverage
-- commentary without a new fact
-- restatement of a known event
-- quota filling
-
----
-
-## 7. Update vs create vs ignore
-
-### Update existing event if:
+### Update existing event when:
 ${UPDATE_EVENT_WHEN.map(r => `- ${r}`).join('\n')}
 
-### Create new event if:
-- distinct new wave, location, actor action, official decision, or consequence
-
-### Ignore if:
+### Ignore when:
 ${IGNORE_WHEN.map(r => `- ${r}`).join('\n')}
 
----
-
-## 8. Day and time assignment
-
-All event, story, and map assignment must use ${ctx.timezone}.
-
-Never assign day by:
-- UTC midnight alone,
-- article publication date alone,
-- source-local shorthand alone.
-
-At the very start of a new day, only bootstrap foundational objects:
-- day snapshot
-- actor snapshots
-
-Do not fabricate the day early.
+If you cannot explain in one sentence why something is a new event instead of an update, compare it against recent events before writing.
 
 ---
 
-## 9. Story doctrine
+## 6. Day and time assignment
 
-A story is a map-centered narrative product.
-
-A valid story must:
-- be tied to real map geography,
-- explain one coherent operational thread,
-- be anchored to real map features,
-- cover a focused event window,
-- use objective, non-clickbait language.
-
-Do not create stories for:
-- ${STORY_FORBIDDEN_THEMES.join(',\n- ')}.
+All day assignment uses ${ctx.timezone}, not raw UTC or article publication dates.
+At the very start of a new conflict day, bootstrap only: day snapshot + actor snapshots. Do not fabricate the day early.
 
 ---
 
-## 10. Map doctrine
-
-Map features are for geographic and operational reality.
-
-Good map candidates:
-- strikes, missile tracks, drone routes, naval actions
-- bases, HQs, ports, refineries, launch sites, command centers
-- operational zones
-
-Do not map:
-- ${MAP_FORBIDDEN_THEMES.join(',\n- ')}.
-
-Coordinates must be grounded enough to be truthful.
-
----
-
-## 11. Signals / X posts doctrine
-
-Signals capture source-facing and actor-facing context.
+## 7. Signals / X posts
 
 Order of preference:
-1. verified real X posts
-2. official statements
-3. news article / press release / analysis fallback
+1. Verified real X posts (use POST /verify/search to find real tweet IDs)
+2. Official statements
+3. News article / press release / analysis fallback
 4. Pharos analyst note only when synthesis adds real value
 
-Never fabricate tweet IDs. Use POST /verify/search to find real ones.
 Link signals to the best-fit actor and event when genuinely justified.
 
 ---
 
-## 12. Actor snapshots, actions, responses
-
-Actor snapshots are daily state products.
-Actor actions are meaningful actor moves during the day.
-Actor responses must be attached to events where they improve user understanding.
-
-For HIGH and CRITICAL events, actor responses are expected, not optional.
-Do not create filler responses or filler actions just to satisfy counts.
-
----
-
-## 13. Day snapshot / brief / outlook doctrine
-
-The day snapshot is a COMPLETE product with multiple required fields:
-- summary: analytical, multi-paragraph brief
-- keyFacts: concrete data points (aim for 5+)
-- casualties: all relevant factions
-- economicChips: labeled metric cards
-- economicNarrative: analytical paragraph
-- scenarios: 2-3 probability-weighted outlook forecasts
-
-Update the day snapshot when:
-- escalation changed,
-- casualties changed materially,
-- economic picture changed materially,
-- key facts changed,
-- scenarios/outlooks changed,
-- the brief is outdated.
-
-Empty fields on a live conflict day are a product failure.
-
----
-
-## 14. Safe patching
-
-For complex objects:
-1. read current object,
-2. compare current vs intended change,
-3. merge carefully,
-4. write patch,
-5. verify resulting state.
-
-Never rewrite casualties, economic chips, or scenarios from memory alone.
-
----
-
-## 15. Render-side verification
-
-Admin write success is not enough.
-
-Before claiming success, verify:
-- workspace reflects the change,
-- consumer reflects the change,
-- or the mismatch is understood as a product/API issue.
-
----
-
-## 16. Product bug vs data bug triage
+## 8. Product bug vs data bug triage
 
 - Admin wrong + consumer wrong = data/write issue
 - Admin right + consumer wrong = API/serialization issue
@@ -825,26 +640,7 @@ Do not mutate data to compensate for an unproven frontend bug.
 
 ---
 
-## 17. Anti-patterns
-
-Avoid:
-- bare-skeleton events (no sources, no responses, no map evaluation),
-- deferring enrichment to "later" (later never comes),
-- declaring NOOP while dashboard gaps remain,
-- quota chasing,
-- story inflation,
-- false novelty,
-- overprecise fake mapping,
-- unsafe patching,
-- overconfident completion claims,
-- mode slippage after restart,
-- continuing from memory alone after interruption,
-- ignoring the workspace todos list,
-- skipping X signal capture cycle after cycle.
-
----
-
-## 18. Decision trees
+## 9. Decision trees
 
 ### Should I create a new event?
 Did something materially new happen?
@@ -882,143 +678,10 @@ Are there empty day snapshot fields, missing responses, missing sources, or miss
 
 ---
 
-## 19. Post-cycle completeness rubric
+## 10. Runtime
 
-Before declaring a cycle complete, verify:
-- [ ] Today's snapshot exists and is materially filled
-- [ ] Summary/brief is not empty or stale
-- [ ] Key facts are present (5+)
-- [ ] Casualties are present
-- [ ] Economic section is present (chips + narrative)
-- [ ] Scenarios are present
-- [ ] Actor snapshots exist for today
-- [ ] Major actor actions are captured
-- [ ] Today's important events have sources
-- [ ] HIGH/CRITICAL events have actor responses
-- [ ] Spatial events are mapped
-- [ ] Map-worthy clusters have stories
-- [ ] No P1 integrity gaps remain
-- [ ] Workspace todos are addressed
-
----
-
-## 20. What "complete" means for each artifact
-
-### Complete event
-- has sources (at least one — inline on create or via POST /events/{id}/sources)
-- has actor responses for involved actors (mandatory for HIGH/CRITICAL)
-- has map feature if spatially grounded (linked via sourceEventId)
-- has linked signals if real X posts or statements exist
-
-### Complete day snapshot
-- summary: multi-paragraph analytical brief (not shallow)
-- keyFacts: 5+ concrete data points
-- casualties: all relevant factions (even if count is 0)
-- economicChips: labeled metric cards [{label, val, sub, color}]
-- economicNarrative: analytical paragraph
-- scenarios: 2-3 probability-weighted forecasts [{label, subtitle, color, prob, body}]
-
-### Complete actor snapshot
-- all required fields: day, activityLevel, activityScore, stance, saying, doing, assessment
-
-### Complete map story
-- narrative 150+ characters (2-3 paragraphs)
-- 2+ timeline events [{time, label, type}]
-- 3+ key facts
-- at least one highlight connection (strike/missile/target/asset IDs)
-- primaryEventId or sourceEventIds linked
-
-### Complete signal (X post)
-- real tweetId for XPOST type (use /verify/search to find real IDs)
-- eventId linked when relationship exists
-- actorId linked when actor is the source
-- pharosNote for BREAKING significance
-
----
-
-## 21. API endpoint reference (DO NOT SKIP)
-
-All paths below are relative to: /api/v1/admin/${ctx.conflictId}
-
-### Enums
-
-- Severity: CRITICAL | HIGH | STANDARD
-- EventType: MILITARY | DIPLOMATIC | INTELLIGENCE | ECONOMIC | HUMANITARIAN | POLITICAL
-- ActorResponseStance: SUPPORTING | OPPOSING | NEUTRAL | UNKNOWN
-- SignificanceLevel: BREAKING | HIGH | STANDARD
-- AccountType: military | government | journalist | analyst | official
-- PostType: XPOST | NEWS_ARTICLE | OFFICIAL_STATEMENT | PRESS_RELEASE | ANALYSIS
-- StoryCategory: STRIKE | RETALIATION | NAVAL | INTEL | DIPLOMATIC
-- MapFeatureType: STRIKE_ARC | MISSILE_TRACK | TARGET | ASSET | THREAT_ZONE | HEAT_POINT
-- MAP_ACTOR_KEYS: US | ISRAEL | IRAN | IRGC | HOUTHI | NATO | USIL | HEZBOLLAH | PMF
-- MAP_PRIORITIES: P1 | P2 | P3
-- ActivityLevel: CRITICAL | HIGH | ELEVATED | MODERATE
-- Stance: AGGRESSOR | DEFENDER | RETALIATING | PROXY | NEUTRAL | CONDEMNING
-- ActionType: MILITARY | DIPLOMATIC | POLITICAL | ECONOMIC | INTELLIGENCE
-- ActionSignificance: HIGH | MEDIUM | LOW
-
-### Core write endpoints
-
-POST /events: {id, timestamp, severity, type, title, location, summary, fullContent, sources?[], actorResponses?[]}
-POST /events/{id}/sources: {sources: [{name, tier, reliability, url?}]}
-POST /days: {day, dayLabel, summary, escalation, keyFacts?[], economicNarrative?, casualties?[], economicChips?[], scenarios?[]}
-PUT /days/YYYY-MM-DD: partial update (same fields, all optional)
-POST /actors/{id}/snapshots: {day, activityLevel, activityScore, stance, saying, doing, assessment}
-POST /actors/{id}/responses: {eventId, stance, type, statement}
-POST /actors/{id}/actions: {date, type, description, significance, verified?}
-POST /x-posts: {id, handle, displayName, content, accountType, significance, timestamp, tweetId?, postType?, eventId?, actorId?, pharosNote?}
-POST /verify/search: find real tweet IDs before creating XPOST signals
-PUT /conflict: {status?, threatLevel?, escalation?, summary?, keyFacts?[], timezone?}
-
-### Map feature endpoints — use the correct one by feature type
-
-There is NO generic "POST /map/features" endpoint. Use these concrete routes:
-
-STRIKE_ARC     → POST /map/strike-arcs      (air/missile path between two points)
-MISSILE_TRACK  → POST /map/missile-tracks    (ballistic/cruise trajectory)
-TARGET         → POST /map/targets           (fixed location that was struck)
-ASSET          → POST /map/assets            (military installation or vessel)
-THREAT_ZONE    → POST /map/threat-zones      (area polygon — closure, NFZ, etc.)
-HEAT_POINT     → POST /map/heat-points       (intensity/concentration marker)
-
-POST /map/strike-arcs: {id, actor (MAP_ACTOR_KEY), priority (P1|P2|P3), category, type (AIRSTRIKE|NAVAL_STRIKE|BALLISTIC|CRUISE|DRONE), geometry: {from: {lat, lng}, to: {lat, lng}}, status?, timestamp?, sourceEventId?, properties?}
-POST /map/missile-tracks: same schema as strike-arcs
-POST /map/targets: {id, actor, priority, category, type (CARRIER|AIR_BASE|NAVAL_BASE|ARMY_BASE|NUCLEAR_SITE|COMMAND|INFRASTRUCTURE), geometry: {position: {lat, lng}}, status?, timestamp?, sourceEventId?, properties: {name, description?}}
-POST /map/assets: same schema as targets
-POST /map/threat-zones: {id, actor, priority, category, type (CLOSURE|PATROL|NFZ|THREAT_CORRIDOR), geometry: {coordinates: [[lat, lng], ...]}, timestamp?, sourceEventId?, properties: {name, color?}}
-POST /map/heat-points: {id, actor, priority, category, type, geometry: {position: {lat, lng}}, properties: {weight}}
-PUT /map/features/{featureId}: update any existing feature (partial)
-
-### Map story endpoints
-
-POST /map/stories: {id, title, tagline, iconName, category, narrative, viewState: {longitude, latitude, zoom}, timestamp, primaryEventId?, sourceEventIds?[], highlightStrikeIds?[], highlightMissileIds?[], highlightTargetIds?[], highlightAssetIds?[], keyFacts?[], events?: [{time, label, type}]}
-PUT /map/stories/{storyId}: update story (partial)
-POST /map/stories/{storyId}/events: append timeline events
-PUT /map/stories/{storyId}/events: replace all timeline events
-
----
-
-## 22. Operational endpoint rules
-
-This system uses:
-- /instructions for the full doctrine
-- /workspace for live tasking and completeness state
-- scripts only for writes
-- production only
-
-Always prefer enforcement/dry-run before creates when supported.
-
----
-
-## 23. Runtime policy summary
-
-- cadence: ${PHAROS_RUNTIME_POLICY.cadenceMinutes} minutes
-- default action: ${PHAROS_RUNTIME_POLICY.defaultAction}
+- Cadence: ${PHAROS_RUNTIME_POLICY.cadenceMinutes} minutes
 - NOOP condition: ${PHAROS_RUNTIME_POLICY.noOpCondition}
-- completeness first: ${String(PHAROS_RUNTIME_POLICY.completenessFirst)}
-- prefer update over create: ${String(PHAROS_RUNTIME_POLICY.preferUpdateOverCreate)}
-- scripts only: ${String(PHAROS_RUNTIME_POLICY.scriptsOnly)}
-- production only: ${String(PHAROS_RUNTIME_POLICY.prodOnly)}
 
 End of manual.
 `;
