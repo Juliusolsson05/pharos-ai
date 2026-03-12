@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
-import { BrowsePageHeader } from '@/features/browse/components/BrowsePageHeader';
-import { EventFilterBar } from '@/features/browse/components/EventFilterBar';
-import { EventList } from '@/features/browse/components/EventList';
-import { EventPagination } from '@/features/browse/components/EventPagination';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { EventFilterBar } from '@/features/browse/components/events/EventFilterBar';
+import { EventList } from '@/features/browse/components/events/EventList';
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
+import { BrowsePagination } from '@/features/browse/components/layout/BrowsePagination';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
 import {
   buildBrowseMetadata,
   buildDescription,
@@ -106,7 +106,7 @@ export default async function BrowseEventsPage({ searchParams }: Props) {
       <EventList events={events} page={page} filterBar={<EventFilterBar eventDates={eventDates} />} />
       {totalPages > 1 && (
         <div className="mt-10">
-          <EventPagination page={page} totalPages={totalPages} searchParams={filterQs} />
+          <BrowsePagination page={page} totalPages={totalPages} basePath="/browse/events" searchParams={filterQs} />
         </div>
       )}
     </div>

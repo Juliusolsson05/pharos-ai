@@ -3,7 +3,7 @@ import { cache } from 'react';
 import { publicConflictId } from '@/shared/lib/env';
 import { prisma } from '@/server/lib/db';
 
-import { PAGE_SIZE } from './events';
+import { PAGE_SIZE } from './page-size';
 
 const CONFLICT_ID = publicConflictId;
 

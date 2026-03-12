@@ -3,9 +3,9 @@ import { cache } from 'react';
 import { publicConflictId } from '@/shared/lib/env';
 import { prisma } from '@/server/lib/db';
 
-const CONFLICT_ID = publicConflictId;
+import { STORY_PAGE_SIZE } from './page-size';
 
-export const STORY_PAGE_SIZE = 10;
+const CONFLICT_ID = publicConflictId;
 
 export const getStories = cache(async (page = 1) => {
   const where = { conflictId: CONFLICT_ID };

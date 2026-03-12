@@ -1,8 +1,8 @@
-import { ActorResponseList } from '@/features/browse/components/ActorResponseList';
-import { BrowsePageHeader } from '@/features/browse/components/BrowsePageHeader';
-import { SeverityBadge } from '@/features/browse/components/SeverityBadge';
-import { SignalCard } from '@/features/browse/components/SignalCard';
-import { SourceList } from '@/features/browse/components/SourceList';
+import { ActorResponseList } from '@/features/browse/components/events/ActorResponseList';
+import { SeverityBadge } from '@/features/browse/components/events/SeverityBadge';
+import { SignalCard } from '@/features/browse/components/events/SignalCard';
+import { SourceList } from '@/features/browse/components/events/SourceList';
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
 
 import { fmtDate, fmtTimeZ } from '@/shared/lib/format';
 

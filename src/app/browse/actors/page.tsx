@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
-import { ActorGrid } from '@/features/browse/components/ActorGrid';
-import { BrowsePageHeader } from '@/features/browse/components/BrowsePageHeader';
-import { BrowsePagination } from '@/features/browse/components/BrowsePagination';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { ActorGrid } from '@/features/browse/components/actors/ActorGrid';
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
+import { BrowsePagination } from '@/features/browse/components/layout/BrowsePagination';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
 import {
   buildBrowseMetadata,
   buildDescription,

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 
-import { BrowseRefreshControls } from './BrowseRefreshControls';
+import { BrowseRefreshControls } from '@/features/browse/components/layout/BrowseRefreshControls';
 
 type Crumb = {
   label: string;

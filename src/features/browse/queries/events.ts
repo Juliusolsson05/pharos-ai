@@ -6,9 +6,9 @@ import { prisma } from '@/server/lib/db';
 
 import type { BrowseEventFilters } from '@/types/domain';
 
-const CONFLICT_ID = publicConflictId;
+import { PAGE_SIZE } from './page-size';
 
-export const PAGE_SIZE = 20;
+const CONFLICT_ID = publicConflictId;
 
 export const getEvents = cache(async (filters?: BrowseEventFilters) => {
   const where: Record<string, unknown> = { conflictId: CONFLICT_ID };

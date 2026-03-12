@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
-import { BriefList } from '@/features/browse/components/BriefList';
-import { BrowsePageHeader } from '@/features/browse/components/BrowsePageHeader';
-import { BrowsePagination } from '@/features/browse/components/BrowsePagination';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { BriefList } from '@/features/browse/components/briefs/BriefList';
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
+import { BrowsePagination } from '@/features/browse/components/layout/BrowsePagination';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
 import {
   buildBrowseMetadata,
   buildDescription,

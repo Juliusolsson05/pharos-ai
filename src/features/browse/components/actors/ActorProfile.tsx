@@ -1,3 +1,4 @@
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
 import { Flag } from '@/shared/components/shared/Flag';
 
 import { ACT_C, STA_C } from '@/data/iran-actors';
@@ -5,7 +6,6 @@ import type { ActivityLevel, Stance } from '@/types/domain';
 
 import { ActorProfileActions } from './ActorProfileActions';
 import { ActorProfileResponses } from './ActorProfileResponses';
-import { BrowsePageHeader } from './BrowsePageHeader';
 
 type Actor = {
   id: string;

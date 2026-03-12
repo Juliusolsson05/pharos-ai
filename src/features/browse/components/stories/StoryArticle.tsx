@@ -1,8 +1,9 @@
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
+
 import { fmtDate, fmtTimeZ } from '@/shared/lib/format';
 
 import type { BrowseStoryEvent } from '@/types/domain';
 
-import { BrowsePageHeader } from './BrowsePageHeader';
 import { CategoryBadge } from './CategoryBadge';
 
 type Story = {

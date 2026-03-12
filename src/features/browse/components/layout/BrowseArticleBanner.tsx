@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 
 import Link from 'next/link';
 
@@ -10,20 +10,32 @@ import { Button } from '@/components/ui/button';
 
 const STORAGE_KEY = 'pharos:browse-article-banner-dismissed';
 
-function readDismissed(): boolean {
-  if (typeof window === 'undefined') return true;
+function subscribe() {
+  return () => {};
+}
+
+function getDismissedSnapshot() {
   return localStorage.getItem(STORAGE_KEY) === '1';
 }
 
+function getDismissedServerSnapshot() {
+  return true;
+}
+
 export function BrowseArticleBanner() {
-  const [isDismissed, setIsDismissed] = useState(readDismissed);
+  const dismissedFromStorage = useSyncExternalStore(
+    subscribe,
+    getDismissedSnapshot,
+    getDismissedServerSnapshot,
+  );
+  const [isLocallyDismissed, setIsLocallyDismissed] = useState(false);
 
   function handleDismiss() {
     localStorage.setItem(STORAGE_KEY, '1');
-    setIsDismissed(true);
+    setIsLocallyDismissed(true);
   }
 
-  if (isDismissed) return null;
+  if (dismissedFromStorage || isLocallyDismissed) return null;
 
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-2 bg-black border-b border-[var(--bd)]">

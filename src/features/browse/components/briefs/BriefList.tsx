@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { EscalationBar } from './EscalationBar';
+import { EscalationBar } from '@/features/browse/components/briefs/EscalationBar';
 
 type BriefItem = {
   id: string;

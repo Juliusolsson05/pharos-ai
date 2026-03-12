@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
-import { BrowsePageHeader } from '@/features/browse/components/BrowsePageHeader';
-import { StoryList } from '@/features/browse/components/StoryList';
-import { StoryPagination } from '@/features/browse/components/StoryPagination';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
+import { BrowsePagination } from '@/features/browse/components/layout/BrowsePagination';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
+import { StoryList } from '@/features/browse/components/stories/StoryList';
 import {
   buildBrowseMetadata,
   buildDescription,
@@ -79,7 +79,7 @@ export default async function BrowseStoriesPage({ searchParams }: Props) {
       <StoryList stories={stories} />
       {totalPages > 1 && (
         <div className="mt-10">
-          <StoryPagination page={page} totalPages={totalPages} />
+          <BrowsePagination page={page} totalPages={totalPages} basePath="/browse/stories" />
         </div>
       )}
     </div>

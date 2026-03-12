@@ -1,6 +1,5 @@
 import { SITE_URL } from '@/features/browse/constants';
-import { PAGE_SIZE } from '@/features/browse/queries/events';
-import { STORY_PAGE_SIZE } from '@/features/browse/queries/stories';
+import { PAGE_SIZE, STORY_PAGE_SIZE } from '@/features/browse/queries/page-size';
 
 export type SitemapUrl = {
   url: string;

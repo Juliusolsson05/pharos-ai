@@ -13,13 +13,13 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 
-import { useIsMobile } from '@/shared/hooks/use-is-mobile';
+import { BrowseArticleBanner } from '@/features/browse/components/layout/BrowseArticleBanner';
+import { BrowseFooter } from '@/features/browse/components/layout/BrowseFooter';
+import { BrowseNav } from '@/features/browse/components/layout/BrowseNav';
+import { BrowseSidebar } from '@/features/browse/components/layout/BrowseSidebar';
+import { CriticalTimeline } from '@/features/browse/components/layout/CriticalTimeline';
 
-import { BrowseArticleBanner } from './BrowseArticleBanner';
-import { BrowseFooter } from './BrowseFooter';
-import { BrowseNav } from './BrowseNav';
-import { BrowseSidebar } from './BrowseSidebar';
-import { CriticalTimeline } from './CriticalTimeline';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
 type Props = {
   children: React.ReactNode;
@@ -59,7 +59,7 @@ export function BrowseShell({ children }: Props) {
     <>
       <BrowseNav hamburgerSlot={hamburgerButton} />
 
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {showDesktopSidebar && <BrowseSidebar />}
 
         {showMobileSheet && (
@@ -76,7 +76,7 @@ export function BrowseShell({ children }: Props) {
           </Sheet>
         )}
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 min-h-0 overflow-y-auto">
           {isDetailPage && <BrowseArticleBanner />}
           {children}
           {isLanding && <BrowseFooter />}

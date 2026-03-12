@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
-import { ActorProfile } from '@/features/browse/components/ActorProfile';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { ActorProfile } from '@/features/browse/components/actors/ActorProfile';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
 import {
   buildDescription,
   buildDetailMetadata,

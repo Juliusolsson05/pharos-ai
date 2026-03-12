@@ -1,10 +1,10 @@
-import type { BrowseCasualty, BrowseEconChip, BrowseScenario } from '@/types/domain';
+import { CasualtyTable } from '@/features/browse/components/briefs/CasualtyTable';
+import { EconomicChipGrid } from '@/features/browse/components/briefs/EconomicChipGrid';
+import { EscalationBar } from '@/features/browse/components/briefs/EscalationBar';
+import { ScenarioCard } from '@/features/browse/components/briefs/ScenarioCard';
+import { BrowsePageHeader } from '@/features/browse/components/layout/BrowsePageHeader';
 
-import { BrowsePageHeader } from './BrowsePageHeader';
-import { CasualtyTable } from './CasualtyTable';
-import { EconomicChipGrid } from './EconomicChipGrid';
-import { EscalationBar } from './EscalationBar';
-import { ScenarioCard } from './ScenarioCard';
+import type { BrowseCasualty, BrowseEconChip, BrowseScenario } from '@/types/domain';
 
 type Brief = {
   day: string;

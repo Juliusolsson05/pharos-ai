@@ -1,4 +1,4 @@
-import { SourceBadge } from '@/features/browse/components/SourceBadge';
+import { SourceBadge } from '@/features/browse/components/events/SourceBadge';
 
 import type { Source } from '@/types/domain';
 

@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
-import { EventArticle } from '@/features/browse/components/EventArticle';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { EventArticle } from '@/features/browse/components/events/EventArticle';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
 import {
   buildDescription,
   buildDetailMetadata,

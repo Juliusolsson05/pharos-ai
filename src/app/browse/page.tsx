@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 
-import { Capabilities } from '@/features/browse/components/Capabilities';
-import { Faq } from '@/features/browse/components/Faq';
-import { FooterCta } from '@/features/browse/components/FooterCta';
-import { Hero } from '@/features/browse/components/Hero';
-import { HowItWorks } from '@/features/browse/components/HowItWorks';
-import { JsonLd } from '@/features/browse/components/JsonLd';
-import { OpenSource } from '@/features/browse/components/OpenSource';
-import { Screenshot } from '@/features/browse/components/Screenshot';
-import { StatsBar } from '@/features/browse/components/StatsBar';
-import { WhoItsFor } from '@/features/browse/components/WhoItsFor';
+import { Capabilities } from '@/features/browse/components/landing/Capabilities';
+import { Faq } from '@/features/browse/components/landing/Faq';
+import { FooterCta } from '@/features/browse/components/landing/FooterCta';
+import { Hero } from '@/features/browse/components/landing/Hero';
+import { HowItWorks } from '@/features/browse/components/landing/HowItWorks';
+import { JsonLd } from '@/features/browse/components/landing/JsonLd';
+import { OpenSource } from '@/features/browse/components/landing/OpenSource';
+import { Screenshot } from '@/features/browse/components/landing/Screenshot';
+import { StatsBar } from '@/features/browse/components/landing/StatsBar';
+import { WhoItsFor } from '@/features/browse/components/landing/WhoItsFor';
 
 export const metadata: Metadata = {
   title: 'Conflicts.app — Free Open-Source Iran Conflict Dashboard | Pharos',

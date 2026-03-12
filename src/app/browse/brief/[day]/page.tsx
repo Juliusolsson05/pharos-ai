@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
-import { BriefArticle } from '@/features/browse/components/BriefArticle';
-import { StructuredData } from '@/features/browse/components/StructuredData';
+import { BriefArticle } from '@/features/browse/components/briefs/BriefArticle';
+import { StructuredData } from '@/features/browse/components/seo/StructuredData';
 import {
   buildDescription,
   buildDetailMetadata,

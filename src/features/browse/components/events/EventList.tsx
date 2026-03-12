@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { SeverityBadge } from '@/features/browse/components/SeverityBadge';
+import { SeverityBadge } from '@/features/browse/components/events/SeverityBadge';
 
 import { fmtDate, fmtTimeZ } from '@/shared/lib/format';
 
