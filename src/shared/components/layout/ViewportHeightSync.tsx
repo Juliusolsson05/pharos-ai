@@ -7,7 +7,9 @@ function updateAppHeightVar() {
   const vv = window.visualViewport;
   // When pinch-zoomed (scale > 1), visualViewport.height shrinks — use innerHeight instead
   const vh = vv && vv.scale <= 1 ? vv.height : window.innerHeight;
+  const mobileVh = vv?.height ?? window.innerHeight;
   document.documentElement.style.setProperty('--app-height', `${Math.round(vh)}px`);
+  document.documentElement.style.setProperty('--app-height-mobile', `${Math.round(mobileVh)}px`);
 }
 
 export function ViewportHeightSync() {
@@ -30,4 +32,3 @@ export function ViewportHeightSync() {
 
   return null;
 }
-

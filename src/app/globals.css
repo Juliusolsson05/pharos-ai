@@ -6,6 +6,8 @@
 
 :root {
   --app-height: 100vh;
+  --app-height-mobile: 100vh;
+  --app-shell-height: var(--app-height);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -142,7 +144,14 @@
   html, body { height: 100%; }
 
   @supports (height: 100dvh) {
-    :root { --app-height: 100dvh; }
+    :root {
+      --app-height: 100dvh;
+      --app-height-mobile: 100dvh;
+    }
+  }
+
+  @media (pointer: coarse) {
+    :root { --app-shell-height: var(--app-height-mobile); }
   }
 
   body {

@@ -8,7 +8,7 @@ export default function BrowseLayout({ children }: { children: React.ReactNode }
       <div
         data-theme="auto"
         className="flex flex-col min-h-0 overflow-hidden bg-[var(--bg-app)]"
-        style={{ height: 'var(--app-height)' }}
+        style={{ height: 'var(--app-shell-height)' }}
       >
         <BrowseShell>{children}</BrowseShell>
       </div>
