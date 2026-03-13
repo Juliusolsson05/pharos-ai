@@ -31,6 +31,8 @@ const NAV = [
   { label: 'DATA',        href: '/dashboard/data'          },
 ];
 
+const GITHUB_URL = 'https://github.com/Juliusolsson05/pharos-ai';
+
 export function Header() {
   const path = usePathname();
   const { data: bootstrap } = useBootstrap();
@@ -76,7 +78,19 @@ export function Header() {
               <span className="mono text-xs font-bold text-[var(--t1)] tracking-[0.14em]">PHAROS</span>
               <span className="mono text-[8px] text-[var(--warning)] shrink-0">{latestLabel}</span>
             </Link>
-            <span className="mono text-[8px] text-[var(--t4)] truncate">{displayDate} · UTC</span>
+            <div className="flex items-center gap-2 min-w-0 shrink-0">
+              <span className="mono text-[8px] text-[var(--t4)] truncate">{displayDate} · UTC</span>
+              <Button
+                variant="ghost"
+                asChild
+                className="h-6 shrink-0 gap-1 rounded bg-[var(--t1)] pl-2 pr-1.5 text-[var(--bg-app)] hover:bg-[var(--t2)] hover:text-[var(--bg-app)]"
+              >
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="View Pharos on GitHub">
+                  <Github size={12} fill="currentColor" strokeWidth={0} />
+                  <span className="mono text-[9px] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
+                </a>
+              </Button>
+            </div>
           </div>
           <nav
             className={`${isLandscapeNonMap ? 'h-8' : 'h-9'} flex items-stretch overflow-x-auto touch-scroll hide-scrollbar`}
@@ -177,7 +191,7 @@ export function Header() {
 
             {/* GitHub link */}
             <a
-              href="https://github.com/Juliusolsson05/pharos-ai"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--t1)] text-[var(--bg-app)] hover:bg-[var(--t2)] transition-colors"
