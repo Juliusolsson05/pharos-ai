@@ -1,3 +1,4 @@
+import { ChatWidget } from '@/features/chat/components/ChatWidget';
 import { Header } from '@/shared/components/layout/Header';
 import { ViewportHeightSync } from '@/shared/components/layout/ViewportHeightSync';
 
@@ -11,6 +12,7 @@ export default function DashboardShellLayout({ children }: { children: React.Rea
           {children}
         </div>
       </div>
+      <ChatWidget />
     </>
   );
 }
