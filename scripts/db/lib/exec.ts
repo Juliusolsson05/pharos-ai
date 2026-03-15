@@ -3,13 +3,15 @@ import { spawnSync } from 'node:child_process';
 type RunOptions = {
   args: string[];
   command: string;
+  env?: NodeJS.ProcessEnv;
   input?: string | Buffer;
 };
 
-export function run({ args, command, input }: RunOptions) {
+export function run({ args, command, env, input }: RunOptions) {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
     encoding: 'utf8',
+    env: env ?? process.env,
     input,
     stdio: input ? ['pipe', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'],
   });

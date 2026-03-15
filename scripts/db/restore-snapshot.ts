@@ -12,9 +12,9 @@ function compose(args: string[]) {
 
 export async function restoreSnapshot() {
   compose(['up', '-d', 'postgres']);
-  const containerId = compose(['ps', '-q', 'postgres']);
-  if (!containerId) throw new Error('Local postgres container is not running');
-  compose(['cp', snapshotPath(SNAPSHOT_DUMP), `${containerId}:${CONTAINER_TMP}`]);
+  const serviceState = compose(['ps', '-q', 'postgres']);
+  if (!serviceState) throw new Error('Local postgres container is not running');
+  compose(['cp', snapshotPath(SNAPSHOT_DUMP), `postgres:${CONTAINER_TMP}`]);
   const truncateSql = `TRUNCATE ${INCLUDED_SQL} RESTART IDENTITY CASCADE;`;
   compose(['exec', '-T', 'postgres', 'psql', '-U', 'pharos', '-d', 'pharos', '-c', truncateSql]);
   compose([

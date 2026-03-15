@@ -5,8 +5,18 @@ import { pullSnapshot } from './pull-snapshot';
 import { restoreSnapshot } from './restore-snapshot';
 import { verifySnapshot } from './verify-snapshot';
 
+const LOCAL_DB_URL = 'postgresql://pharos:pharos@localhost:5434/pharos';
+
+function dbEnv() {
+  return {
+    ...process.env,
+    DATABASE_URL: LOCAL_DB_URL,
+    DATABASE_URL_MIGRATION: LOCAL_DB_URL,
+  };
+}
+
 function npm(script: string) {
-  return run({ command: 'npm', args: ['run', script] });
+  return run({ command: 'npm', args: ['run', script], env: dbEnv() });
 }
 
 function docker(args: string[]) {

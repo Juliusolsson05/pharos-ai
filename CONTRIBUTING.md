@@ -23,7 +23,7 @@ Thanks for your interest in contributing. This document covers the setup process
    cp .env.local.example .env.local
    ```
 
-   Fill in the required values. At minimum you need `DATABASE_URL` pointing to your local Postgres (the next step provides defaults).
+   `npm run setup` uses the local Docker Postgres defaults automatically. Fill in the non-database values you need for the parts of the app you want to use.
 
 3. **Install dependencies**
 
