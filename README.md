@@ -47,6 +47,8 @@ npm run dev
 
 `npm run setup` restores the latest public onboarding snapshot when available, then falls back to the deterministic seed dataset if the snapshot cannot be downloaded.
 
+Pharos targets Node 22 and local Postgres 17. If you already have an older local Docker volume from Postgres 16, reset it with `docker compose down -v` before rerunning setup.
+
 ## Open-source scope
 
 Pharos is being open-sourced in stages. This repository currently includes the application layer — the dashboard, interface, and supporting app code.

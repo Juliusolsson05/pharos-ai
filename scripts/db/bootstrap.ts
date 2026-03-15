@@ -13,8 +13,21 @@ function docker(args: string[]) {
   return run({ command: 'docker', args: ['compose', ...args] });
 }
 
+function waitForPostgres() {
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    try {
+      docker(['exec', '-T', 'postgres', 'pg_isready', '-U', 'pharos', '-d', 'pharos']);
+      return;
+    } catch (error) {
+      if (attempt === 30) throw error;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1_000);
+    }
+  }
+}
+
 export async function bootstrapDatabase() {
   docker(['up', '-d', 'postgres']);
+  waitForPostgres();
   npm('db:generate');
   npm('db:migrate:deploy');
   try {

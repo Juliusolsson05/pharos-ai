@@ -39,6 +39,8 @@ Thanks for your interest in contributing. This document covers the setup process
 
    This command starts local PostgreSQL, applies all tracked migrations, tries to restore the latest public onboarding snapshot, and falls back to the deterministic seed if the snapshot is unavailable.
 
+   If you already have an older Postgres 16 Docker volume from a previous setup, run `docker compose down -v` once before rerunning `npm run setup`.
+
 5. **Start the dev server**
 
    ```bash

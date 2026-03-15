@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector:pg17
     restart: unless-stopped
     ports:
       - "5434:5432"
@@ -8,6 +8,11 @@ services:
       POSTGRES_USER: pharos
       POSTGRES_PASSWORD: pharos
       POSTGRES_DB: pharos
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pharos -d pharos"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     volumes:
       - pgdata:/var/lib/postgresql/data
 
