@@ -4,6 +4,7 @@ import { useContext, useMemo } from 'react';
 
 import Link from 'next/link';
 
+import { InstabilityPulse } from '@/shared/components/shared/InstabilityPulse';
 import { getConflictForDay, getEventsForDay } from '@/shared/lib/day-filter';
 import { fmtTimeZ } from '@/shared/lib/format';
 import { SEV_C } from '@/shared/lib/severity-colors';
@@ -65,6 +66,13 @@ export function BriefWidget() {
           </div>
         </div>
       </div>
+
+      {/* instability pulse */}
+      {conflict?.id && (
+        <div className="px-4 py-3 border-b border-[var(--bd)]">
+          <InstabilityPulse conflictId={conflict.id} />
+        </div>
+      )}
 
       {/* executive summary */}
       <div className="px-4 py-3 border-b border-[var(--bd)]">
