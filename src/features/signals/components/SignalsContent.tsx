@@ -10,6 +10,7 @@ import { useXPosts } from '@/features/events/queries/x-posts';
 import { SectionHeader } from '@/features/signals/components/SectionHeader';
 import { type AccountType, SignalFilterRail, type Significance } from '@/features/signals/components/SignalFilterRail';
 import { ListDetailScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
+import { EmptyState } from '@/shared/components/shared/EmptyState';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
 
 import { track } from '@/shared/lib/analytics';
@@ -35,7 +36,7 @@ export function SignalsContent() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { defaultLayout, onLayoutChanged } = usePanelLayout({ id: 'signals' });
   const { currentDay, setDay, allDays } = useConflictDay();
-  const { data: allPosts, isLoading } = useXPosts();
+  const { data: allPosts, isLoading, isError, error, refetch } = useXPosts();
   const [showAll, setShowAll] = useState(true);
 
   const filtered = useMemo(() => {
@@ -142,6 +143,7 @@ export function SignalsContent() {
   );
 
   if (isLoading) return <ListDetailScreenSkeleton />;
+  if (isError && error) return <EmptyState variant="error" message="Signals could not be loaded." onRetry={() => { void refetch(); }} />;
 
   if (isMobile) {
     return (

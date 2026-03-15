@@ -35,7 +35,7 @@ export function FeedContent() {
   const onLandscapeScroll = useLandscapeScrollEmitter(usePageScroll);
   const { currentDay, setDay } = useConflictDay();
   const [showAllDays, setShowAllDays] = useState(true);
-  const { data: allEvents, isLoading } = useEvents(undefined, showAllDays ? undefined : { day: currentDay });
+  const { data: allEvents, isLoading, isError, error, refetch } = useEvents(undefined, showAllDays ? undefined : { day: currentDay });
 
   const [sevFilter,  setSevFilter]  = useState<Record<Severity, boolean>>({ CRITICAL: true, HIGH: true, STANDARD: true });
   const [typeFilter, setTypeFilter] = useState<Record<EventType, boolean>>(
@@ -73,6 +73,7 @@ export function FeedContent() {
   }, [pathname, router, searchParams]);
 
   if (isLoading) return <ListDetailScreenSkeleton />;
+  if (isError && error) return <EmptyState variant="error" message="Events could not be loaded." onRetry={() => { void refetch(); }} />;
 
   if (isMobile) {
     return (

@@ -14,6 +14,7 @@ import { ConflictBanner } from '@/features/news/components/ConflictBanner';
 import { useRssCollections, useRssFeedItems, useRssFeeds } from '@/features/news/queries';
 
 import { track } from '@/shared/lib/analytics';
+import { EmptyState } from '@/shared/components/shared/EmptyState';
 import { queryKeys } from '@/shared/lib/query/keys';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
@@ -30,12 +31,19 @@ export function NewsContent() {
   const now = useNow();
   const queryClient = useQueryClient();
 
-  const { data: feeds } = useRssFeeds();
-  const { data: collections } = useRssCollections();
+  const { data: feeds, isError: feedsIsError, error: feedsError, refetch: refetchFeeds } = useRssFeeds();
+  const { data: collections, isError: collectionsIsError, error: collectionsError, refetch: refetchCollections } = useRssCollections();
   const allFeeds = useMemo(() => feeds ?? [], [feeds]);
   const feedIds = useMemo(() => allFeeds.map(f => f.id), [allFeeds]);
 
-  const { data: feedData, isFetching, dataUpdatedAt } = useRssFeedItems(feedIds);
+  const {
+    data: feedData,
+    isFetching,
+    dataUpdatedAt,
+    isError: feedItemsIsError,
+    error: feedItemsError,
+    refetch: refetchFeedItems,
+  } = useRssFeedItems(feedIds);
 
   const collection = collections?.[0];
   const channel = collection?.channels[activeChannel];
@@ -48,6 +56,20 @@ export function NewsContent() {
   const timeSinceRefresh = dataUpdatedAt
     ? `${Math.floor((now - dataUpdatedAt) / 1000)}s ago`
     : 'loading...';
+
+  if ((feedsIsError && feedsError) || (collectionsIsError && collectionsError) || (feedItemsIsError && feedItemsError)) {
+    return (
+      <EmptyState
+        variant="error"
+        message="News feeds could not be loaded."
+        onRetry={() => {
+          void refetchFeeds();
+          void refetchCollections();
+          void refetchFeedItems();
+        }}
+      />
+    );
+  }
 
   return (
     <div
