@@ -14,6 +14,9 @@ import {
   SNAPSHOT_TAG,
 } from './manifest';
 
+const PG_DUMP_BIN = process.env.PG_DUMP_BIN ?? 'pg_dump';
+const PSQL_BIN = process.env.PSQL_BIN ?? 'psql';
+
 async function latestMigration() {
   const dirs = await readdir('prisma/migrations', { withFileTypes: true });
   return dirs.filter(dir => dir.isDirectory()).map(dir => dir.name).sort().at(-1) ?? 'unknown';
@@ -29,11 +32,11 @@ export async function publishSnapshot() {
   await ensureSnapshotDir();
   const dumpPath = snapshotPath(SNAPSHOT_DUMP);
   run({
-    command: 'pg_dump',
+    command: PG_DUMP_BIN,
     args: ['--data-only', '--format=custom', '--file', dumpPath, ...INCLUDED_TABLES.flatMap(table => ['-t', quoted(table)]), databaseUrl],
   });
   const rowCountsSql = INCLUDED_TABLES.map(table => `select '${table}', count(*) from ${quoted(table)};`).join(' ');
-  const rows = run({ command: 'psql', args: [databaseUrl, '-At', '-c', rowCountsSql] });
+  const rows = run({ command: PSQL_BIN, args: [databaseUrl, '-At', '-c', rowCountsSql] });
   const rowCounts = Object.fromEntries(rows.split('\n').filter(Boolean).map(line => {
     const [table, count] = line.split('|');
     return [table, Number(count)];
