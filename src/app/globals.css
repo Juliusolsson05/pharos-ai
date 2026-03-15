@@ -409,7 +409,13 @@
   .mapboxgl-ctrl-attrib,
   .mapboxgl-ctrl-bottom-right { display: none !important; }
 
-  /* Chat panel */
+  /* Chat trigger */
+  .chat-trigger {
+    bottom: max(20px, var(--safe-bottom, 0px));
+    right: max(20px, var(--safe-right, 0px));
+  }
+
+  /* Chat panel — desktop */
   .chat-panel {
     width: 380px;
     height: min(520px, calc(var(--app-height) - 100px));
@@ -420,8 +426,28 @@
     animation: chat-slide-in 0.2s ease-out;
   }
 
+  /* Chat panel — mobile full-screen sheet */
+  .chat-panel-mobile {
+    width: 100%;
+    height: 100dvh;
+    max-width: 100%;
+    max-height: 100dvh;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 0;
+    padding-top: var(--safe-top);
+    padding-bottom: 0;
+    overscroll-behavior: contain;
+    animation: chat-slide-up 0.25s ease-out;
+  }
+
   @keyframes chat-slide-in {
     from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes chat-slide-up {
+    from { opacity: 0; transform: translateY(100%); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
@@ -437,18 +463,6 @@
   @keyframes chat-pulse {
     0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
     40% { opacity: 1; transform: scale(1); }
-  }
-
-  @media (max-width: 480px) {
-    .chat-panel {
-      width: calc(100vw - 24px);
-      min-width: calc(100vw - 24px);
-      min-height: min(420px, calc(var(--app-height) - 96px));
-      max-width: calc(100vw - 24px);
-      max-height: calc(var(--app-height) - 96px);
-      right: 12px;
-      bottom: 72px;
-    }
   }
 
   @media (max-width: 1024px) {

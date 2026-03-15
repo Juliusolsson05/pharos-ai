@@ -17,7 +17,7 @@ export function ChatTrigger({ isOpen, hasMessages, onToggle }: Props) {
       size="icon"
       onClick={onToggle}
       aria-label={isOpen ? 'Close chat' : 'Open Intel Assistant'}
-      className="fixed bottom-5 right-5 z-50 h-11 w-11 rounded-full border-[var(--bd)] bg-[var(--bg-2)] shadow-lg hover:bg-[var(--bg-3)] transition-all"
+      className="chat-trigger fixed z-50 h-11 w-11 rounded-full border-[var(--bd)] bg-[var(--bg-2)] shadow-lg transition-all hover:bg-[var(--bg-3)]"
     >
       <MessageSquare size={18} className={hasMessages ? 'text-[var(--blue-l)]' : 'text-[var(--t2)]'} />
     </Button>
