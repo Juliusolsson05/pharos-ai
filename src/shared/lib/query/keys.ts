@@ -74,6 +74,9 @@ export const queryKeys = {
     history: (tokenId: string, range: string) => ['prediction-history', tokenId, range] as const,
     chart: (tokenId: string) => ['prediction-chart', tokenId] as const,
   },
+  perspectives: {
+    liveStatus: (handle: string) => ['perspective-live-status', handle] as const,
+  },
   worldBank: {
     military: (countries?: string[]) =>
       ['world-bank-military', countries] as const,

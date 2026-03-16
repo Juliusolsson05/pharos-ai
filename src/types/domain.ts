@@ -260,11 +260,25 @@ export type ChatSessionData = {
 
 // RSS Feed Sources
 
+export type Perspective =
+  | 'WESTERN'
+  | 'US_GOV'
+  | 'ISRAELI'
+  | 'IRANIAN'
+  | 'ARAB'
+  | 'RUSSIAN'
+  | 'CHINESE'
+  | 'INDEPENDENT'
+  | 'INTL_ORG'
+  | 'AFRICAN'
+  | 'LATAM'
+  | 'LIVECAM';
+
 export type RssFeed = {
   id: string;
   name: string;
   url: string;
-  perspective: 'WESTERN' | 'US_GOV' | 'ISRAELI' | 'IRANIAN' | 'ARAB' | 'RUSSIAN' | 'CHINESE' | 'INDEPENDENT' | 'INTL_ORG';
+  perspective: Perspective;
   country: string;
   tags: string[];
   stateFunded?: boolean;
@@ -292,6 +306,19 @@ export type ConflictChannel = {
   perspective: string;
   feedIds: string[];
   color: string;
+};
+
+export type PerspectiveChannel = {
+  id: string;
+  name: string;
+  handle: string;
+  channelId: string;
+  perspective: Perspective;
+  country: string;
+  language: string;
+  priority: number;
+  logo: string | null;
+  notes: string;
 };
 
 // Economic Indexes

@@ -12,7 +12,7 @@ const DATA_SOURCES = [
     description: 'Live RSS feeds from 30 global news sources. Multi-perspective conflict channels with Western, US/Pentagon, Israeli, and Iranian state media.',
     count: '30 feeds',
     status: 'LIVE',
-    color: '#ef4444',
+    color: 'var(--danger)',
   },
   {
     href: '/dashboard/data/predictions',
@@ -20,7 +20,7 @@ const DATA_SOURCES = [
     description: 'Live Polymarket prediction markets on Iran conflict outcomes — regime change, military ops, Hormuz, nuclear deals, ceasefire, economic impact.',
     count: '~60 markets',
     status: 'LIVE',
-    color: '#a78bfa',
+    color: 'var(--cyber)',
   },
   {
     href: '/dashboard/data/economics',
@@ -28,7 +28,15 @@ const DATA_SOURCES = [
     description: '15 conflict-relevant market indexes — oil, gold, VIX, defense, currencies, shipping. Live charts via Yahoo Finance.',
     count: '15 indexes',
     status: 'LIVE',
-    color: '#f59e0b',
+    color: 'var(--warning)',
+  },
+  {
+    href: '/dashboard/data/perspectives',
+    label: 'PERSPECTIVES',
+    description: 'Curated live YouTube desks, regional broadcasters, and livecams embedded by stable channel ID with live/offline monitoring.',
+    count: '64 channels',
+    status: 'LIVE',
+    color: 'var(--teal)',
   },
 ];
 
@@ -54,10 +62,10 @@ export default function DataIndexPage() {
               href={source.href}
               className={`
                 no-underline block p-5 border transition-colors
-                ${source.status === 'LIVE'
+                 ${source.status === 'LIVE'
                   ? 'bg-[var(--bg-1)] border-[var(--bd)] hover:bg-[var(--bg-2)] hover:border-white/20 cursor-pointer'
                   : 'bg-[var(--bg-1)] border-[var(--bd)] opacity-40 cursor-not-allowed pointer-events-none'
-                }
+                 }
               `}
             >
               <div className="flex items-center gap-2 mb-2">
@@ -65,13 +73,13 @@ export default function DataIndexPage() {
                 <span className="mono text-[11px] font-bold text-[var(--t1)] tracking-wider">
                   {source.label}
                 </span>
-                <span className={`ml-auto px-1.5 py-0.5 text-[7px] mono font-bold border ${
-                  source.status === 'LIVE'
-                    ? 'bg-[var(--danger-dim)] text-[var(--danger)] border-[var(--danger-bd)]'
-                    : 'bg-white/5 text-[var(--t4)] border-white/10'
-                }`}>
-                  {source.status}
-                </span>
+                 <span className={`ml-auto px-1.5 py-0.5 text-[7px] mono font-bold border ${
+                   source.status === 'LIVE'
+                     ? 'bg-[var(--danger-dim)] text-[var(--danger)] border-[var(--danger-bd)]'
+                     : 'bg-white/5 text-[var(--t4)] border-white/10'
+                 }`}>
+                   {source.status}
+                 </span>
               </div>
               <p className="text-[10px] text-[var(--t3)] leading-relaxed mb-2">
                 {source.description}

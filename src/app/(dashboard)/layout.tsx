@@ -1,10 +1,12 @@
 import { ChatWidget } from '@/features/chat/components/ChatWidget';
+import { FloatingChannelWindow } from '@/features/perspectives/components/FloatingChannelWindow';
+import { FloatingChannelWindowProvider } from '@/features/perspectives/components/FloatingChannelWindowProvider';
 import { Header } from '@/shared/components/layout/Header';
 import { ViewportHeightSync } from '@/shared/components/layout/ViewportHeightSync';
 
 export default function DashboardShellLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <FloatingChannelWindowProvider>
       <ViewportHeightSync />
       <div className="dashboard-shell bg-[var(--bg-app)]">
         <Header />
@@ -13,6 +15,7 @@ export default function DashboardShellLayout({ children }: { children: React.Rea
         </div>
       </div>
       <ChatWidget />
-    </>
+      <FloatingChannelWindow />
+    </FloatingChannelWindowProvider>
   );
 }
