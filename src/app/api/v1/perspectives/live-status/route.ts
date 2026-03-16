@@ -3,8 +3,9 @@ import { NextRequest } from 'next/server';
 import { err, ok } from '@/server/lib/api-utils';
 
 const CACHE_TTL = 600;
+const CANONICAL_VIDEO_RE = /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([^"&]+)"/;
 const IS_LIVE_RE = /"isLive"\s*:\s*true/;
-const VIDEO_ID_RE = /"videoId"\s*:\s*"([^"]+)"/;
+const PLAYABLE_VIDEO_RE = /"playabilityStatus":\{"status":"OK","playableInEmbed":(true|false)[\s\S]{0,4000}?"videoId":"([^"]+)"/;
 
 type CacheEntry = {
   isLive: boolean;
@@ -15,9 +16,43 @@ type CacheEntry = {
 
 const cache = new Map<string, CacheEntry>();
 
-function isPlayableInEmbed(html: string): boolean {
-  const match = html.match(/"playableInEmbed"\s*:\s*(true|false)/);
-  return match?.[1] === 'true';
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseLivePlayback(html: string) {
+  const canonicalVideoId = html.match(CANONICAL_VIDEO_RE)?.[1] ?? null;
+
+  if (canonicalVideoId) {
+    const canonicalPlayable = new RegExp(
+      `"playabilityStatus":\\{"status":"OK","playableInEmbed":(true|false)[\\s\\S]{0,4000}?"videoId":"${escapeRegExp(canonicalVideoId)}"`,
+    ).exec(html);
+
+    if (canonicalPlayable) {
+      return {
+        playableInEmbed: canonicalPlayable[1] === 'true',
+        videoId: canonicalPlayable[1] === 'true' ? canonicalVideoId : null,
+      };
+    }
+
+    return {
+      playableInEmbed: true,
+      videoId: canonicalVideoId,
+    };
+  }
+
+  const playableMatch = html.match(PLAYABLE_VIDEO_RE);
+  if (!playableMatch) {
+    return {
+      playableInEmbed: false,
+      videoId: null,
+    };
+  }
+
+  return {
+    playableInEmbed: playableMatch[1] === 'true',
+    videoId: playableMatch[1] === 'true' ? playableMatch[2] : null,
+  };
 }
 
 async function checkLiveStatus(handle: string): Promise<{ isLive: boolean; playableInEmbed: boolean; videoId: string | null }> {
@@ -37,9 +72,11 @@ async function checkLiveStatus(handle: string): Promise<{ isLive: boolean; playa
     });
     const html = await res.text();
     const isLive = IS_LIVE_RE.test(html);
-    const playableInEmbed = isLive && isPlayableInEmbed(html);
-    const videoMatch = VIDEO_ID_RE.exec(html);
-    const videoId = isLive && playableInEmbed && videoMatch ? videoMatch[1] : null;
+    const playback = isLive
+      ? parseLivePlayback(html)
+      : { playableInEmbed: false, videoId: null };
+    const playableInEmbed = playback.playableInEmbed;
+    const videoId = playback.videoId;
 
     cache.set(handle, { isLive, playableInEmbed, videoId, checkedAt: Date.now() });
     return { isLive, playableInEmbed, videoId };
