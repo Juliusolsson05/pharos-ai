@@ -18,6 +18,9 @@ All API writes go through Python scripts.
 Root:
 `workspace/pharos-fulfillment/`
 
+Repo mirror:
+`repos/pharos-ai-fulfillment/`
+
 Day folder:
 `workspace/pharos-fulfillment/YYYY-MM-DD/`
 
@@ -26,6 +29,17 @@ Run from the fulfillment root:
 ```bash
 cd workspace/pharos-fulfillment
 python3 YYYY-MM-DD/01_day_snapshot.py
+```
+
+After successful execution, sync the repo mirror and push to remote main:
+
+```bash
+cd repos/pharos-ai-fulfillment
+git pull --ff-only
+rsync -a --delete --exclude '.git' ../workspace/pharos-fulfillment/ ./
+git add -A
+git commit -m "sync: update fulfillment scripts" || true
+git push origin main
 ```
 
 ## Shared client

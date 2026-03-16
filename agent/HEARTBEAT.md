@@ -24,7 +24,7 @@ Bare-skeleton events are not acceptable output.
    - Fetch at least one live blog (Times of Israel, Guardian, Al Jazeera) for granular updates
    - Cross-reference timestamps: anything after the last system event is a candidate
    - Do NOT skip this even if system state looks complete
-5. Search X/Twitter for real signals: official military accounts, journalist breaking tweets, actor statements
+5. Search X/Twitter for real signals: official military accounts (for example `@CENTCOM`, `@IDF` and relevant official actor channels), journalist breaking tweets, actor statements
    - Find real tweet IDs — never fabricate them
    - Capture the best 2-4 signals per cycle when available
 
@@ -35,6 +35,12 @@ Bare-skeleton events are not acceptable output.
    - UPDATE_EXISTING_EVENT
    - NEW_EVENT — immediately assess: does it need a map feature? Actor responses? A signal?
    - SNAPSHOT_UPDATE_ONLY (brief/economic/outlook change)
+
+   **Before classifying anything as `NEW_EVENT`: verify the event date against a dated primary source.**
+   - Search-result publication date is not the same thing as the event date.
+   - Wikipedia general war overview pages are undated summaries — do not use them as event sources.
+   - Require a live-blog timestamp, wire report date, official statement date, or dated timeline article that confirms the event happened on the conflict day being filled.
+   - If the date is uncertain, run a targeted search that includes the event name and claimed date before writing.
 
 ### Phase 4: Execute COMPLETE items (not skeletons)
 
