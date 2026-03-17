@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertIntRange, assertRequired, safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminDaySnapshotCreateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { checkDaySnapshotEnforcement } from '@/server/lib/enforcement';
-import { enforcementResponse,isEnforcementMode } from '@/server/lib/enforcement-utils';
+import { enforcementResponse, isEnforcementMode } from '@/server/lib/enforcement-utils';
 import { upsertSnapshotDocument } from '@/server/lib/rag/indexer';
 
 export async function POST(
@@ -16,20 +17,13 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminDaySnapshotCreateSchema);
   if (body instanceof NextResponse) return body;
 
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
 
-  const missing = assertRequired(body, ['day', 'dayLabel', 'summary', 'escalation']);
-  if (missing) return err('VALIDATION', missing);
-
-  const escErr = assertIntRange(body.escalation, 0, 100, 'escalation');
-  if (escErr) return err('VALIDATION', escErr);
-
   const day = new Date(body.day + 'T00:00:00Z');
-  if (isNaN(day.getTime())) return err('VALIDATION', 'Invalid day format');
 
   // Enforcement dry-run
   if (isEnforcementMode(req)) {

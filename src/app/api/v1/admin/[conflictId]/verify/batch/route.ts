@@ -3,15 +3,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminVerifyBatchSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { upsertXPostDocument } from '@/server/lib/rag/indexer';
 import { isXAIConfigured } from '@/server/lib/xai-client';
 import { verifyXPost } from '@/server/lib/xai-verify';
 
 import type { Prisma } from '@/generated/prisma/client';
-import { PostType,VerificationStatus } from '@/generated/prisma/client';
+import { PostType, VerificationStatus } from '@/generated/prisma/client';
 
 const MAX_BATCH = 20;
 
@@ -23,7 +24,7 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminVerifyBatchSchema);
   if (body instanceof NextResponse) return body;
 
   if (!isXAIConfigured()) {
@@ -35,10 +36,7 @@ export async function POST(
 
   let posts;
 
-  if (body.postIds && Array.isArray(body.postIds)) {
-    if (body.postIds.length > MAX_BATCH) {
-      return err('VALIDATION', `Maximum ${MAX_BATCH} posts per batch request`);
-    }
+  if (body.postIds && body.postIds.length > 0) {
     posts = await prisma.xPost.findMany({
       where: { id: { in: body.postIds }, conflictId },
     });
@@ -70,7 +68,6 @@ export async function POST(
     });
   }
 
-  // Verify each post (sequential to avoid rate limits)
   const results: {
     postId: string;
     handle: string;
@@ -95,7 +92,8 @@ export async function POST(
       where: { id: post.id },
       data: {
         verificationStatus: outcome.status as VerificationStatus,
-        verificationResult: outcome.result as import('@/generated/prisma/client').Prisma.InputJsonValue,
+        verificationResult:
+          outcome.result as import('@/generated/prisma/client').Prisma.InputJsonValue,
         verifiedAt: new Date(),
         xaiCitations: outcome.citations,
       },
@@ -113,10 +111,18 @@ export async function POST(
     });
 
     switch (outcome.status) {
-      case 'VERIFIED': summary.verified++; break;
-      case 'FAILED': summary.failed++; break;
-      case 'PARTIAL': summary.partial++; break;
-      case 'SKIPPED': summary.skipped++; break;
+      case 'VERIFIED':
+        summary.verified++;
+        break;
+      case 'FAILED':
+        summary.failed++;
+        break;
+      case 'PARTIAL':
+        summary.partial++;
+        break;
+      case 'SKIPPED':
+        summary.skipped++;
+        break;
     }
   }
 

@@ -3,8 +3,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminVerifyPostSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { upsertXPostDocument } from '@/server/lib/rag/indexer';
 import { isXAIConfigured } from '@/server/lib/xai-client';
@@ -20,12 +21,8 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminVerifyPostSchema);
   if (body instanceof NextResponse) return body;
-
-  if (!body.postId) {
-    return err('VALIDATION', 'postId is required');
-  }
 
   if (!isXAIConfigured()) {
     return err('SERVER_ERROR', 'XAI_API_KEY is not configured. Cannot verify posts.', 503);
@@ -51,7 +48,8 @@ export async function POST(
     where: { id: post.id },
     data: {
       verificationStatus: outcome.status as VerificationStatus,
-      verificationResult: outcome.result as import('@/generated/prisma/client').Prisma.InputJsonValue,
+      verificationResult:
+        outcome.result as import('@/generated/prisma/client').Prisma.InputJsonValue,
       verifiedAt: new Date(),
       xaiCitations: outcome.citations,
     },

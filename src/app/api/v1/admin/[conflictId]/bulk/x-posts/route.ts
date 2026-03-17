@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum, assertRequired, parseISODate, safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminBulkXPostsSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { upsertXPostDocument } from '@/server/lib/rag/indexer';
 import { isXAIConfigured } from '@/server/lib/xai-client';
-import { shouldSkipVerification,verifyXPost } from '@/server/lib/xai-verify';
+import { shouldSkipVerification, verifyXPost } from '@/server/lib/xai-verify';
 
 import { AccountType, PostType, SignificanceLevel, VerificationStatus } from '@/generated/prisma/client';
-
-const SIGNIFICANCE_LEVELS = Object.values(SignificanceLevel);
-const ACCOUNT_TYPES = Object.values(AccountType);
-const POST_TYPE_VALUES = Object.values(PostType);
-
-const MAX_BULK = 50;
 
 type ValidatedPost = {
   id: string;
@@ -52,15 +47,8 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminBulkXPostsSchema);
   if (body instanceof NextResponse) return body;
-
-  if (!Array.isArray(body.posts) || body.posts.length === 0) {
-    return err('VALIDATION', 'posts array is required and must not be empty');
-  }
-  if (body.posts.length > MAX_BULK) {
-    return err('VALIDATION', `Maximum ${MAX_BULK} posts per bulk request`);
-  }
 
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
@@ -68,35 +56,12 @@ export async function POST(
   const skipVerification = shouldSkipVerification(req.nextUrl.searchParams);
   const xaiConfigured = isXAIConfigured();
 
-  // Pre-validate
   const errors: { index: number; error: string }[] = [];
   const validated: ValidatedPost[] = [];
 
   for (let i = 0; i < body.posts.length; i++) {
     const item = body.posts[i];
-
-    const missing = assertRequired(item, [
-      'id', 'handle', 'displayName', 'content', 'accountType', 'significance', 'timestamp',
-    ]);
-    if (missing) { errors.push({ index: i, error: missing }); continue; }
-
-    const sigErr = assertEnum(item.significance, SIGNIFICANCE_LEVELS, 'significance');
-    if (sigErr) { errors.push({ index: i, error: sigErr }); continue; }
-
-    const accErr = assertEnum(item.accountType, ACCOUNT_TYPES, 'accountType');
-    if (accErr) { errors.push({ index: i, error: accErr }); continue; }
-
-    const postType = item.postType ?? 'XPOST';
-    const ptErr = assertEnum(postType, POST_TYPE_VALUES, 'postType');
-    if (ptErr) { errors.push({ index: i, error: ptErr }); continue; }
-
-    if (postType === 'XPOST' && !item.tweetId) {
-      errors.push({ index: i, error: 'tweetId is required when postType is XPOST' });
-      continue;
-    }
-
-    const ts = parseISODate(item.timestamp, 'timestamp');
-    if (typeof ts === 'string') { errors.push({ index: i, error: ts }); continue; }
+    const postType = item.postType;
 
     let verificationStatus: VerificationStatus = VerificationStatus.UNVERIFIED;
     let verificationResult: Record<string, unknown> | null = null;
@@ -132,7 +97,7 @@ export async function POST(
       content: item.content,
       accountType: item.accountType,
       significance: item.significance,
-      timestamp: ts,
+      timestamp: new Date(item.timestamp),
       postType,
       tweetId: item.tweetId ?? null,
       avatar: item.avatar ?? '',
@@ -157,18 +122,18 @@ export async function POST(
   if (errors.length > 0) {
     return err(
       'VALIDATION',
-      `${errors.length} item(s) failed validation: ${errors.map(e => `[${e.index}] ${e.error}`).join('; ')}`,
+      `${errors.length} item(s) failed verification: ${errors.map((e) => `[${e.index}] ${e.error}`).join('; ')}`,
       400,
     );
   }
 
-  const ids = validated.map(v => v.id);
+  const ids = validated.map((v) => v.id);
   const existing = await prisma.xPost.findMany({
     where: { id: { in: ids } },
     select: { id: true },
   });
   if (existing.length > 0) {
-    const dupes = existing.map(e => e.id);
+    const dupes = existing.map((e) => e.id);
     return err('DUPLICATE', `X posts already exist: ${dupes.join(', ')}`, 409);
   }
 
@@ -200,7 +165,9 @@ export async function POST(
           eventId: item.eventId,
           actorId: item.actorId,
           verificationStatus: item.verificationStatus,
-          verificationResult: (item.verificationResult ?? undefined) as import('@/generated/prisma/client').Prisma.InputJsonValue | undefined,
+          verificationResult: (item.verificationResult ?? undefined) as
+            | import('@/generated/prisma/client').Prisma.InputJsonValue
+            | undefined,
           verifiedAt: item.verifiedAt,
           xaiCitations: item.xaiCitations,
         },
@@ -209,7 +176,7 @@ export async function POST(
     }
   });
 
-  await Promise.all(created.map(id => upsertXPostDocument(conflictId, id)));
+  await Promise.all(created.map((id) => upsertXPostDocument(conflictId, id)));
 
   return ok({ created, errors: [] });
 }

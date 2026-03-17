@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum, assertIntRange , safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema, parseDayParam } from '@/server/lib/admin-schema-utils';
+import { adminActorSnapshotUpdateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { upsertActorDocument } from '@/server/lib/rag/indexer';
-
-import { ActivityLevel, Stance } from '@/generated/prisma/client';
-
-const ACTIVITY_LEVELS = Object.values(ActivityLevel);
-const STANCES = Object.values(Stance);
 
 export async function PUT(
   req: NextRequest,
@@ -19,14 +15,14 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, actorId, day: dayStr } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminActorSnapshotUpdateSchema);
   if (body instanceof NextResponse) return body;
 
   const actor = await prisma.actor.findFirst({ where: { id: actorId, conflictId } });
   if (!actor) return err('NOT_FOUND', `Actor ${actorId} not found`, 404);
 
-  const day = new Date(dayStr + 'T00:00:00Z');
-  if (isNaN(day.getTime())) return err('VALIDATION', 'Invalid day format');
+  const day = parseDayParam(dayStr);
+  if (!day) return err('VALIDATION', 'Invalid day format', 422);
 
   const snapshot = await prisma.actorDaySnapshot.findUnique({
     where: { actorId_day: { actorId, day } },
@@ -34,22 +30,9 @@ export async function PUT(
   if (!snapshot) return err('NOT_FOUND', `Snapshot for ${actorId} on ${dayStr} not found`, 404);
 
   const data: Record<string, unknown> = {};
-
-  if (body.activityLevel !== undefined) {
-    const e = assertEnum(body.activityLevel, ACTIVITY_LEVELS, 'activityLevel');
-    if (e) return err('VALIDATION', e);
-    data.activityLevel = body.activityLevel;
-  }
-  if (body.stance !== undefined) {
-    const e = assertEnum(body.stance, STANCES, 'stance');
-    if (e) return err('VALIDATION', e);
-    data.stance = body.stance;
-  }
-  if (body.activityScore !== undefined) {
-    const e = assertIntRange(body.activityScore, 0, 100, 'activityScore');
-    if (e) return err('VALIDATION', e);
-    data.activityScore = body.activityScore;
-  }
+  if (body.activityLevel !== undefined) data.activityLevel = body.activityLevel;
+  if (body.stance !== undefined) data.stance = body.stance;
+  if (body.activityScore !== undefined) data.activityScore = body.activityScore;
   if (body.saying !== undefined) data.saying = body.saying;
   if (body.doing !== undefined) data.doing = body.doing;
   if (body.assessment !== undefined) data.assessment = body.assessment;

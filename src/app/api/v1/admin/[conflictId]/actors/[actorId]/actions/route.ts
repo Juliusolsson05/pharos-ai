@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum , assertRequired, safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminActorActionCreateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { upsertActorDocument } from '@/server/lib/rag/indexer';
-
-import { ActionSignificance,ActionType } from '@/generated/prisma/client';
-
-const ACTION_TYPES = Object.values(ActionType);
-const ACTION_SIGNIFICANCES = Object.values(ActionSignificance);
 
 export async function POST(
   req: NextRequest,
@@ -19,20 +15,11 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId, actorId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminActorActionCreateSchema);
   if (body instanceof NextResponse) return body;
 
   const actor = await prisma.actor.findFirst({ where: { id: actorId, conflictId } });
   if (!actor) return err('NOT_FOUND', `Actor ${actorId} not found`, 404);
-
-  const missing = assertRequired(body, ['date', 'type', 'description', 'significance']);
-  if (missing) return err('VALIDATION', missing);
-
-  const typeErr = assertEnum(body.type, ACTION_TYPES, 'type');
-  if (typeErr) return err('VALIDATION', typeErr);
-
-  const sigErr = assertEnum(body.significance, ACTION_SIGNIFICANCES, 'significance');
-  if (sigErr) return err('VALIDATION', sigErr);
 
   const action = await prisma.actorAction.create({
     data: {

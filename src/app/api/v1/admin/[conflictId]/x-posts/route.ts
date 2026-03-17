@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum, assertRequired, parseISODate, safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminXPostCreateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { checkXPostEnforcement } from '@/server/lib/enforcement';
-import { enforcementResponse,isEnforcementMode } from '@/server/lib/enforcement-utils';
+import { enforcementResponse, isEnforcementMode } from '@/server/lib/enforcement-utils';
 import { upsertXPostDocument } from '@/server/lib/rag/indexer';
 import { isXAIConfigured } from '@/server/lib/xai-client';
-import { shouldSkipVerification,verifyXPost } from '@/server/lib/xai-verify';
+import { shouldSkipVerification, verifyXPost } from '@/server/lib/xai-verify';
 
-import { AccountType, PostType, SignificanceLevel, VerificationStatus } from '@/generated/prisma/client';
-
-const SIGNIFICANCE_LEVELS = Object.values(SignificanceLevel);
-const ACCOUNT_TYPES = Object.values(AccountType);
-const POST_TYPE_VALUES = Object.values(PostType);
+import { PostType, VerificationStatus } from '@/generated/prisma/client';
 
 export async function POST(
   req: NextRequest,
@@ -24,30 +21,10 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminXPostCreateSchema);
   if (body instanceof NextResponse) return body;
-
-  const missing = assertRequired(body, [
-    'id', 'handle', 'displayName', 'content', 'accountType', 'significance', 'timestamp',
-  ]);
-  if (missing) return err('VALIDATION', missing);
-
-  const sigErr = assertEnum(body.significance, SIGNIFICANCE_LEVELS, 'significance');
-  if (sigErr) return err('VALIDATION', sigErr);
-
-  const accErr = assertEnum(body.accountType, ACCOUNT_TYPES, 'accountType');
-  if (accErr) return err('VALIDATION', accErr);
-
-  const postType: PostType = body.postType ?? 'XPOST';
-  const ptErr = assertEnum(postType, POST_TYPE_VALUES, 'postType');
-  if (ptErr) return err('VALIDATION', ptErr);
-
-  if (postType === PostType.XPOST && !body.tweetId) {
-    return err('VALIDATION', 'tweetId is required when postType is XPOST. Provide a realistic numeric ID string (e.g. "1894731234567890123").');
-  }
-
-  const ts = parseISODate(body.timestamp, 'timestamp');
-  if (typeof ts === 'string') return err('VALIDATION', ts);
+  const postType = body.postType;
+  const ts = new Date(body.timestamp);
 
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);

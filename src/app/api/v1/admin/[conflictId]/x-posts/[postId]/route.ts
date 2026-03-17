@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum, parseISODate , safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminXPostUpdateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { removeXPostDocument, upsertXPostDocument } from '@/server/lib/rag/indexer';
-
-import { AccountType,SignificanceLevel } from '@/generated/prisma/client';
-
-const SIGNIFICANCE_LEVELS = Object.values(SignificanceLevel);
-const ACCOUNT_TYPES = Object.values(AccountType);
 
 export async function PUT(
   req: NextRequest,
@@ -19,29 +15,16 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, postId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminXPostUpdateSchema);
   if (body instanceof NextResponse) return body;
 
   const post = await prisma.xPost.findFirst({ where: { id: postId, conflictId } });
   if (!post) return err('NOT_FOUND', `X post ${postId} not found`, 404);
 
   const data: Record<string, unknown> = {};
-
-  if (body.significance !== undefined) {
-    const e = assertEnum(body.significance, SIGNIFICANCE_LEVELS, 'significance');
-    if (e) return err('VALIDATION', e);
-    data.significance = body.significance;
-  }
-  if (body.accountType !== undefined) {
-    const e = assertEnum(body.accountType, ACCOUNT_TYPES, 'accountType');
-    if (e) return err('VALIDATION', e);
-    data.accountType = body.accountType;
-  }
-  if (body.timestamp !== undefined) {
-    const ts = parseISODate(body.timestamp, 'timestamp');
-    if (typeof ts === 'string') return err('VALIDATION', ts);
-    data.timestamp = ts;
-  }
+  if (body.significance !== undefined) data.significance = body.significance;
+  if (body.accountType !== undefined) data.accountType = body.accountType;
+  if (body.timestamp !== undefined) data.timestamp = new Date(body.timestamp);
   if (body.handle !== undefined) data.handle = body.handle;
   if (body.displayName !== undefined) data.displayName = body.displayName;
   if (body.content !== undefined) data.content = body.content;
@@ -55,6 +38,7 @@ export async function PUT(
   if (body.replies !== undefined) data.replies = body.replies;
   if (body.views !== undefined) data.views = body.views;
   if (body.pharosNote !== undefined) data.pharosNote = body.pharosNote;
+
   if (body.eventId !== undefined) {
     if (body.eventId !== null) {
       const event = await prisma.intelEvent.findFirst({ where: { id: body.eventId, conflictId } });

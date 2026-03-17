@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { validateOptionalEventId } from '@/server/lib/admin-relations';
-import { assertEnum, assertRequired, INSTALLATION_STATUSES,INSTALLATION_TYPES, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema, toJsonValue } from '@/server/lib/admin-schema-utils';
+import { adminTargetCreateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { checkMapFeatureEnforcement } from '@/server/lib/enforcement';
-import { enforcementResponse,isEnforcementMode } from '@/server/lib/enforcement-utils';
+import { enforcementResponse, isEnforcementMode } from '@/server/lib/enforcement-utils';
 
 export async function POST(
   req: NextRequest,
@@ -16,30 +17,8 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminTargetCreateSchema);
   if (body instanceof NextResponse) return body;
-
-  const missing = assertRequired(body, ['id', 'actor', 'priority', 'category', 'type']);
-  if (missing) return err('VALIDATION', missing);
-
-  const actorErr = assertEnum(body.actor, MAP_ACTOR_KEYS, 'actor');
-  if (actorErr) return err('VALIDATION', actorErr);
-
-  const priorityErr = assertEnum(body.priority, MAP_PRIORITIES, 'priority');
-  if (priorityErr) return err('VALIDATION', priorityErr);
-
-  const typeErr = assertEnum(body.type, INSTALLATION_TYPES, 'type');
-  if (typeErr) return err('VALIDATION', typeErr);
-
-  if (body.status !== undefined && body.status !== null) {
-    const statusErr = assertEnum(body.status, INSTALLATION_STATUSES, 'status');
-    if (statusErr) return err('VALIDATION', statusErr);
-  }
-
-  // Target needs position
-  if (!body.geometry?.position) {
-    return err('VALIDATION', 'Target geometry requires position [lng, lat]');
-  }
 
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
@@ -47,23 +26,13 @@ export async function POST(
   const eventErr = await validateOptionalEventId(conflictId, body.sourceEventId ?? null);
   if (eventErr) return err('VALIDATION', eventErr);
 
-  // Enforcement dry-run
   if (isEnforcementMode(req)) {
     const issues = checkMapFeatureEnforcement(body, 'TARGET');
     return enforcementResponse(body, issues);
   }
 
-
-
   const existing = await prisma.mapFeature.findUnique({ where: { id: body.id } });
   if (existing) return err('DUPLICATE', `Map feature ${body.id} already exists`, 409);
-
-  let timestamp: Date | null = null;
-  if (body.timestamp) {
-    const ts = parseISODate(body.timestamp, 'timestamp');
-    if (typeof ts === 'string') return err('VALIDATION', ts);
-    timestamp = ts;
-  }
 
   const feature = await prisma.mapFeature.create({
     data: {
@@ -76,9 +45,9 @@ export async function POST(
       category: body.category,
       type: body.type,
       status: body.status ?? null,
-      timestamp,
-      geometry: body.geometry,
-      properties: body.properties ?? {},
+      timestamp: body.timestamp ? new Date(body.timestamp) : null,
+      geometry: toJsonValue(body.geometry),
+      properties: toJsonValue(body.properties ?? {}),
     },
   });
 

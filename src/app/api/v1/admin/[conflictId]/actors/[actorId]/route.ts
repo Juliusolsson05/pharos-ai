@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum , safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminActorUpdateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { upsertActorDocument } from '@/server/lib/rag/indexer';
-
-import { ActivityLevel, Stance } from '@/generated/prisma/client';
-
-const ACTIVITY_LEVELS = Object.values(ActivityLevel);
-const STANCES = Object.values(Stance);
 
 export async function PUT(
   req: NextRequest,
@@ -19,24 +15,15 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, actorId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminActorUpdateSchema);
   if (body instanceof NextResponse) return body;
 
   const actor = await prisma.actor.findFirst({ where: { id: actorId, conflictId } });
   if (!actor) return err('NOT_FOUND', `Actor ${actorId} not found`, 404);
 
   const data: Record<string, unknown> = {};
-
-  if (body.activityLevel !== undefined) {
-    const e = assertEnum(body.activityLevel, ACTIVITY_LEVELS, 'activityLevel');
-    if (e) return err('VALIDATION', e);
-    data.activityLevel = body.activityLevel;
-  }
-  if (body.stance !== undefined) {
-    const e = assertEnum(body.stance, STANCES, 'stance');
-    if (e) return err('VALIDATION', e);
-    data.stance = body.stance;
-  }
+  if (body.activityLevel !== undefined) data.activityLevel = body.activityLevel;
+  if (body.stance !== undefined) data.stance = body.stance;
   if (body.activityScore !== undefined) data.activityScore = body.activityScore;
   if (body.saying !== undefined) data.saying = body.saying;
   if (body.doing !== undefined) data.doing = body.doing;

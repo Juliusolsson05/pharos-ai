@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum, assertRequired, parseISODate, safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminEventCreateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { checkEventEnforcement } from '@/server/lib/enforcement';
-import { enforcementResponse,isEnforcementMode } from '@/server/lib/enforcement-utils';
+import { enforcementResponse, isEnforcementMode } from '@/server/lib/enforcement-utils';
 import { upsertEventDocument } from '@/server/lib/rag/indexer';
-
-import { EventType,Severity } from '@/generated/prisma/client';
-
-const SEVERITIES = Object.values(Severity);
-const EVENT_TYPES = Object.values(EventType);
 
 export async function POST(
   req: NextRequest,
@@ -21,22 +17,9 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminEventCreateSchema);
   if (body instanceof NextResponse) return body;
-
-  const missing = assertRequired(body, [
-    'id', 'timestamp', 'severity', 'type', 'title', 'location', 'summary', 'fullContent',
-  ]);
-  if (missing) return err('VALIDATION', missing);
-
-  const sevErr = assertEnum(body.severity, SEVERITIES, 'severity');
-  if (sevErr) return err('VALIDATION', sevErr);
-
-  const typeErr = assertEnum(body.type, EVENT_TYPES, 'type');
-  if (typeErr) return err('VALIDATION', typeErr);
-
-  const ts = parseISODate(body.timestamp, 'timestamp');
-  if (typeof ts === 'string') return err('VALIDATION', ts);
+  const ts = new Date(body.timestamp);
 
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
@@ -95,7 +78,7 @@ export async function POST(
       actorResponses: body.actorResponses?.length
         ? {
             create: body.actorResponses.map(
-              (r: { actorId: string; actorName: string; stance: string; type: string; statement: string }) => ({
+              (r) => ({
                 actorId: r.actorId,
                 actorName: r.actorName,
                 stance: r.stance,

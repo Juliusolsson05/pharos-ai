@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertEnum, parseISODate , safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema } from '@/server/lib/admin-schema-utils';
+import { adminEventUpdateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { removeEventDocument, upsertEventDocument } from '@/server/lib/rag/indexer';
-
-import { EventType,Severity } from '@/generated/prisma/client';
-
-const SEVERITIES = Object.values(Severity);
-const EVENT_TYPES = Object.values(EventType);
 
 export async function PUT(
   req: NextRequest,
@@ -19,7 +15,7 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, eventId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminEventUpdateSchema);
   if (body instanceof NextResponse) return body;
 
   const event = await prisma.intelEvent.findFirst({
@@ -27,31 +23,10 @@ export async function PUT(
   });
   if (!event) return err('NOT_FOUND', `Event ${eventId} not found`, 404);
 
-  // Guard: reject fields that look like they should be nested but aren't handled here
-  if (body.sources !== undefined) {
-    return err('VALIDATION', 'Cannot update sources via PUT /events/{id}. Use POST /events/{id}/sources to add sources.');
-  }
-  if (body.actorResponses !== undefined) {
-    return err('VALIDATION', 'Cannot update actorResponses via PUT /events/{id}. Use POST /actors/{actorId}/responses to record responses.');
-  }
-
   const data: Record<string, unknown> = {};
-
-  if (body.severity !== undefined) {
-    const e = assertEnum(body.severity, SEVERITIES, 'severity');
-    if (e) return err('VALIDATION', e);
-    data.severity = body.severity;
-  }
-  if (body.type !== undefined) {
-    const e = assertEnum(body.type, EVENT_TYPES, 'type');
-    if (e) return err('VALIDATION', e);
-    data.type = body.type;
-  }
-  if (body.timestamp !== undefined) {
-    const ts = parseISODate(body.timestamp, 'timestamp');
-    if (typeof ts === 'string') return err('VALIDATION', ts);
-    data.timestamp = ts;
-  }
+  if (body.severity !== undefined) data.severity = body.severity;
+  if (body.type !== undefined) data.type = body.type;
+  if (body.timestamp !== undefined) data.timestamp = new Date(body.timestamp);
   if (body.title !== undefined) data.title = body.title;
   if (body.location !== undefined) data.location = body.location;
   if (body.summary !== undefined) data.summary = body.summary;

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
-import { assertIntRange , safeJson } from '@/server/lib/admin-validate';
-import { err,ok } from '@/server/lib/api-utils';
+import { parseBodyWithSchema, parseDayParam } from '@/server/lib/admin-schema-utils';
+import { adminDaySnapshotUpdateSchema } from '@/server/lib/admin-schemas';
+import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { syncSnapshotDocumentForDay } from '@/server/lib/rag/snapshot-sync';
 
@@ -14,21 +15,16 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, day: dayStr } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminDaySnapshotUpdateSchema);
   if (body instanceof NextResponse) return body;
 
-  const day = new Date(dayStr + 'T00:00:00Z');
-  if (isNaN(day.getTime())) return err('VALIDATION', 'Invalid day format');
+  const day = parseDayParam(dayStr);
+  if (!day) return err('VALIDATION', 'Invalid day format', 422);
 
   const snapshot = await prisma.conflictDaySnapshot.findUnique({
     where: { conflictId_day: { conflictId, day } },
   });
   if (!snapshot) return err('NOT_FOUND', `Day snapshot for ${dayStr} not found`, 404);
-
-  if (body.escalation !== undefined) {
-    const e = assertIntRange(body.escalation, 0, 100, 'escalation');
-    if (e) return err('VALIDATION', e);
-  }
 
   await prisma.$transaction(async (tx) => {
     const data: Record<string, unknown> = {};
