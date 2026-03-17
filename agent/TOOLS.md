@@ -126,6 +126,11 @@ casualties: `[{faction, killed?, wounded?, civilians?, injured?}]`
 economicChips: `[{label, val, sub, color}]`
 scenarios: `[{label, subtitle, color, prob, body}]`
 
+Admin casualty writes use flat rows only:
+- use `killed`, never `kia`
+- do not send nested dicts like `casualties: { iran: {...} }`
+- do not send `regional: {...}` blocks; regional groups are separate rows like `{faction: "gulf states", killed: 20, injured: 0}`
+
 ### PUT /days/YYYY-MM-DD — Update day snapshot
 
 All fields optional (partial update). Nested arrays fully replace when provided.

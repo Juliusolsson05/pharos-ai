@@ -36,6 +36,14 @@ function formatIssue(issue: z.core.$ZodIssue): string {
       return 'economicImpact is no longer accepted. Use top-level economicChips and economicNarrative instead.';
     }
 
+    if (path[0] === 'casualties' && issue.keys.includes('kia')) {
+      return 'casualties rows must use killed, not kia. Admin writes use flat rows like { faction, killed, wounded, civilians, injured }.';
+    }
+
+    if (path[0] === 'casualties' && issue.keys.includes('regional')) {
+      return 'regional is not a nested casualties object. Flatten regional casualties into separate rows, for example { faction: "gulf states", killed: 20, injured: 0 }.';
+    }
+
     return `${pathLabel} contains unrecognized key(s): ${keys}`;
   }
 
