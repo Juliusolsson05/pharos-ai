@@ -179,7 +179,7 @@ There is NO generic `POST /map/features` endpoint. Use these concrete routes:
 
 ### Map story endpoints
 
-`POST /map/stories`: `{id, title, tagline, iconName, category, narrative, viewState: {longitude, latitude, zoom}, timestamp, primaryEventId?, sourceEventIds?[], highlightStrikeIds?[], highlightMissileIds?[], highlightTargetIds?[], highlightAssetIds?[], keyFacts?[], events?: [{time, label, type}]}`
+`POST /map/stories`: `{id, title, tagline, iconName, category, narrative, viewState: {longitude, latitude, zoom}, timestamp, primaryEventId?, sourceEventIds?[], highlightStrikeIds?[], highlightMissileIds?[], highlightTargetIds?[], highlightAssetIds?[], keyFacts?[], events: [{time, label, type}]}`
 `PUT /map/stories/{storyId}`: update story (partial)
 `POST /map/stories/{storyId}/events`: append timeline events
 `PUT /map/stories/{storyId}/events`: replace all timeline events

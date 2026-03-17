@@ -59,6 +59,17 @@ export async function POST(
                 })),
               }
             : undefined,
+          actorResponses: item.actorResponses?.length
+            ? {
+                create: item.actorResponses.map((response) => ({
+                  actorId: response.actorId,
+                  actorName: response.actorName,
+                  stance: response.stance,
+                  type: response.type,
+                  statement: response.statement,
+                })),
+              }
+            : undefined,
         },
       });
       created.push(item.id);

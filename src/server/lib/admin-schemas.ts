@@ -168,14 +168,14 @@ const strikeArcPropertiesSchema = z
   .object({
     label: requiredString,
   })
-  .strict();
+  .passthrough();
 
 const threatZonePropertiesSchema = z
   .object({
     name: requiredString,
     color: requiredString,
   })
-  .strict();
+  .passthrough();
 
 /* ------------------------------------------------------------------ */
 /* Map feature base (shared across all 6 feature types)                */
@@ -448,7 +448,7 @@ export const adminMapStoryCreateSchema = z
     viewState: storyViewStateSchema,
     keyFacts: optionalStringArray,
     timestamp: isoDateTime,
-    events: z.array(mapStoryEventSchema).min(1, 'Stories must have at least 1 timeline event').optional(),
+    events: z.array(mapStoryEventSchema).min(1, 'Stories must have at least 1 timeline event'),
   })
   .strict()
   .refine(

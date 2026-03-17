@@ -10,9 +10,6 @@
   "homepage": "https://conflicts.app",
   "bugs": "https://github.com/Juliusolsson05/pharos-ai/issues",
   "author": "Julius Olsson",
-  "engines": {
-    "node": "22.x"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
