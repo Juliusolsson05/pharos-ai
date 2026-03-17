@@ -32,7 +32,8 @@ export function ChatWidget() {
   const { messages, input, setInput, isLoading, isReady, error, handleSubmit, stop, clear } = useChat({
     conflictId: CONFLICT_ID,
   });
-  const shouldShowOnCurrentRoute = !isMobile || MOBILE_CHAT_ROUTES.includes(pathname);
+  const isMapRoute = pathname.startsWith('/dashboard/map');
+  const shouldShowOnCurrentRoute = !isMapRoute && (!isMobile || MOBILE_CHAT_ROUTES.includes(pathname));
 
   // Lock body scroll on mobile when chat is open
   useEffect(() => {
