@@ -169,11 +169,11 @@ There is NO generic `POST /map/features` endpoint. Use these concrete routes:
 | THREAT_ZONE    | `POST /map/threat-zones`  | Area polygon (closure, NFZ, etc.)   |
 | HEAT_POINT     | `POST /map/heat-points`   | Intensity/concentration marker      |
 
-`POST /map/strike-arcs`: `{id, actor (MAP_ACTOR_KEY), priority (P1|P2|P3), category, type (AIRSTRIKE|NAVAL_STRIKE|BALLISTIC|CRUISE|DRONE), geometry: {from: {lat, lng}, to: {lat, lng}}, status?, timestamp?, sourceEventId?, properties?}`
+`POST /map/strike-arcs`: `{id, actor (MAP_ACTOR_KEY), priority (P1|P2|P3), category, type (AIRSTRIKE|NAVAL_STRIKE|BALLISTIC|CRUISE|DRONE), geometry: {from: {lat, lng}, to: {lat, lng}}, status?, timestamp?, sourceEventId?, properties: {label, ...}}`
 `POST /map/missile-tracks`: same schema as strike-arcs
 `POST /map/targets`: `{id, actor, priority, category, type (CARRIER|AIR_BASE|NAVAL_BASE|ARMY_BASE|NUCLEAR_SITE|COMMAND|INFRASTRUCTURE), geometry: {position: {lat, lng}}, status?, timestamp?, sourceEventId?, properties: {name, description?}}`
 `POST /map/assets`: same schema as targets
-`POST /map/threat-zones`: `{id, actor, priority, category, type (CLOSURE|PATROL|NFZ|THREAT_CORRIDOR), geometry: {coordinates: [[lat, lng], ...]}, timestamp?, sourceEventId?, properties: {name, color?}}`
+`POST /map/threat-zones`: `{id, actor, priority, category, type (CLOSURE|PATROL|NFZ|THREAT_CORRIDOR), geometry: {coordinates: [[lat, lng], ...]}, timestamp?, sourceEventId?, properties: {name, color, ...}}`
 `POST /map/heat-points`: `{id, actor, priority, category, type, geometry: {position: {lat, lng}}, properties: {weight}}`
 `PUT /map/features/{featureId}`: update any existing feature (partial)
 
@@ -228,3 +228,31 @@ All optional: `{status, threatLevel, escalation (0-100), name, summary, keyFacts
 - empty day snapshot fields are a product failure — fill them
 - NOOP is only valid when the dashboard is complete AND nothing new happened
 - ALWAYS read the FULL /instructions manual including the API endpoint reference — do not skip sections
+
+## Coordinate verification
+
+Before writing any viewState or geometry coordinates:
+- look up the named location's real coordinates from your search results or existing map features
+- do not use memorized or approximate coordinates
+- verify longitude and latitude are correct to within ~0.5 degrees of the named location
+- if uncertain, search "[location name] coordinates" before writing
+
+## Highlight ID rules
+
+Feature ID prefixes determine which highlight array they belong in:
+- `sa-*` -> highlightStrikeIds
+- `mt-*` -> highlightMissileIds
+- `t-*` -> highlightTargetIds
+- `a-*` -> highlightAssetIds
+- `hp-*` and `tz-*` are heat points and threat zones - these NEVER go in highlight arrays
+
+Only reference features from the same day/incident as the story. Do not cross-reference features from unrelated days. If all highlight arrays would be empty, find or create the right features first.
+
+## Enforcement rule
+
+Before any POST that creates an event, day snapshot, x-post, or story:
+1. Run the same payload with `?enforcement=true` first
+2. Read the enforcement response and fix any flagged issues
+3. Then run the real create
+
+Do not skip this step.

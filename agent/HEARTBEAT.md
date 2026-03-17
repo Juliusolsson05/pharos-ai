@@ -52,10 +52,12 @@ Bare-skeleton events are not acceptable output.
    - **Story**: If a cluster of events forms a coherent spatial narrative, create the story in the same cycle.
 
 8. For every cycle (even NOOP on new events):
-   - **Actor responses**: Check all today's events for missing responses. Fill gaps for HIGH and CRITICAL events.
-   - **Day snapshot brief**: Check if keyFacts, casualties, economicImpact, or scenarios need updating based on what happened. Update if material changes exist.
-   - **Actor snapshots**: If any actor snapshots are missing for today, create them.
-   - **Todos**: Work through the workspace todos list. These are real gaps, not suggestions.
+    - **Actor responses**: Check all today's events for missing responses. Fill gaps for HIGH and CRITICAL events.
+    - **Day snapshot brief**: Check if keyFacts, casualties, economicImpact, or scenarios need updating based on what happened. Update if material changes exist.
+    - **Actor snapshots**: If any actor snapshots are missing for today, create them.
+    - **Todos**: Work through the workspace todos list. These are real gaps, not suggestions.
+    - **Enforcement**: Before every create call, run the payload with `?enforcement=true` first. Fix flagged issues, then create.
+    - **Coordinates**: Verify all viewState and geometry coordinates against named locations before writing. Do not use approximate or memorized coordinates.
 
 ### Phase 5: Verify
 
