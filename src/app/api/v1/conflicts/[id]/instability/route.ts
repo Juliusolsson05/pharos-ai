@@ -2,10 +2,9 @@ import { NextRequest } from 'next/server';
 
 import { err, ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
-import { calculateInstability } from '@/server/lib/instability';
+import { calculateInstability, SEVEN_DAYS_MS } from '@/server/lib/instability';
 
 const CACHE = 'public, s-maxage=300, stale-while-revalidate=600';
-const SEVEN_DAYS_MS = 7 * 24 * 3_600_000;
 
 export async function GET(
   _req: NextRequest,

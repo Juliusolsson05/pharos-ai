@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+import { api } from '@/shared/lib/query/client';
+import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
 type InstabilityPulseProps = { conflictId: string };
 
@@ -8,7 +11,7 @@ type PulseData = {
   score: number;
   sparkline: number[];
   trend: 'rising' | 'falling' | 'stable';
-} | null;
+};
 
 const TREND_ARROW: Record<string, string> = { rising: '↑', falling: '↓', stable: '→' };
 const TREND_COLOR: Record<string, string> = {
@@ -22,20 +25,23 @@ function scoreColor(score: number): string {
 }
 
 export function InstabilityPulse({ conflictId }: InstabilityPulseProps) {
-  const [data, setData] = useState<PulseData>(null);
+  const { data, isError } = useQuery({
+    queryKey: queryKeys.conflicts.instability(conflictId),
+    queryFn: () => api.get<PulseData>(`/conflicts/${conflictId}/instability`),
+    staleTime: STALE.MEDIUM,
+    refetchInterval: REFETCH.NORMAL,
+  });
 
-  useEffect(() => {
-    setData(null);
-    fetch(`/api/v1/conflicts/${conflictId}/instability`)
-      .then(r => r.json())
-      .then((json: { ok: boolean; data: PulseData }) => { if (json.ok) setData(json.data); })
-      .catch(() => {});
-  }, [conflictId]);
+  if (isError) {
+    return (
+      <div className="w-full h-7 flex items-center">
+        <span className="mono text-[9px] text-[var(--t4)]">INSTABILITY PULSE — UNAVAILABLE</span>
+      </div>
+    );
+  }
 
   if (!data) {
-    return (
-      <div className="w-full h-7 bg-[var(--bg-3)] rounded-sm animate-pulse" />
-    );
+    return <div className="w-full h-7 bg-[var(--bg-3)] rounded-sm animate-pulse" />;
   }
 
   const { score, sparkline, trend } = data;

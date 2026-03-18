@@ -1,5 +1,6 @@
-const SEVEN_DAYS_MS = 7 * 24 * 3_600_000;
 const HOUR_MS = 3_600_000;
+export const SEVEN_DAYS_MS = 7 * 24 * HOUR_MS;
+const DAY_MS = 24 * HOUR_MS;
 
 const EVENT_HL = 36 * HOUR_MS;
 const POST_HL = 12 * HOUR_MS;
@@ -58,7 +59,7 @@ export function calculateInstability(
     if (e.timestamp.getTime() < cutoff) continue;
     const base = EVENT_W[e.severity] ?? 0;
     rawScore += base * decay(ageMs, EVENT_HL);
-    buckets[bucketIdx(ageMs)] += base;
+    if (ageMs <= DAY_MS) buckets[bucketIdx(ageMs)] += base;
   }
 
   for (const p of xPosts) {
@@ -72,7 +73,7 @@ export function calculateInstability(
       base = 1.5 * (VERIF_MULT[p.verificationStatus] ?? 0.4);
     }
     rawScore += base * decay(ageMs, POST_HL);
-    buckets[bucketIdx(ageMs)] += base;
+    if (ageMs <= DAY_MS) buckets[bucketIdx(ageMs)] += base;
   }
 
   for (const a of actions) {
@@ -82,7 +83,7 @@ export function calculateInstability(
     if (ts.getTime() < cutoff) continue;
     const base = ACTION_W[a.significance] ?? 0;
     rawScore += base * decay(ageMs, ACTION_HL);
-    buckets[bucketIdx(ageMs)] += base;
+    if (ageMs <= DAY_MS) buckets[bucketIdx(ageMs)] += base;
   }
 
   const score = Math.min(100, Math.max(0, Math.round(rawScore)));

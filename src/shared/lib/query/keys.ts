@@ -33,6 +33,7 @@ export const queryKeys = {
     days: (id = CONFLICT_ID) => ['conflict-days', id] as const,
     snapshot: (id = CONFLICT_ID, day?: string) =>
       ['conflict-day-snapshot', id, day] as const,
+    instability: (id = CONFLICT_ID) => ['conflict-instability', id] as const,
   },
   actors: {
     list: (id = CONFLICT_ID, day?: string) => ['actors', id, day] as const,
