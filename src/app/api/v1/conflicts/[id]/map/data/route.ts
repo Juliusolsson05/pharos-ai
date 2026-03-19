@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 
 import { err, ok, parseQueryArray } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
+import { normalizeKineticGeometry, normalizePointGeometry, normalizePolygonGeometry } from '@/server/lib/map-feature-geometry';
+
 import { MapFeatureType } from '@/generated/prisma/enums';
 
 const VALID_FEATURE_TYPES = Object.values(MapFeatureType) as string[];
@@ -49,7 +51,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   // Group by featureType and reconstruct typed arrays
-  type Geo = Record<string, unknown>;
   type Props = Record<string, unknown>;
 
   const KINETIC_DEFAULT = 'COMPLETE';
@@ -66,72 +67,84 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const strikes = features
     .filter(f => f.featureType === 'STRIKE_ARC')
     .map(f => {
-        const geo = f.geometry as Geo;
+        const geo = normalizeKineticGeometry(f.geometry);
+        if (!geo) return null;
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
           status: normStatus(f.status, f.featureType), timestamp: f.timestamp?.toISOString() ?? '',
           from: geo.from, to: geo.to, label: props.label, severity: props.severity,
         };
-    });
+    })
+    .filter(Boolean);
 
   const missiles = features
     .filter(f => f.featureType === 'MISSILE_TRACK')
     .map(f => {
-        const geo = f.geometry as Geo;
+        const geo = normalizeKineticGeometry(f.geometry);
+        if (!geo) return null;
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
           status: normStatus(f.status, f.featureType), timestamp: f.timestamp?.toISOString() ?? '',
           from: geo.from, to: geo.to, label: props.label, severity: props.severity,
         };
-    });
+    })
+    .filter(Boolean);
 
   const targets = features
     .filter(f => f.featureType === 'TARGET')
     .map(f => {
-        const geo = f.geometry as Geo;
+        const geo = normalizePointGeometry(f.geometry);
+        if (!geo) return null;
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
           status: normStatus(f.status, f.featureType), timestamp: f.timestamp?.toISOString() ?? '',
           position: geo.position, name: props.name, description: props.description,
         };
-    });
+    })
+    .filter(Boolean);
 
   const assets = features
     .filter(f => f.featureType === 'ASSET')
     .map(f => {
-        const geo = f.geometry as Geo;
+        const geo = normalizePointGeometry(f.geometry);
+        if (!geo) return null;
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
           status: normStatus(f.status, f.featureType), timestamp: f.timestamp?.toISOString() ?? '',
           position: geo.position, name: props.name, description: props.description,
         };
-    });
+    })
+    .filter(Boolean);
 
   const threatZones = features
     .filter(f => f.featureType === 'THREAT_ZONE')
     .map(f => {
-        const geo = f.geometry as Geo;
+        const geo = normalizePolygonGeometry(f.geometry);
+        if (!geo) return null;
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
           timestamp: f.timestamp?.toISOString() ?? '', coordinates: geo.coordinates, name: props.name, color: props.color,
         };
-    });
+    })
+    .filter(Boolean);
 
   const heatPoints = features
     .filter(f => f.featureType === 'HEAT_POINT')
     .map(f => {
-        const geo = f.geometry as Geo;
+        const geo = normalizePointGeometry(f.geometry);
+        if (!geo) return null;
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority,
           position: geo.position, weight: props.weight,
         };
-    });
+    })
+    .filter(Boolean);
 
   // Build actorMeta keyed by mapKey
   const actorMeta: Record<string, {
