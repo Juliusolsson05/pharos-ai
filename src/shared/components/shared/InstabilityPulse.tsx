@@ -2,6 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import { Button } from '@/components/ui/button';
+
 import { api } from '@/shared/lib/query/client';
 import { queryKeys, REFETCH, STALE } from '@/shared/lib/query/keys';
 
@@ -25,7 +27,7 @@ function scoreColor(score: number): string {
 }
 
 export function InstabilityPulse({ conflictId }: InstabilityPulseProps) {
-  const { data, isError } = useQuery({
+  const { data, isError, isPending, refetch } = useQuery({
     queryKey: queryKeys.conflicts.instability(conflictId),
     queryFn: () => api.get<PulseData>(`/conflicts/${conflictId}/instability`),
     staleTime: STALE.MEDIUM,
@@ -34,13 +36,16 @@ export function InstabilityPulse({ conflictId }: InstabilityPulseProps) {
 
   if (isError) {
     return (
-      <div className="w-full h-7 flex items-center">
-        <span className="mono text-[9px] text-[var(--t4)]">INSTABILITY PULSE — UNAVAILABLE</span>
+      <div className="flex h-7 items-center justify-between gap-3">
+        <span className="mono text-[9px] text-[var(--t4)]">INSTABILITY PULSE - UNAVAILABLE</span>
+        <Button className="h-6 px-2" size="sm" variant="outline" onClick={() => refetch()}>
+          Retry
+        </Button>
       </div>
     );
   }
 
-  if (!data) {
+  if (isPending || !data) {
     return <div className="w-full h-7 bg-[var(--bg-3)] rounded-sm animate-pulse" />;
   }
 
@@ -50,7 +55,10 @@ export function InstabilityPulse({ conflictId }: InstabilityPulseProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="label text-[8px] text-[var(--t4)] tracking-[0.10em]">INSTABILITY PULSE</span>
+        <div className="flex items-center gap-2">
+          <span className="label text-[8px] text-[var(--t4)] tracking-[0.10em]">INSTABILITY PULSE</span>
+          <span className="mono text-[9px] text-[var(--t4)]">7D</span>
+        </div>
         <div className="flex items-center gap-1.5">
           <span
             className="mono text-[9px] font-bold"
