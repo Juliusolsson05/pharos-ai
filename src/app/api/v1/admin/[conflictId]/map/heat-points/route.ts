@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { validateOptionalEventId } from '@/server/lib/admin-relations';
-import { parseBodyWithSchema, toJsonValue } from '@/server/lib/admin-schema-utils';
-import { adminHeatPointCreateSchema } from '@/server/lib/admin-schemas';
-import { err, ok } from '@/server/lib/api-utils';
+import { assertRequired, parseISODate , safeJson } from '@/server/lib/admin-validate';
+import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
+import { normalizePointGeometry } from '@/server/lib/map-feature-geometry';
 
 export async function POST(
   req: NextRequest,
@@ -15,8 +15,16 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await parseBodyWithSchema(req, adminHeatPointCreateSchema);
+  const body = await safeJson(req);
   if (body instanceof NextResponse) return body;
+
+  const missing = assertRequired(body, ['id', 'actor', 'priority', 'category', 'type']);
+  if (missing) return err('VALIDATION', missing);
+
+  const geometry = normalizePointGeometry(body.geometry);
+  if (!geometry) {
+    return err('VALIDATION', 'Heat point geometry requires position [lng, lat]');
+  }
 
   const conflict = await prisma.conflict.findUnique({ where: { id: conflictId } });
   if (!conflict) return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
@@ -26,6 +34,13 @@ export async function POST(
 
   const existing = await prisma.mapFeature.findUnique({ where: { id: body.id } });
   if (existing) return err('DUPLICATE', `Map feature ${body.id} already exists`, 409);
+
+  let timestamp: Date | null = null;
+  if (body.timestamp) {
+    const ts = parseISODate(body.timestamp, 'timestamp');
+    if (typeof ts === 'string') return err('VALIDATION', ts);
+    timestamp = ts;
+  }
 
   const feature = await prisma.mapFeature.create({
     data: {
@@ -38,9 +53,9 @@ export async function POST(
       category: body.category,
       type: body.type,
       status: body.status ?? null,
-      timestamp: body.timestamp ? new Date(body.timestamp) : null,
-      geometry: toJsonValue(body.geometry),
-      properties: toJsonValue(body.properties ?? {}),
+      timestamp,
+      geometry,
+      properties: body.properties ?? {},
     },
   });
 

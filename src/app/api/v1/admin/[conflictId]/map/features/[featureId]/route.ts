@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { validateOptionalEventId } from '@/server/lib/admin-relations';
-import { parseBodyWithSchema, toJsonValue } from '@/server/lib/admin-schema-utils';
-import { adminMapFeatureUpdateSchema } from '@/server/lib/admin-schemas';
-import { err, ok } from '@/server/lib/api-utils';
+import { assertEnum, INSTALLATION_STATUSES,INSTALLATION_TYPES, KINETIC_STATUSES, KINETIC_TYPES, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, safeJson, ZONE_TYPES } from '@/server/lib/admin-validate';
+import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
+import { normalizeKineticGeometry, normalizePointGeometry, normalizePolygonGeometry } from '@/server/lib/map-feature-geometry';
 
 export async function PUT(
   req: NextRequest,
@@ -15,7 +15,7 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, featureId } = await params;
-  const body = await parseBodyWithSchema(req, adminMapFeatureUpdateSchema);
+  const body = await safeJson(req);
   if (body instanceof NextResponse) return body;
 
   const feature = await prisma.mapFeature.findFirst({
@@ -23,19 +23,63 @@ export async function PUT(
   });
   if (!feature) return err('NOT_FOUND', `Map feature ${featureId} not found`, 404);
 
+  // Determine valid type/status enums from the feature's existing featureType
+  const isKinetic = feature.featureType === 'STRIKE_ARC' || feature.featureType === 'MISSILE_TRACK';
+  const isZone = feature.featureType === 'THREAT_ZONE';
+  const validTypes = isKinetic ? KINETIC_TYPES : isZone ? ZONE_TYPES : INSTALLATION_TYPES;
+  const validStatuses = isKinetic ? KINETIC_STATUSES : INSTALLATION_STATUSES;
+
+  if (body.actor !== undefined) {
+    const e = assertEnum(body.actor, MAP_ACTOR_KEYS, 'actor');
+    if (e) return err('VALIDATION', e);
+  }
+  if (body.priority !== undefined) {
+    const e = assertEnum(body.priority, MAP_PRIORITIES, 'priority');
+    if (e) return err('VALIDATION', e);
+  }
+  if (body.type !== undefined) {
+    const e = assertEnum(body.type, validTypes, 'type');
+    if (e) return err('VALIDATION', e);
+  }
+  if (body.status !== undefined && body.status !== null && !isZone) {
+    const e = assertEnum(body.status, validStatuses, 'status');
+    if (e) return err('VALIDATION', e);
+  }
+
   const data: Record<string, unknown> = {};
+
   if (body.actor !== undefined) data.actor = body.actor;
   if (body.priority !== undefined) data.priority = body.priority;
   if (body.category !== undefined) data.category = body.category;
   if (body.type !== undefined) data.type = body.type;
   if (body.status !== undefined) data.status = body.status;
-  if (body.geometry !== undefined) data.geometry = toJsonValue(body.geometry);
-  if (body.properties !== undefined) data.properties = toJsonValue(body.properties);
+  if (body.geometry !== undefined) {
+    if (isKinetic) {
+      const geometry = normalizeKineticGeometry(body.geometry);
+      if (!geometry) return err('VALIDATION', `${feature.featureType} geometry requires from and to coordinates`);
+      data.geometry = geometry;
+    } else if (isZone) {
+      const geometry = normalizePolygonGeometry(body.geometry);
+      if (!geometry) return err('VALIDATION', 'THREAT_ZONE geometry requires coordinates array');
+      data.geometry = geometry;
+    } else {
+      const geometry = normalizePointGeometry(body.geometry);
+      if (!geometry) return err('VALIDATION', `${feature.featureType} geometry requires position [lng, lat]`);
+      data.geometry = geometry;
+    }
+  }
+  if (body.properties !== undefined) data.properties = body.properties;
   if (body.timestamp !== undefined) {
-    data.timestamp = body.timestamp === null ? null : new Date(body.timestamp);
+    if (body.timestamp === null) {
+      data.timestamp = null;
+    } else {
+      const ts = parseISODate(body.timestamp, 'timestamp');
+      if (typeof ts === 'string') return err('VALIDATION', ts);
+      data.timestamp = ts;
+    }
   }
   if (body.sourceEventId !== undefined) {
-    const eventErr = await validateOptionalEventId(conflictId, body.sourceEventId ?? null);
+    const eventErr = await validateOptionalEventId(conflictId, body.sourceEventId);
     if (eventErr) return err('VALIDATION', eventErr);
     data.sourceEventId = body.sourceEventId;
   }
