@@ -22,6 +22,7 @@ import { XPostCard } from '@/shared/components/shared/XPostCard';
 import { dayAbbrev,getActorForDay } from '@/shared/lib/day-filter';
 import { cn } from '@/shared/lib/utils';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
 import { ACT_C, STA_C } from '@/data/iran-actors';
 import type { Actor, XPost } from '@/types/domain';
@@ -39,6 +40,7 @@ type Props = {
 
 export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = false, pageScroll = false }: Props) {
   const [inlineLeadershipOpen, setInlineLeadershipOpen] = useState(true);
+  const isMobile = useIsMobile(1024);
   const snap   = getActorForDay(actor, currentDay);
   const actC   = ACT_C[snap?.activityLevel] ?? 'var(--t2)';
   const staC   = STA_C[snap?.stance] ?? 'var(--t2)';
@@ -108,9 +110,11 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
             <span className="label ml-2.5 text-[8px] text-[var(--t3)]">{actor.type}</span>
           </div>
           <div className="shrink-0 flex items-center gap-1.5">
-            <div className="h-1.5 w-20 bg-[var(--bd)]">
-              <div style={{ width: `${snap.activityScore}%`, height: '100%', background: actC }} />
-            </div>
+            {!isMobile && (
+              <div className="h-1.5 w-20 bg-[var(--bd)]">
+                <div style={{ width: `${snap.activityScore}%`, height: '100%', background: actC }} />
+              </div>
+            )}
             <span className="mono text-[11px]" style={{ color: actC }}>{snap.activityScore}%</span>
           </div>
         </div>
