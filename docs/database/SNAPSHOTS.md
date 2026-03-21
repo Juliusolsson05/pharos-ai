@@ -25,6 +25,8 @@ This keeps local onboarding easy while preserving an offline-safe fallback path.
 
 The published artifact is data-only. Schema creation stays in Prisma migrations, which makes the snapshot portable across local environments.
 
+The snapshot now includes leadership tree product data as well, including people, roles, relations, tenures, control states, and leadership event links. That keeps fresh local restores aligned with the live actor dossier and leadership graph experience.
+
 ## Commands
 
 ```bash
