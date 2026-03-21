@@ -8,6 +8,8 @@ const requiredString = z.string().trim().min(1, 'Required');
 const optionalString = z.string().trim().min(1).optional();
 const dayString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
 const metadataSchema = z.record(z.string(), z.unknown()).optional();
+const nullableString = z.string().trim().min(1).nullable().optional();
+const nullableUrlString = z.url().nullable().optional();
 
 export const leadershipPersonSchema = z.object({
   id: requiredString,
@@ -95,6 +97,23 @@ export const leadershipBatchUpsertSchema = z.object({
   tenures: z.array(leadershipTenureSchema).default([]),
   controlStates: z.array(leadershipControlStateSchema).default([]),
   eventLinks: z.array(leadershipEventLinkSchema).default([]),
+  pruneMissing: z.boolean().default(false),
 }).strict();
 
+export const leadershipPersonPatchSchema = z.object({
+  name: nullableString,
+  status: z.enum(LEADERSHIP_PERSON_STATUSES).optional(),
+  kind: nullableString,
+  summary: nullableString,
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+  wikipediaQuery: nullableString,
+  wikipediaTitle: nullableString,
+  wikipediaPageUrl: nullableUrlString,
+  wikipediaImageUrl: nullableUrlString,
+  wikipediaResolvedAt: z.iso.datetime({ offset: true }).nullable().optional(),
+}).strict().refine(value => Object.keys(value).length > 0, {
+  message: 'At least one field must be provided',
+});
+
 export type LeadershipBatchUpsert = z.infer<typeof leadershipBatchUpsertSchema>;
+export type LeadershipPersonPatch = z.infer<typeof leadershipPersonPatchSchema>;

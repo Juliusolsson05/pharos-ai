@@ -145,6 +145,7 @@ function toBatch(tree: LeadershipSeedTree): LeadershipBatchUpsert {
     tenures,
     controlStates,
     eventLinks,
+    pruneMissing: true,
   };
 }
 

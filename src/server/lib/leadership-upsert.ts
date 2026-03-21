@@ -113,9 +113,10 @@ export async function upsertLeadershipBatch(conflictId: string, actorId: string,
       });
     }
 
-    await tx.leadershipTenure.deleteMany({ where: { conflictId, actorId, id: { notIn: tenureIds.length ? tenureIds : ['__none__'] } } });
-    await tx.leadershipRole.deleteMany({ where: { conflictId, actorId, id: { notIn: roleIds.length ? roleIds : ['__none__'] } } });
-    await tx.leadershipPerson.deleteMany({ where: { conflictId, actorId, id: { notIn: personIds.length ? personIds : ['__none__'] } } });
+    if (payload.pruneMissing) {
+      await tx.leadershipTenure.deleteMany({ where: { conflictId, actorId, id: { notIn: tenureIds.length ? tenureIds : ['__none__'] } } });
+      await tx.leadershipRole.deleteMany({ where: { conflictId, actorId, id: { notIn: roleIds.length ? roleIds : ['__none__'] } } });
+      await tx.leadershipPerson.deleteMany({ where: { conflictId, actorId, id: { notIn: personIds.length ? personIds : ['__none__'] } } });
+    }
   });
 }
-
