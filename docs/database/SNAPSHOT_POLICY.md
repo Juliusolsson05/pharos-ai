@@ -15,6 +15,12 @@ Public onboarding snapshots use an explicit allowlist. If a table is not on the 
 - `IntelEvent`
 - `EventSource`
 - `EventActorResponse`
+- `LeadershipPerson`
+- `LeadershipRole`
+- `LeadershipRoleRelation`
+- `LeadershipTenure`
+- `LeadershipControlState`
+- `LeadershipEventLink`
 - `XPost`
 - `MapFeature`
 - `MapStory`
@@ -39,5 +45,6 @@ Public onboarding snapshots use an explicit allowlist. If a table is not on the 
 
 - Treat every published snapshot as permanently public
 - Add new tables to the allowlist only after an explicit review
+- Leadership tree data is part of the public onboarding snapshot because it is product data needed for actor dossier and graph flows
 - Use a dedicated read-only production connection string for publishing
 - Prefer restoring only app data, not full platform/system schemas
