@@ -32,7 +32,7 @@ export function ActorsWidget() {
             >
               <div className="shrink-0 w-28">
                 <div className="flex items-center gap-1 mb-0.5">
-                  {actor.countryCode && <Flag code={actor.countryCode} size={18} />}
+                  <Flag actorId={actor.id} code={actor.countryCode} size={18} />
                   <span className="text-[11px] font-bold text-[var(--t1)]">{actor.name}</span>
                 </div>
                 <span

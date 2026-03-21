@@ -39,6 +39,8 @@ export const queryKeys = {
     list: (id = CONFLICT_ID, day?: string) => ['actors', id, day] as const,
     detail: (id = CONFLICT_ID, actorId?: string, day?: string) =>
       ['actor', id, actorId, day] as const,
+    leadership: (id = CONFLICT_ID, actorId?: string) =>
+      ['actor-leadership', id, actorId] as const,
   },
   events: {
     list: (id = CONFLICT_ID, filters?: object) =>

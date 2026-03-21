@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <clipPath id="us-region">
+      <polygon points="0,0 1200,0 1200,300 0,520"/>
+    </clipPath>
+    <clipPath id="il-region">
+      <polygon points="0,610 1200,390 1200,900 0,900"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#us-region)">
+    <svg width="1200" height="900" viewBox="0 0 7410 3900" preserveAspectRatio="xMidYMid slice">
+      <path d="M0,0h7410v3900H0" fill="#b31942"/>
+      <path d="M0,450H7410m0,600H0m0,600H7410m0,600H0m0,600H7410m0,600H0" stroke="#FFF" stroke-width="300"/>
+      <path d="M0,0h2964v2100H0" fill="#0a3161"/>
+      <g fill="#FFF">
+        <g id="s18"><g id="s9"><g id="s5"><g id="s4"><path id="s" d="M247,90 317.534230,307.082039 132.873218,172.917961H361.126782L176.465770,307.082039z"/><use href="#s" y="420"/><use href="#s" y="840"/><use href="#s" y="1260"/></g><use href="#s" y="1680"/></g><use href="#s4" x="247" y="210"/></g><use href="#s9" x="494"/></g><use href="#s18" x="988"/><use href="#s9" x="1976"/><use href="#s5" x="2470"/>
+      </g>
+    </svg>
+  </g>
+
+  <g clip-path="url(#il-region)">
+    <svg width="1200" height="900" viewBox="0 0 1100 800" preserveAspectRatio="xMidYMid slice">
+      <path fill="#fff" d="M0 0h1100v800H0z"/>
+      <path fill="#0038b8" d="M0 75h1100v125H0zm0 525h1100v125H0z"/>
+      <path fill="none" stroke="#0038b8" stroke-width="27.5" d="M423.81566 472.85253H676.18435L550.00001 254.29492Zm126.18435 72.85255 126.1843-218.55765H423.81566Z"/>
+    </svg>
+  </g>
+
+  <polygon points="0,545 1200,325 1200,385 0,605" fill="#ffffff"/>
+  <polygon points="0,552 1200,332 1200,378 0,598" fill="#d7e4f5" opacity="0.35"/>
+</svg>

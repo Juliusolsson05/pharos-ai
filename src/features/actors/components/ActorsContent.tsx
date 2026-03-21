@@ -34,7 +34,7 @@ export function ActorsContent() {
   const onLandscapeScroll = useLandscapeScrollEmitter(usePageScroll);
 
   const selId = searchParams.get('actor');
-  const [tab,   setTab]   = useState<'intel' | 'signals' | 'military'>('intel');
+  const [tab,   setTab]   = useState<'intel' | 'signals' | 'leadership' | 'military'>('intel');
   const { defaultLayout, onLayoutChanged } = usePanelLayout({ id: 'actors' });
 
   const { data: actors, isLoading } = useActors(undefined, currentDay || undefined);

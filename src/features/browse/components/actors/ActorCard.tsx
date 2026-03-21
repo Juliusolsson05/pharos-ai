@@ -30,7 +30,7 @@ export function ActorCard(props: Props) {
     >
       <article className="relative rounded-md border border-[var(--bd-s)] px-4 py-3.5 h-full transition-colors hover:border-[var(--bd)] hover:bg-[var(--bg-3)]/20">
         <div className="flex items-center gap-2.5 mb-2.5">
-          {props.countryCode && <Flag code={props.countryCode} size={22} />}
+          <Flag actorId={props.id} code={props.countryCode} size={22} />
           <div className="flex-1 min-w-0">
             <h3 className="text-[13px] font-bold text-[var(--t1)] group-hover:text-[var(--blue)] transition-colors truncate">
               {props.name}

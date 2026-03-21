@@ -53,7 +53,7 @@ export function ActorProfile({ actor }: Props) {
         <div className="h-[3px] w-10 mb-5" style={{ background: actC }} />
 
         <div className="flex items-center gap-3 mb-2">
-          {actor.countryCode && <Flag code={actor.countryCode} size={32} />}
+          <Flag actorId={actor.id} code={actor.countryCode} size={32} />
           <div>
             <h1 className="text-lg font-bold text-[var(--t1)]">{actor.name}</h1>
             <p className="mono text-[11px] text-[var(--t3)]">{actor.fullName}</p>

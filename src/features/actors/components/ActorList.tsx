@@ -89,7 +89,7 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
                 {/* Name + flag + stance */}
                 <div>
                   <div className="flex items-center gap-[5px] mb-[3px]">
-                    {actor.countryCode && <Flag code={actor.countryCode} size={18} />}
+                    <Flag actorId={actor.id} code={actor.countryCode} size={18} />
                     <span className="text-[11px] font-bold text-[var(--t1)] text-left">
                       {actor.name}
                     </span>
@@ -148,7 +148,7 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
                 {/* Name + flag + stance */}
                 <div>
                   <div className="flex items-center gap-[5px] mb-[3px]">
-                    {actor.countryCode && <Flag code={actor.countryCode} size={18} />}
+                    <Flag actorId={actor.id} code={actor.countryCode} size={18} />
                     <span className="text-[11px] font-bold text-[var(--t1)] text-left">
                       {actor.name}
                     </span>

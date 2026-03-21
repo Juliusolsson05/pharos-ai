@@ -81,7 +81,7 @@ export function BriefContent() {
               return (
                 <div key={actor.id} className="px-4 py-3 bg-[var(--bg-2)] border border-[var(--bd)]">
                   <div className="flex items-center gap-2 mb-2">
-                    {actor.countryCode && <Flag code={actor.countryCode} size={18} />}
+                    <Flag actorId={actor.id} code={actor.countryCode} size={18} />
                     <span className="text-[13px] font-bold text-[var(--t1)]">{actor.fullName}</span>
                     <span className="text-[8px] font-bold px-[6px] py-[2px] ml-auto"
                       style={{ background: actC + '18', color: actC }}>

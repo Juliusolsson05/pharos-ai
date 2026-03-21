@@ -18,9 +18,22 @@ type Props = {
   staC: string;
   currentDay: ConflictDay;
   dayActions: RecentAction[];
+  showKeyFigures?: boolean;
+  leadershipStatus?: 'loading' | 'available' | 'unavailable';
+  footer?: React.ReactNode;
 };
 
-export function ActorIntelTab({ actor, snap, actC, staC, currentDay, dayActions }: Props) {
+export function ActorIntelTab({
+  actor,
+  snap,
+  actC,
+  staC,
+  currentDay,
+  dayActions,
+  showKeyFigures = true,
+  leadershipStatus,
+  footer,
+}: Props) {
   return (
     <ScrollArea className="h-full">
       <div className="px-[22px] py-[18px]">
@@ -83,16 +96,40 @@ export function ActorIntelTab({ actor, snap, actC, staC, currentDay, dayActions 
           </div>
         </div>
 
-        <div className="mb-5">
-          <SectionDivider label="KEY FIGURES" />
-          <div className="flex gap-1.5 flex-wrap">
-            {actor.keyFigures.map((fig, i) => (
-              <div key={i} className="px-2.5 py-[3px] border border-[var(--bd)] bg-[var(--bg-2)]">
-                <span className="text-[10px] text-[var(--t2)]">{fig}</span>
-              </div>
-            ))}
+        {showKeyFigures && (
+          <div className="mb-5">
+            <SectionDivider label="KEY FIGURES" />
+            <div className="flex gap-1.5 flex-wrap">
+              {actor.keyFigures.map((fig, i) => (
+                <div key={i} className="px-2.5 py-[3px] border border-[var(--bd)] bg-[var(--bg-2)]">
+                  <span className="text-[10px] text-[var(--t2)]">{fig}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {leadershipStatus === 'loading' && (
+          <div className="mb-5 border border-[var(--bd)] bg-[var(--bg-1)] px-4 py-3">
+            <div className="label mb-1 text-[8px] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
+            <div className="section-title mb-2 text-[11px] text-[var(--t1)]">Loading leadership tree...</div>
+            <p className="text-[11px] leading-relaxed text-[var(--t3)]">
+              Pharos is resolving the command structure for this actor.
+            </p>
+          </div>
+        )}
+
+        {leadershipStatus === 'unavailable' && !showKeyFigures && (
+          <div className="mb-5 border border-dashed border-[var(--bd)] bg-[var(--bg-1)] px-4 py-3">
+            <div className="label mb-1 text-[8px] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
+            <div className="section-title mb-2 text-[11px] text-[var(--t1)]">Not available</div>
+            <p className="text-[11px] leading-relaxed text-[var(--t3)]">
+              No leadership tree is currently available for this actor.
+            </p>
+          </div>
+        )}
+
+        {footer && <div className="mt-8">{footer}</div>}
       </div>
     </ScrollArea>
   );
