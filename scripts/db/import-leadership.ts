@@ -1,20 +1,68 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { readFileSync } from 'fs';
-
 import { prisma } from '@/server/lib/db';
 import { upsertLeadershipBatch } from '@/server/lib/leadership';
 import type { LeadershipBatchUpsert } from '@/server/lib/leadership-schemas';
 
-function loadTree(path: string) {
-  const raw = readFileSync(path, 'utf8');
-  const start = raw.indexOf('{');
-  const end = raw.lastIndexOf('} as const;');
-  return JSON.parse(raw.slice(start, end + 1));
-}
+import { HEZBOLLAH_TREE } from '../../src/data/hezbollah';
+import { IRAN_TREE } from '../../src/data/iran-tree';
+import { IRGC_TREE } from '../../src/data/irgc';
+import { ISRAEL_TREE } from '../../src/data/israel';
+import { UNITED_STATES_TREE } from '../../src/data/united-states';
 
-function toBatch(tree: any): LeadershipBatchUpsert {
-  const persons = Object.values<any>(tree.persons).map(person => ({
+type TreeEntity = {
+  id: string;
+  metadata?: Record<string, unknown>;
+};
+
+type LooseTreeEntity = {
+  id?: string;
+  metadata?: Record<string, unknown>;
+};
+
+type TreeRole = TreeEntity & {
+  title: string;
+  level: number;
+  parentRoleId?: string;
+  reportsTo?: readonly string[];
+};
+
+type TreeTenure = TreeEntity & {
+  roleId: string;
+  personId?: string;
+  startDate: string;
+  endDate?: string;
+  isActive: boolean;
+  predecessorId?: string;
+  successorId?: string;
+  endReason?: string;
+};
+
+type TreeControlState = LooseTreeEntity & {
+  roleId: string;
+  deFactoHolderId?: string | null;
+  deJureHolderId?: string | null;
+  contested?: boolean;
+};
+
+type TreeEvent = LooseTreeEntity & {
+  roleId?: string;
+  personId?: string;
+  tenureId?: string;
+  type?: string;
+  description?: string;
+};
+
+type BatchEventLink = LeadershipBatchUpsert['eventLinks'][number];
+
+type LeadershipSeedTree = {
+  persons: Record<string, TreeEntity & { name: string; status?: string }>;
+  roles: Record<string, TreeRole>;
+  tenures: Record<string, TreeTenure>;
+  controlStates: Record<string, TreeControlState>;
+  events?: Record<string, TreeEvent>;
+};
+
+function toBatch(tree: LeadershipSeedTree): LeadershipBatchUpsert {
+  const persons = Object.values(tree.persons).map(person => ({
     id: person.id,
     name: person.name,
     status: String(person.status ?? 'UNKNOWN').toUpperCase() as 'ALIVE' | 'DEAD' | 'UNKNOWN' | 'VACANT',
@@ -24,7 +72,7 @@ function toBatch(tree: any): LeadershipBatchUpsert {
   }));
   const personIdSet = new Set(persons.map(person => person.id));
 
-  const roles = Object.values<any>(tree.roles).map((role, index) => ({
+  const roles = Object.values(tree.roles).map((role, index) => ({
     id: role.id,
     title: role.title,
     level: role.level,
@@ -34,7 +82,7 @@ function toBatch(tree: any): LeadershipBatchUpsert {
   }));
 
   const relationMap = new Map<string, LeadershipBatchUpsert['relations'][number]>();
-  for (const role of Object.values<any>(tree.roles)) {
+  for (const role of Object.values(tree.roles)) {
     const parents = [
       ...(role.parentRoleId ? [role.parentRoleId] : []),
       ...(Array.isArray(role.reportsTo) ? role.reportsTo : []),
@@ -49,7 +97,7 @@ function toBatch(tree: any): LeadershipBatchUpsert {
     });
   }
 
-  const tenures = Object.values<any>(tree.tenures).map(tenure => ({
+  const tenures = Object.values(tree.tenures).map(tenure => ({
     id: tenure.id,
     roleId: tenure.roleId,
     personId: tenure.personId && personIdSet.has(tenure.personId) ? tenure.personId : null,
@@ -65,7 +113,7 @@ function toBatch(tree: any): LeadershipBatchUpsert {
     metadata: tenure.metadata,
   }));
 
-  const controlStates = Object.values<any>(tree.controlStates).map(state => ({
+  const controlStates = Object.values(tree.controlStates).map(state => ({
     roleId: state.roleId,
     deFactoPersonId: state.deFactoHolderId ?? null,
     deJurePersonId: state.deJureHolderId ?? null,
@@ -75,8 +123,11 @@ function toBatch(tree: any): LeadershipBatchUpsert {
     metadata: state.metadata,
   }));
 
-  const eventLinks = Object.values<any>(tree.events ?? {})
-    .map((event, ord) => ({
+  const eventLinks: BatchEventLink[] = [];
+  Object.values(tree.events ?? {}).forEach((event, ord) => {
+    if (!event.id || !(event.roleId || event.personId || event.tenureId)) return;
+
+    eventLinks.push({
       eventId: event.id,
       roleId: event.roleId,
       personId: event.personId,
@@ -84,8 +135,8 @@ function toBatch(tree: any): LeadershipBatchUpsert {
       kind: String(event.type ?? 'EVENT').toUpperCase(),
       ord,
       metadata: { description: event.description },
-    }))
-    .filter(link => link.roleId || link.personId || link.tenureId);
+    });
+  });
 
   return {
     persons,
@@ -104,11 +155,11 @@ async function main() {
   const actorIdByName = new Map(actors.map(actor => [actor.name.toLowerCase(), actor.id]));
 
   const mappings = [
-    { actorId: actorIdByName.get('iran') ?? 'iran', tree: loadTree('./src/data/iran-tree.ts') },
-    { actorId: actorIdByName.get('united states') ?? 'us', tree: loadTree('./src/data/united-states.ts') },
-    { actorId: actorIdByName.get('israel') ?? 'idf', tree: loadTree('./src/data/israel.ts') },
-    { actorId: actorIdByName.get('hezbollah') ?? 'hezbollah', tree: loadTree('./src/data/hezbollah.ts') },
-    { actorId: actorIdByName.get('irgc') ?? 'irgc', tree: loadTree('./src/data/irgc.ts') },
+    { actorId: actorIdByName.get('iran') ?? 'iran', tree: IRAN_TREE },
+    { actorId: actorIdByName.get('united states') ?? 'us', tree: UNITED_STATES_TREE },
+    { actorId: actorIdByName.get('israel') ?? 'idf', tree: ISRAEL_TREE },
+    { actorId: actorIdByName.get('hezbollah') ?? 'hezbollah', tree: HEZBOLLAH_TREE },
+    { actorId: actorIdByName.get('irgc') ?? 'irgc', tree: IRGC_TREE },
   ];
 
   for (const mapping of mappings) {
