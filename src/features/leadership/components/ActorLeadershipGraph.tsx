@@ -13,15 +13,19 @@ import {
   type NodeProps,
   Position,
   ReactFlow,
+  type ReactFlowInstance,
   ReactFlowProvider,
 } from '@xyflow/react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 import { getLeadershipHeaderColor, getLeadershipTierColor } from '@/features/leadership/lib/leadership-colors';
 import { useActorLeadership } from '@/features/leadership/queries';
+
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
 import type { Actor, LeadershipNode, LeadershipTreeResponse } from '@/types/domain';
 
@@ -253,16 +257,127 @@ function getLeadershipTitle(actorName?: string): string {
   return `${actorName} Leadership Tree`;
 }
 
+type LeadershipDetailProps = {
+  selectedNode: GraphNodeData;
+  headerCollapsed: boolean;
+  onHeaderCollapsedChange: (collapsed: boolean) => void;
+  mobile?: boolean;
+};
+
+function LeadershipDetailPanel({ selectedNode, headerCollapsed, onHeaderCollapsedChange, mobile = false }: LeadershipDetailProps) {
+  const bodyHeight = headerCollapsed
+    ? mobile
+      ? 'h-[calc(100dvh-78px)]'
+      : 'h-[calc(94vh-88px)]'
+    : mobile
+      ? 'h-[calc(100dvh-200px)]'
+      : 'h-[calc(94vh-190px)]';
+
+  return (
+    <>
+      {headerCollapsed ? (
+        <div className={`flex items-center justify-between gap-3 border-b border-[var(--bd)] bg-[var(--bg-1)] py-3 pr-12 ${mobile ? 'safe-px' : 'px-4 md:px-5'}`}>
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 h-[10px] w-full" style={{ background: getLeadershipHeaderColor(selectedNode.tier, selectedNode.status) }} />
+            <div className="flex flex-wrap items-center gap-2">
+              <DialogTitle className="text-[15px] leading-tight text-[var(--t1)] md:text-[16px]">{selectedNode.name}</DialogTitle>
+              <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={() => onHeaderCollapsedChange(false)}>
+            Expand
+          </Button>
+        </div>
+      ) : (
+        <DialogHeader
+          className={`border-b border-[var(--bd)] bg-[var(--bg-1)] pr-12 ${mobile ? 'safe-px py-4' : 'p-4 md:p-5 md:pr-12'}`}
+          style={mobile ? { paddingTop: 'max(16px, env(safe-area-inset-top))' } : undefined}
+        >
+          <div className="mb-3 h-[10px] w-full" style={{ background: getLeadershipHeaderColor(selectedNode.tier, selectedNode.status) }} />
+          <div className="flex items-start gap-4">
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden border border-[var(--bd)] bg-[var(--bg-2)] md:h-28 md:w-28">
+              {selectedNode.wikipediaImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selectedNode.wikipediaImageUrl} alt={selectedNode.name} className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-2xl font-bold text-[var(--t3)]">{selectedNode.name.slice(0, 1).toUpperCase()}</div>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="label mb-1 text-[8px] text-[var(--t4)]">{selectedNode.title}</div>
+              <DialogTitle className="text-[17px] leading-tight text-[var(--t1)] md:text-[18px]">{selectedNode.name}</DialogTitle>
+              <DialogDescription className="mt-2 flex flex-wrap items-center gap-2 text-[var(--t3)]">
+                <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
+                {selectedNode.dateLabel && <span className="mono text-[10px] text-[var(--t4)]">{selectedNode.dateLabel}</span>}
+                <span className="mono text-[10px] text-[var(--t4)]">Tier {selectedNode.tier + 1}</span>
+              </DialogDescription>
+              <p className="mt-3 text-[12px] leading-relaxed text-[var(--t2)]">{selectedNode.summary}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {selectedNode.wikipediaPageUrl && (
+                  <Button asChild variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]">
+                    <a href={selectedNode.wikipediaPageUrl} target="_blank" rel="noreferrer">Open full Wikipedia</a>
+                  </Button>
+                )}
+                <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={() => onHeaderCollapsedChange(true)}>
+                  Collapse header
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogHeader>
+      )}
+
+      <ScrollArea className={bodyHeight}>
+        <div className="px-4 py-4 md:px-5 md:py-5">
+          <div className="mb-4 flex items-center justify-between border-b border-[var(--bd-s)] pb-2">
+            <div className="section-title text-[10px]">Wikipedia dossier</div>
+          </div>
+
+          {selectedNode.wikipediaPageUrl ? (
+            <div className="overflow-hidden rounded-sm border border-[var(--bd)] bg-white">
+              <iframe
+                key={selectedNode.wikipediaPageUrl}
+                src={selectedNode.wikipediaPageUrl}
+                title={selectedNode.name}
+                className={`w-full ${mobile ? 'h-[72dvh]' : 'h-[76vh]'}`}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-[12px] leading-relaxed text-[var(--t3)]">No stored Wikipedia article is available for this node yet.</p>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    </>
+  );
+}
+
 function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['actor']; inline?: boolean }) {
   const { data: tree, isLoading } = useActorLeadership(undefined, actor.id);
   const [selectedNode, setSelectedNode] = useState<GraphNodeData | null>(null);
-  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  const [headerCollapsed, setHeaderCollapsed] = useState(true);
+  const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<Node<GraphNodeData>, Edge> | null>(null);
+  const isMobile = useIsMobile(1024);
   const graph = useMemo(() => (tree ? buildGraph(tree) : { nodes: [], edges: [], height: 980 }), [tree]);
-  const boardHeight = inline ? Math.max(Math.min(graph.height, 760), 620) : Math.max(graph.height, 980);
+  const boardHeight = inline
+    ? Math.max(Math.min(graph.height, isMobile ? 680 : 760), isMobile ? 520 : 620)
+    : Math.max(graph.height, isMobile ? 780 : 980);
 
   const onNodeClick: NodeMouseHandler<Node<GraphNodeData>> = (_, node) => {
-    setHeaderCollapsed(false);
+    setHeaderCollapsed(true);
     setSelectedNode(node.data);
+  };
+
+  const resetView = () => {
+    flowInstance?.fitView({
+      padding: isMobile ? 0.18 : 0.14,
+      duration: 250,
+      minZoom: isMobile ? 0.72 : 0.45,
+      maxZoom: isMobile ? 1.45 : 1.1,
+    });
   };
 
   return (
@@ -273,13 +388,19 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
             <div className="label mb-1 text-[8px]">WARTIME SUCCESSION / COMMAND GRAPH</div>
             <h2 className="section-title text-[12px]">{getLeadershipTitle(tree?.actorName ?? actor.name)}</h2>
           </div>
-          <div className="mono text-[10px] text-[var(--t4)]">Click a node for full profile</div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={resetView}>
+              Reset view
+            </Button>
+            <div className="mono text-[10px] text-[var(--t4)]">{isMobile ? 'Tap a node for full profile' : 'Click a node for full profile'}</div>
+          </div>
         </div>
 
         <div className="rounded-sm border border-[var(--bd)] bg-[linear-gradient(180deg,var(--bg-1),var(--bg-app))]">
           <div className="w-full" style={{ height: `${boardHeight}px` }}>
             <ReactFlow
               fitView
+              fitViewOptions={{ padding: isMobile ? 0.18 : 0.14, minZoom: isMobile ? 0.72 : 0.45, maxZoom: isMobile ? 1.45 : 1.1 }}
               nodes={graph.nodes}
               edges={graph.edges}
               nodeTypes={nodeTypes}
@@ -287,9 +408,13 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
               nodesConnectable={false}
               elementsSelectable={false}
               onNodeClick={onNodeClick}
+              onInit={setFlowInstance}
               panOnDrag
-              zoomOnScroll
-              minZoom={0.45}
+              panOnScroll={false}
+              zoomOnScroll={!isMobile}
+              zoomOnPinch
+              zoomOnDoubleClick={false}
+              minZoom={isMobile ? 0.14 : 0.45}
               maxZoom={2.25}
               proOptions={{ hideAttribution: true }}
               defaultEdgeOptions={{ type: 'smoothstep' }}
@@ -301,89 +426,27 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
         </div>
       </div>
 
-      <Dialog open={Boolean(selectedNode)} onOpenChange={(open) => { if (!open) { setSelectedNode(null); setHeaderCollapsed(false); } }}>
-        <DialogContent className="h-[94vh] !w-[96vw] !max-w-[96vw] overflow-hidden border-[var(--bd)] bg-[var(--bg-app)] p-0">
-          {selectedNode && (
-            <>
-              {headerCollapsed ? (
-                <div className="flex items-center justify-between gap-3 border-b border-[var(--bd)] bg-[var(--bg-1)] px-5 py-3 pr-12">
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-2 h-[10px] w-full" style={{ background: getLeadershipHeaderColor(selectedNode.tier, selectedNode.status) }} />
-                    <div className="flex flex-wrap items-center gap-2">
-                      <DialogTitle className="text-[16px] leading-tight text-[var(--t1)]">{selectedNode.name}</DialogTitle>
-                      <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={() => setHeaderCollapsed(false)}>
-                    Expand header
-                  </Button>
-                </div>
-              ) : (
-                <DialogHeader className="border-b border-[var(--bd)] bg-[var(--bg-1)] p-5 pr-12">
-                  <div className="mb-3 h-[10px] w-full" style={{ background: getLeadershipHeaderColor(selectedNode.tier, selectedNode.status) }} />
-                  <div className="flex items-start gap-4">
-                    <div className="relative h-28 w-28 shrink-0 overflow-hidden border border-[var(--bd)] bg-[var(--bg-2)]">
-                      {selectedNode.wikipediaImageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={selectedNode.wikipediaImageUrl} alt={selectedNode.name} className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-2xl font-bold text-[var(--t3)]">{selectedNode.name.slice(0, 1).toUpperCase()}</div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="label mb-1 text-[8px] text-[var(--t4)]">{selectedNode.title}</div>
-                      <DialogTitle className="text-[18px] leading-tight text-[var(--t1)]">{selectedNode.name}</DialogTitle>
-                      <DialogDescription className="mt-2 flex flex-wrap items-center gap-2 text-[var(--t3)]">
-                        <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
-                        {selectedNode.dateLabel && <span className="mono text-[10px] text-[var(--t4)]">{selectedNode.dateLabel}</span>}
-                        <span className="mono text-[10px] text-[var(--t4)]">Tier {selectedNode.tier + 1}</span>
-                      </DialogDescription>
-                      <p className="mt-3 text-[12px] leading-relaxed text-[var(--t2)]">{selectedNode.summary}</p>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {selectedNode.wikipediaPageUrl && (
-                          <Button asChild variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]">
-                            <a href={selectedNode.wikipediaPageUrl} target="_blank" rel="noreferrer">Open full Wikipedia</a>
-                          </Button>
-                        )}
-                        <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={() => setHeaderCollapsed(true)}>
-                          Collapse header
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </DialogHeader>
-              )}
-
-              <ScrollArea className={headerCollapsed ? 'h-[calc(94vh-88px)]' : 'h-[calc(94vh-190px)]'}>
-                <div className="px-5 py-5">
-                  <div className="mb-4 flex items-center justify-between border-b border-[var(--bd-s)] pb-2">
-                    <div className="section-title text-[10px]">Wikipedia dossier</div>
-                    <div className="mono text-[10px] text-[var(--t4)]">Stored article link</div>
-                  </div>
-
-                  {selectedNode.wikipediaPageUrl ? (
-                    <div className="overflow-hidden rounded-sm border border-[var(--bd)] bg-white" onMouseEnter={() => setHeaderCollapsed(true)}>
-                      <iframe
-                        key={selectedNode.wikipediaPageUrl}
-                        src={selectedNode.wikipediaPageUrl}
-                        title={selectedNode.name}
-                        className="h-[76vh] w-full"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                        onLoad={() => undefined}
-                      />
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-[12px] leading-relaxed text-[var(--t3)]">No stored Wikipedia article is available for this node yet.</p>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {isMobile ? (
+        <Sheet open={Boolean(selectedNode)} onOpenChange={(open) => { if (!open) { setSelectedNode(null); setHeaderCollapsed(true); } }}>
+          <SheetContent side="bottom" showCloseButton className="h-[100dvh] max-h-[100dvh] gap-0 overflow-hidden border-[var(--bd)] bg-[var(--bg-app)] p-0">
+            {selectedNode && (
+              <>
+                <SheetHeader className="sr-only">
+                  <SheetTitle>{selectedNode.name}</SheetTitle>
+                  <SheetDescription>{selectedNode.title}</SheetDescription>
+                </SheetHeader>
+                <LeadershipDetailPanel selectedNode={selectedNode} headerCollapsed={headerCollapsed} onHeaderCollapsedChange={setHeaderCollapsed} mobile />
+              </>
+            )}
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog open={Boolean(selectedNode)} onOpenChange={(open) => { if (!open) { setSelectedNode(null); setHeaderCollapsed(true); } }}>
+          <DialogContent className="h-[94vh] !w-[96vw] !max-w-[96vw] overflow-hidden border-[var(--bd)] bg-[var(--bg-app)] p-0">
+            {selectedNode && <LeadershipDetailPanel selectedNode={selectedNode} headerCollapsed={headerCollapsed} onHeaderCollapsedChange={setHeaderCollapsed} />}
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }
