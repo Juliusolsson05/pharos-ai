@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { validateOptionalEventId } from '@/server/lib/admin-relations';
-import { assertRequired, parseISODate , safeJson } from '@/server/lib/admin-validate';
+import { parseBodyWithSchema, toJsonValue } from '@/server/lib/admin-schema-utils';
+import { adminHeatPointCreateSchema } from '@/server/lib/admin-schemas';
+import { parseISODate } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { normalizePointGeometry } from '@/server/lib/map-feature-geometry';
@@ -15,11 +17,8 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminHeatPointCreateSchema);
   if (body instanceof NextResponse) return body;
-
-  const missing = assertRequired(body, ['id', 'actor', 'priority', 'category', 'type']);
-  if (missing) return err('VALIDATION', missing);
 
   const geometry = normalizePointGeometry(body.geometry);
   if (!geometry) {
@@ -55,7 +54,7 @@ export async function POST(
       status: body.status ?? null,
       timestamp,
       geometry,
-      properties: body.properties ?? {},
+      properties: toJsonValue(body.properties ?? {}),
     },
   });
 

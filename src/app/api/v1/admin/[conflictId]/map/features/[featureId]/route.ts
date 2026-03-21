@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { validateOptionalEventId } from '@/server/lib/admin-relations';
-import { assertEnum, INSTALLATION_STATUSES,INSTALLATION_TYPES, KINETIC_STATUSES, KINETIC_TYPES, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, safeJson, ZONE_TYPES } from '@/server/lib/admin-validate';
+import { parseBodyWithSchema, toJsonValue } from '@/server/lib/admin-schema-utils';
+import { adminMapFeatureUpdateSchema } from '@/server/lib/admin-schemas';
+import { assertEnum, INSTALLATION_STATUSES,INSTALLATION_TYPES, KINETIC_STATUSES, KINETIC_TYPES, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, ZONE_TYPES } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { normalizeKineticGeometry, normalizePointGeometry, normalizePolygonGeometry } from '@/server/lib/map-feature-geometry';
@@ -15,7 +17,7 @@ export async function PUT(
   if (denied) return denied;
 
   const { conflictId, featureId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminMapFeatureUpdateSchema);
   if (body instanceof NextResponse) return body;
 
   const feature = await prisma.mapFeature.findFirst({
@@ -68,7 +70,7 @@ export async function PUT(
       data.geometry = geometry;
     }
   }
-  if (body.properties !== undefined) data.properties = body.properties;
+  if (body.properties !== undefined) data.properties = toJsonValue(body.properties);
   if (body.timestamp !== undefined) {
     if (body.timestamp === null) {
       data.timestamp = null;

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { requireAdmin } from '@/server/lib/admin-auth';
 import { validateOptionalEventId } from '@/server/lib/admin-relations';
-import { assertEnum, assertRequired, INSTALLATION_STATUSES,INSTALLATION_TYPES, MAP_ACTOR_KEYS, MAP_PRIORITIES, parseISODate, safeJson } from '@/server/lib/admin-validate';
+import { parseBodyWithSchema, toJsonValue } from '@/server/lib/admin-schema-utils';
+import { adminAssetCreateSchema } from '@/server/lib/admin-schemas';
+import { parseISODate } from '@/server/lib/admin-validate';
 import { err,ok } from '@/server/lib/api-utils';
 import { prisma } from '@/server/lib/db';
 import { checkMapFeatureEnforcement } from '@/server/lib/enforcement';
@@ -17,25 +19,8 @@ export async function POST(
   if (denied) return denied;
 
   const { conflictId } = await params;
-  const body = await safeJson(req);
+  const body = await parseBodyWithSchema(req, adminAssetCreateSchema);
   if (body instanceof NextResponse) return body;
-
-  const missing = assertRequired(body, ['id', 'actor', 'priority', 'category', 'type']);
-  if (missing) return err('VALIDATION', missing);
-
-  const actorErr = assertEnum(body.actor, MAP_ACTOR_KEYS, 'actor');
-  if (actorErr) return err('VALIDATION', actorErr);
-
-  const priorityErr = assertEnum(body.priority, MAP_PRIORITIES, 'priority');
-  if (priorityErr) return err('VALIDATION', priorityErr);
-
-  const typeErr = assertEnum(body.type, INSTALLATION_TYPES, 'type');
-  if (typeErr) return err('VALIDATION', typeErr);
-
-  if (body.status !== undefined && body.status !== null) {
-    const statusErr = assertEnum(body.status, INSTALLATION_STATUSES, 'status');
-    if (statusErr) return err('VALIDATION', statusErr);
-  }
 
   const geometry = normalizePointGeometry(body.geometry);
   if (!geometry) {
@@ -79,7 +64,7 @@ export async function POST(
       status: body.status ?? null,
       timestamp,
       geometry,
-      properties: body.properties ?? {},
+      properties: toJsonValue(body.properties ?? {}),
     },
   });
 
