@@ -21,6 +21,12 @@ export const INCLUDED_TABLES = [
   'EventActorResponse',
   'EventSource',
   'IntelEvent',
+  'LeadershipControlState',
+  'LeadershipEventLink',
+  'LeadershipPerson',
+  'LeadershipRole',
+  'LeadershipRoleRelation',
+  'LeadershipTenure',
   'MapFeature',
   'MapStory',
   'MapStoryEvent',
@@ -42,6 +48,8 @@ export const REQUIRED_TABLES = [
   'Actor',
   'Conflict',
   'IntelEvent',
+  'LeadershipPerson',
+  'LeadershipRole',
   'XPost',
 ] as const;
 
