@@ -1,5 +1,10 @@
 'use client';
 
+import { useState } from 'react';
+
+import { ChevronDown } from 'lucide-react';
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -7,6 +12,9 @@ import { ActorIntelTab } from '@/features/actors/components/ActorIntelTab';
 import { ActorMilitaryTab } from '@/features/actors/components/ActorMilitaryTab';
 import { ISO2_TO_ISO3 } from '@/features/actors/lib/country-codes';
 import { useXPostsByActor } from '@/features/events/queries/x-posts';
+import { ActorLeadershipGraph } from '@/features/leadership/components/ActorLeadershipGraph';
+import { isLeadershipActor } from '@/features/leadership/lib/leadership-tree-config';
+import { useActorLeadership } from '@/features/leadership/queries';
 import { Flag } from '@/shared/components/shared/Flag';
 import { IntelTabBar, TabsContent } from '@/shared/components/shared/IntelTabs';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
@@ -18,7 +26,7 @@ import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { ACT_C, STA_C } from '@/data/iran-actors';
 import type { Actor, XPost } from '@/types/domain';
 
-type DossierTab = 'intel' | 'signals' | 'military';
+type DossierTab = 'intel' | 'signals' | 'leadership' | 'military';
 
 type Props = {
   actor: Actor;
@@ -30,6 +38,7 @@ type Props = {
 };
 
 export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = false, pageScroll = false }: Props) {
+  const [inlineLeadershipOpen, setInlineLeadershipOpen] = useState(true);
   const snap   = getActorForDay(actor, currentDay);
   const actC   = ACT_C[snap?.activityLevel] ?? 'var(--t2)';
   const staC   = STA_C[snap?.stance] ?? 'var(--t2)';
@@ -39,11 +48,23 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
 
   const posts = xPosts ?? [];
   const iso3 = ISO2_TO_ISO3[actor.countryCode ?? ''];
+  const supportsLeadershipGraph = isLeadershipActor(actor);
+  const { data: leadershipTree, isLoading: isLeadershipLoading } = useActorLeadership(undefined, actor.id);
+  const hasLeadershipTree = Boolean(leadershipTree?.nodes?.some(node => node.kind === 'active'));
+  const showLeadershipGraph = supportsLeadershipGraph && hasLeadershipTree;
+  const leadershipStatus = supportsLeadershipGraph
+    ? isLeadershipLoading
+      ? 'loading'
+      : hasLeadershipTree
+        ? 'available'
+        : 'unavailable'
+    : undefined;
 
   const tabs: { value: DossierTab; label: string }[] = [
     { value: 'intel', label: 'ACTOR INTELLIGENCE' },
     { value: 'signals', label: `𝕏 SIGNALS${posts.length > 0 ? ` (${posts.length})` : ''}` },
   ];
+  if (showLeadershipGraph) tabs.push({ value: 'leadership', label: 'LEADERSHIP TREE' });
   if (iso3) tabs.push({ value: 'military', label: 'MILITARY PROFILE' });
 
   if (!snap) {
@@ -64,7 +85,7 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
           ACTOR INTELLIGENCE DOSSIER // PHAROS THREAT ANALYSIS // OPERATION EPIC FURY
         </div>
         <div className="flex items-start gap-3.5 mb-2.5">
-          {actor.countryCode && <Flag code={actor.countryCode} size={36} />}
+          <Flag actorId={actor.id} code={actor.countryCode} size={36} />
           <div className="flex-1">
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="text-base font-bold text-[var(--t1)] leading-[1.1]">
@@ -129,6 +150,29 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
             staC={staC}
             currentDay={currentDay}
             dayActions={dayActions}
+            showKeyFigures={!showLeadershipGraph}
+            leadershipStatus={leadershipStatus}
+            footer={showLeadershipGraph ? (
+              <Collapsible open={inlineLeadershipOpen} onOpenChange={setInlineLeadershipOpen}>
+                <div className="border border-[var(--bd)] bg-[var(--bg-1)]">
+                  <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-[var(--bg-2)]">
+                    <div>
+                      <div className="label mb-1 text-[8px] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
+                      <div className="section-title text-[11px] text-[var(--t1)]">Leadership tree available</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="mono text-[10px] text-[var(--t4)]">{inlineLeadershipOpen ? 'Expanded' : 'Collapsed'}</span>
+                      <ChevronDown className={cn('h-4 w-4 text-[var(--t3)] transition-transform', inlineLeadershipOpen && 'rotate-180')} />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="border-t border-[var(--bd)] bg-[var(--bg-app)]">
+                      <ActorLeadershipGraph actor={actor} inline pageScroll />
+                    </div>
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
+            ) : undefined}
           />
         </TabsContent>
 
@@ -178,12 +222,19 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
           )}
         </TabsContent>
 
+        {showLeadershipGraph && (
+          <TabsContent value="leadership" className={pageScroll ? '' : 'flex-1 min-h-0 overflow-hidden'}>
+            <ActorLeadershipGraph actor={actor} pageScroll={pageScroll} />
+          </TabsContent>
+        )}
+
         {iso3 && (
           <TabsContent value="military" className={pageScroll ? '' : 'flex-1 min-h-0 overflow-hidden'}>
             <ActorMilitaryTab actor={actor} iso3={iso3} pageScroll={pageScroll} />
           </TabsContent>
         )}
       </IntelTabBar>
+
     </div>
   );
 }
