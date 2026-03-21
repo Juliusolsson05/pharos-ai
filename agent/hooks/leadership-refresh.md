@@ -15,7 +15,9 @@ All requests require the `Authorization` header.
 
 ### 1. GET `/workspace`
 
-Returns the raw editable state for this actor's tree.
+Returns the raw editable state for this actor's leadership tree.
+
+This is the leadership-local workspace route under the leadership base path. It is not the main fulfillment `/workspace` route and you should not read or use the main fulfillment workspace for this job.
 
 **Response** `{ ok, data }` where `data` contains:
 - `actor` — `{ id, name, countryCode }`
@@ -36,14 +38,35 @@ Dry-run validation. Send the same body shape as upsert-batch.
 
 ### 3. POST `/upsert-batch`
 
-Atomic full-tree replacement. Wikipedia is auto-resolved for new persons (no existing `wikipediaResolvedAt`). You never need to handle Wikipedia yourself.
+Full-tree sync endpoint. Wikipedia is auto-resolved for new persons (no existing `wikipediaResolvedAt`). You never need to handle Wikipedia yourself.
 
-**Body:** `{ persons, roles, tenures, relations, controlStates, eventLinks }`
+**Body:** `{ persons, roles, tenures, relations, controlStates, eventLinks, pruneMissing? }`
 **Response:** `{ ok, data: { actorId, updated: true } }`
 
-**Important:** Send the FULL tree every time — this is a replace operation, not a patch. Omitting an entity deletes it.
+**Important:** This endpoint is non-destructive by default. Omitting an entity does not delete it unless you explicitly send `pruneMissing: true`.
 
-### 4. GET `/` (root)
+- Use this when you have audited and are intentionally syncing the full tree.
+- Only set `pruneMissing: true` when you are certain the submitted payload is the complete desired state.
+
+### 4. PATCH `/persons/{personId}`
+
+Targeted person update for safe localized maintenance.
+
+**Body:** partial object with any of:
+- `name`
+- `status`
+- `kind`
+- `summary`
+- `metadata`
+- `wikipediaQuery`
+- `wikipediaTitle`
+- `wikipediaPageUrl`
+- `wikipediaImageUrl`
+- `wikipediaResolvedAt`
+
+**Response:** `{ ok, data: { id, updated: true } }`
+
+### 5. GET `/` (root)
 
 Returns the projected leadership tree (read-only, formatted for display). Use this to verify your changes after writing.
 
@@ -64,7 +87,7 @@ Read `note` if present.
 
 ### 3. Read
 
-GET `/workspace` to retrieve the current raw state.
+GET the leadership `/workspace` route to retrieve the current raw state for this actor's tree. Do not read the main fulfillment workspace.
 
 ### 4. Update
 
@@ -74,8 +97,13 @@ Modify the payload to reflect the changes:
 - **Succession:** End predecessor tenure, add successor tenure. Update `controlState`.
 - **Removal:** End tenure, update `controlState` (status to `VACANT` if no replacement).
 
-POST `/validate` first. Fix any issues before proceeding.
-POST `/upsert-batch` with the full corrected tree.
+- If the change is only a person-field correction, prefer `PATCH /persons/{personId}`.
+- If the change touches roles, tenures, relations, or control states, use the workspace flow.
+
+For workspace flow:
+- POST `/validate` first. Fix any issues before proceeding.
+- POST `/upsert-batch` with the corrected tree.
+- Set `pruneMissing: true` only when you intentionally want full replacement semantics.
 
 ### 5. Verify
 
