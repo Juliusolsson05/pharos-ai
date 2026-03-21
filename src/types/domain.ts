@@ -87,6 +87,49 @@ export type Actor = {
   daySnapshots: Record<ConflictDay, ActorDaySnapshot>;
 };
 
+export type LeadershipNodeStatus = 'ALIVE' | 'DEAD' | 'UNKNOWN' | 'VACANT';
+export type LeadershipRelationType = 'REPORTS_TO' | 'ADVISES' | 'COORDINATES_WITH' | 'SUCCESSION';
+export type LeadershipControlStatus = 'STABLE' | 'VACANT' | 'DISPUTED' | 'UNKNOWN';
+
+export type LeadershipNode = {
+  id: string;
+  roleId: string;
+  personId?: string | null;
+  kind: 'active' | 'previous';
+  title: string;
+  name: string;
+  status: LeadershipNodeStatus;
+  tier: number;
+  summary: string;
+  query: string;
+  wikipediaPageUrl?: string | null;
+  wikipediaImageUrl?: string | null;
+  dateLabel?: string;
+  reportsTo: string[];
+  hasSuccession: boolean;
+  successionIndex?: number;
+};
+
+export type LeadershipEdge = {
+  id: string;
+  source: string;
+  target: string;
+  kind: 'hierarchy' | 'succession';
+  relationType: LeadershipRelationType;
+  tier: number;
+};
+
+export type LeadershipTreeResponse = {
+  actorId: string;
+  conflictId: string;
+  actorName: string;
+  countryQuerySuffix: string;
+  nodes: LeadershipNode[];
+  edges: LeadershipEdge[];
+  vacancies: string[];
+  contestedRoles: string[];
+};
+
 // Events
 
 export type Severity = 'CRITICAL' | 'HIGH' | 'STANDARD';

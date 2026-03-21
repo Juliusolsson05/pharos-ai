@@ -211,6 +211,12 @@ model Conflict {
   collections  ConflictCollection[]
   embeddings   DocumentEmbedding[]
   chatSessions ChatSession[]
+  leadershipPeople        LeadershipPerson[]
+  leadershipRoles         LeadershipRole[]
+  leadershipRelations     LeadershipRoleRelation[]
+  leadershipTenures       LeadershipTenure[]
+  leadershipControlStates LeadershipControlState[]
+  leadershipEventLinks    LeadershipEventLink[]
 }
 
 model AnonymousVisitor {
@@ -386,6 +392,12 @@ model Actor {
   actions      ActorAction[]
   responses    EventActorResponse[]
   xPosts       XPost[]
+  leadershipPeople        LeadershipPerson[]
+  leadershipRoles         LeadershipRole[]
+  leadershipRelations     LeadershipRoleRelation[]
+  leadershipTenures       LeadershipTenure[]
+  leadershipControlStates LeadershipControlState[]
+  leadershipEventLinks    LeadershipEventLink[]
 
   @@index([conflictId])
 }
@@ -453,6 +465,7 @@ model IntelEvent {
   sources        EventSource[]
   actorResponses EventActorResponse[]
   xPosts         XPost[]
+  leadershipEventLinks LeadershipEventLink[]
 
   @@index([conflictId, timestamp])
   @@index([severity])
@@ -724,4 +737,172 @@ model PredictionGroup {
   updatedAt DateTime @updatedAt
 
   @@unique([ord])
+}
+
+// ────────────────────────────────────────────────────────────────
+// Leadership Trees
+// ────────────────────────────────────────────────────────────────
+
+model LeadershipPerson {
+  id         String
+  conflictId String
+  actorId    String
+  name       String
+  status     String
+  kind       String?
+  summary    String?
+  wikipediaQuery     String?
+  wikipediaTitle     String?
+  wikipediaPageUrl   String?
+  wikipediaImageUrl  String?
+  wikipediaResolvedAt DateTime?
+  metadata   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conflict Conflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  actor    Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  tenures           LeadershipTenure[]       @relation("LeadershipTenurePerson")
+  deFactoStates     LeadershipControlState[] @relation("LeadershipDeFactoPerson")
+  deJureStates      LeadershipControlState[] @relation("LeadershipDeJurePerson")
+  eventLinks        LeadershipEventLink[]    @relation("LeadershipEventLinkPerson")
+
+  @@id([conflictId, actorId, id])
+  @@index([conflictId, actorId])
+}
+
+model LeadershipRole {
+  id          String
+  conflictId  String
+  actorId     String
+  title       String
+  level       Int
+  ord         Int      @default(0)
+  description String?
+  metadata    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conflict Conflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  actor    Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  tenures      LeadershipTenure[]
+  outgoing     LeadershipRoleRelation[] @relation("LeadershipRelationFromRole")
+  incoming     LeadershipRoleRelation[] @relation("LeadershipRelationToRole")
+  controlState LeadershipControlState?
+  eventLinks   LeadershipEventLink[]
+
+  @@id([conflictId, actorId, id])
+  @@unique([conflictId, actorId, ord])
+  @@index([conflictId, actorId, level])
+}
+
+model LeadershipRoleRelation {
+  id           String   @id @default(cuid())
+  conflictId   String
+  actorId      String
+  fromRoleId   String
+  toRoleId     String
+  relationType String
+  ord          Int      @default(0)
+  metadata     Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conflict Conflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  actor    Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  fromRole LeadershipRole @relation("LeadershipRelationFromRole", fields: [conflictId, actorId, fromRoleId], references: [conflictId, actorId, id], onDelete: Cascade)
+  toRole   LeadershipRole @relation("LeadershipRelationToRole", fields: [conflictId, actorId, toRoleId], references: [conflictId, actorId, id], onDelete: Cascade)
+
+  @@unique([conflictId, actorId, fromRoleId, toRoleId, relationType])
+  @@index([conflictId, actorId, fromRoleId])
+  @@index([conflictId, actorId, toRoleId])
+}
+
+model LeadershipTenure {
+  id                 String
+  conflictId         String
+  actorId            String
+  roleId             String
+  personId           String?
+  startDate          DateTime @db.Date
+  endDate            DateTime? @db.Date
+  isActive           Boolean   @default(false)
+  isActing           Boolean   @default(false)
+  isNominee          Boolean   @default(false)
+  startReason        String?
+  endReason          String?
+  predecessorTenureId String?
+  successorTenureId   String?
+  metadata           Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conflict Conflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  actor    Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  role     LeadershipRole   @relation(fields: [conflictId, actorId, roleId], references: [conflictId, actorId, id], onDelete: Cascade)
+  person   LeadershipPerson? @relation("LeadershipTenurePerson", fields: [conflictId, actorId, personId], references: [conflictId, actorId, id], onDelete: NoAction)
+
+  eventLinks LeadershipEventLink[]
+
+  @@id([conflictId, actorId, id])
+  @@index([conflictId, actorId, roleId])
+  @@index([conflictId, actorId, personId])
+  @@index([conflictId, actorId, isActive])
+}
+
+model LeadershipControlState {
+  id             String   @id @default(cuid())
+  conflictId     String
+  actorId        String
+  roleId         String
+  deFactoPersonId String?
+  deJurePersonId  String?
+  status         String
+  contested      Boolean  @default(false)
+  note           String?
+  metadata       Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conflict Conflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  actor    Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  role     LeadershipRole   @relation(fields: [conflictId, actorId, roleId], references: [conflictId, actorId, id], onDelete: Cascade)
+  deFactoPerson LeadershipPerson? @relation("LeadershipDeFactoPerson", fields: [conflictId, actorId, deFactoPersonId], references: [conflictId, actorId, id], onDelete: NoAction)
+  deJurePerson  LeadershipPerson? @relation("LeadershipDeJurePerson", fields: [conflictId, actorId, deJurePersonId], references: [conflictId, actorId, id], onDelete: NoAction)
+
+  @@unique([conflictId, actorId, roleId])
+  @@index([conflictId, actorId])
+}
+
+model LeadershipEventLink {
+  id         String   @id @default(cuid())
+  conflictId String
+  actorId    String
+  eventId    String
+  roleId     String?
+  personId   String?
+  tenureId   String?
+  kind       String
+  ord        Int      @default(0)
+  metadata   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conflict Conflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  actor    Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  event    IntelEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  role     LeadershipRole? @relation(fields: [conflictId, actorId, roleId], references: [conflictId, actorId, id], onDelete: NoAction)
+  person   LeadershipPerson? @relation("LeadershipEventLinkPerson", fields: [conflictId, actorId, personId], references: [conflictId, actorId, id], onDelete: NoAction)
+  tenure   LeadershipTenure? @relation(fields: [conflictId, actorId, tenureId], references: [conflictId, actorId, id], onDelete: NoAction)
+
+  @@index([conflictId, actorId])
+  @@index([eventId])
 }
