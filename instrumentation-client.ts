@@ -1,9 +1,10 @@
 import posthog from 'posthog-js';
 
 const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY ?? process.env.NEXT_PUBLIC_POSTHOG_TOKEN;
+const analyticsEnabled = process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === 'true';
 const showCookieControls = process.env.NEXT_PUBLIC_SHOW_COOKIE_CONTROLS === 'true';
 
-if (posthogKey) {
+if (posthogKey && analyticsEnabled) {
   posthog.init(posthogKey, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://eu.i.posthog.com',
     autocapture: false,

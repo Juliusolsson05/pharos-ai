@@ -27,6 +27,9 @@ export const publicPosthogKey: string | undefined =
 export const publicPosthogHost: string =
   process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://eu.i.posthog.com';
 
+export const publicAnalyticsEnabled: boolean =
+  process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === 'true';
+
 /* ── server-only env vars ──────────────────────────────────────── */
 
 // Lazy getter — only evaluated when called on the server.
