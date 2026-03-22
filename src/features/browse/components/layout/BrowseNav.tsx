@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 
 import { BROWSE_SECTIONS } from '@/features/browse/constants';
 
+import { trackNavigationClicked } from '@/shared/lib/analytics';
+import { useAnalyticsLayoutMode } from '@/shared/hooks/use-analytics-layout-mode';
+
 import { GITHUB_URL, KOFI_URL } from '@/data/external-links';
 
 type Props = {
@@ -17,6 +20,18 @@ type Props = {
 
 export function BrowseNav({ hamburgerSlot }: Props) {
   const pathname = usePathname();
+  const layoutMode = useAnalyticsLayoutMode();
+
+  const trackBrowseNavigation = (destinationPath: string, component: string, ctaVariant?: string) => {
+    trackNavigationClicked({
+      component,
+      cta_variant: ctaVariant,
+      destination_path: destinationPath,
+      layout_mode: layoutMode,
+      pathname,
+      surface: 'browse_navigation',
+    });
+  };
 
   return (
     <header className="shrink-0 border-b border-[var(--bd)]">
@@ -37,6 +52,10 @@ export function BrowseNav({ hamburgerSlot }: Props) {
                 <Link
                   key={s.href}
                   href={s.href}
+                  onClick={() => {
+                    if (isActive) return;
+                    trackBrowseNavigation(s.href, 'top_nav');
+                  }}
                   className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
                     isActive
                       ? 'text-[var(--t1)] border-[var(--blue)]'
@@ -49,6 +68,10 @@ export function BrowseNav({ hamburgerSlot }: Props) {
             })}
             <Link
               href="/browse/api/reference"
+              onClick={() => {
+                if (pathname.startsWith('/browse/api/reference')) return;
+                trackBrowseNavigation('/browse/api/reference', 'top_nav');
+              }}
               className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
                 pathname.startsWith('/browse/api/reference')
                   ? 'text-[var(--t1)] border-[var(--blue)]'
@@ -66,7 +89,12 @@ export function BrowseNav({ hamburgerSlot }: Props) {
             asChild
             className="hidden md:inline-flex bg-[var(--blue)] text-[var(--bg-app)] font-bold hover:bg-[var(--blue-l)]"
           >
-            <Link href="/dashboard">Dashboard &rarr;</Link>
+            <Link
+              href="/dashboard"
+              onClick={() => trackBrowseNavigation('/dashboard', 'header_cta', 'dashboard')}
+            >
+              Dashboard &rarr;
+            </Link>
           </Button>
 
           <Button

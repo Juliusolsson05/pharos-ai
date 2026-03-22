@@ -13,7 +13,6 @@ import { ListDetailScreenSkeleton } from '@/shared/components/loading/screen-ske
 import { EmptyState } from '@/shared/components/shared/EmptyState';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
 
-import { track } from '@/shared/lib/analytics';
 import { dayLabel, dayShort, getDayFromTimestamp, getPostsForDay } from '@/shared/lib/day-filter';
 import { timeAgo } from '@/shared/lib/format';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
@@ -129,10 +128,10 @@ export function SignalsContent() {
       totalShown={filtered.length}
       totalAll={allPosts?.length ?? 0}
       lastUpdated={lastUpdated}
-      onSigChange={(s, v) => { setSigFilter(p => ({ ...p, [s]: v })); track('signals_filter_changed', { filter: 'significance', value: s, enabled: v }); }}
-      onAcctChange={(a, v) => { setAcctFilter(p => ({ ...p, [a]: v })); track('signals_filter_changed', { filter: 'account_type', value: a, enabled: v }); }}
-      onPharosOnly={v => { setPharosOnly(v); track('signals_filter_changed', { filter: 'pharos_only', enabled: v }); }}
-      onVerifiedOnly={v => { setVerifiedOnly(v); track('signals_filter_changed', { filter: 'verified_only', enabled: v }); }}
+      onSigChange={(s, v) => { setSigFilter(p => ({ ...p, [s]: v })); }}
+      onAcctChange={(a, v) => { setAcctFilter(p => ({ ...p, [a]: v })); }}
+      onPharosOnly={v => { setPharosOnly(v); }}
+      onVerifiedOnly={v => { setVerifiedOnly(v); }}
       currentDay={currentDay}
       onDayChange={(day) => { setDay(day); setShowAll(false); }}
       showAll={showAll}

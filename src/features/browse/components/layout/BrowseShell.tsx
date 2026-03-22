@@ -79,7 +79,7 @@ export function BrowseShell({ children }: Props) {
         <main className="flex-1 min-h-0">
           {isDetailPage && <BrowseArticleBanner />}
           {children}
-          {isLanding && <BrowseFooter />}
+          <BrowseFooter />
         </main>
         {showDesktopSidebar && <CriticalTimeline />}
       </div>

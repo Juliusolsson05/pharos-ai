@@ -4,6 +4,8 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { SelectedItem } from '@/features/map/components/types';
 import { extractInitialState } from '@/features/map/lib/map-filter-engine';
 
+import { hasPreferencesConsent, MAP_STORAGE_KEY } from '@/shared/lib/analytics/consent';
+
 import type { MapStory } from '@/types/domain';
 
 // Types
@@ -42,8 +44,6 @@ export type MapState = {
 
 // localStorage persistence
 
-const MAP_STORAGE_KEY = 'pharos:map:v1';
-
 type PersistedMapPrefs = {
   sidebarOpen: boolean;
   mapStyle: 'dark' | 'satellite';
@@ -51,6 +51,7 @@ type PersistedMapPrefs = {
 
 function loadPersistedMapPrefs(): Partial<PersistedMapPrefs> | undefined {
   if (typeof window === 'undefined') return undefined;
+  if (!hasPreferencesConsent()) return undefined;
   try {
     const raw = localStorage.getItem(MAP_STORAGE_KEY);
     if (raw) return JSON.parse(raw) as PersistedMapPrefs;
@@ -60,6 +61,7 @@ function loadPersistedMapPrefs(): Partial<PersistedMapPrefs> | undefined {
 
 export function persistMapPrefs(state: MapState): void {
   if (typeof window === 'undefined') return;
+  if (!hasPreferencesConsent()) return;
   try {
     const persisted: PersistedMapPrefs = {
       sidebarOpen: state.sidebarOpen,

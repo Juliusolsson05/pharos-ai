@@ -94,7 +94,16 @@ export function FeedContent() {
                 BACK TO FEED
               </Button>
             </div>
-            <EventDetail event={selected} tab={tab} onTabChange={setTab} compact={usePageScroll} pageScroll={usePageScroll} />
+            <EventDetail
+              event={selected}
+              tab={tab}
+              onTabChange={nextTab => {
+                setTab(nextTab);
+                track('event_tab_changed', { event_id: selected.id, tab: nextTab });
+              }}
+              compact={usePageScroll}
+              pageScroll={usePageScroll}
+            />
           </>
         ) : (
           <>

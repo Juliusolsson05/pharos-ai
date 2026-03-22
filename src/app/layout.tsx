@@ -1,11 +1,10 @@
-import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 
 import { Toaster } from '@/components/ui/sonner';
 
 import { SITE_URL } from '@/features/browse/constants';
+import { CookieConsentProvider } from '@/shared/components/privacy/CookieConsentProvider';
 
-import { PostHogPageView } from '@/shared/lib/posthog-provider';
 import { QueryProvider } from '@/shared/lib/query-provider';
 import { ReduxProvider } from '@/shared/state/redux-provider';
 
@@ -56,14 +55,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <PostHogPageView />
-        <ReduxProvider>
-          <QueryProvider>
-            {children}
-            <Toaster theme="dark" position="bottom-right" />
-          </QueryProvider>
-        </ReduxProvider>
-        <Analytics />
+        <CookieConsentProvider>
+          <ReduxProvider>
+            <QueryProvider>
+              {children}
+              <Toaster theme="dark" position="bottom-right" />
+            </QueryProvider>
+          </ReduxProvider>
+        </CookieConsentProvider>
       </body>
     </html>
   );

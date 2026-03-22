@@ -9,13 +9,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 import { useBootstrap } from '@/features/dashboard/queries';
 import { useConflict } from '@/features/dashboard/queries/conflicts';
 import { useEvents } from '@/features/events/queries';
+import { useCookieConsent } from '@/shared/components/privacy/CookieConsentProvider';
 
+import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
 import { fmtDate } from '@/shared/lib/format';
 import { useHorizontalWheelScroll } from '@/shared/hooks/use-horizontal-wheel-scroll';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
@@ -23,6 +26,8 @@ import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 import { useLandscapeHeaderVisibility } from '@/shared/hooks/use-landscape-header-visibility';
 
 import { GITHUB_URL, KOFI_URL } from '@/data/external-links';
+
+import { SHOW_COOKIE_CONTROLS } from '@/shared/config/privacy';
 
 const NAV = [
   { label: 'OVERVIEW',    href: '/dashboard'              },
@@ -63,6 +68,19 @@ export function Header() {
     ? [...events].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]?.timestamp
     : undefined;
   const displayDate = latestDate ? fmtDate(latestDate) : (conflict ? fmtDate(conflict.startDate) : '');
+  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone, isMobile });
+
+  const trackHeaderNavigation = (destinationPath: string, component: string) => {
+    if (destinationPath === path) return;
+
+    trackNavigationClicked({
+      component,
+      destination_path: destinationPath,
+      layout_mode: layoutMode,
+      pathname: path,
+      surface: 'dashboard_header',
+    });
+  };
 
   return (
     <header
@@ -110,12 +128,17 @@ export function Header() {
             {NAV.map(item => {
               const active = isActive(item.href);
               return (
-                <Link key={item.href} href={item.href} className="no-underline flex items-stretch shrink-0">
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="no-underline flex items-stretch shrink-0"
+                  onClick={() => trackHeaderNavigation(item.href, 'top_nav')}
+                >
                   <div className={`nav-item${active ? ' active' : ''}`}>{item.label}</div>
                 </Link>
               );
             })}
-            <MoreDropdown />
+            <MoreDropdown layoutMode={layoutMode} pathname={path} />
           </nav>
         </div>
       )}
@@ -175,12 +198,13 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className="no-underline flex items-stretch"
+                  onClick={() => trackHeaderNavigation(item.href, 'top_nav')}
                 >
                   <div className={`nav-item${active ? ' active' : ''}`}>{item.label}</div>
                 </Link>
               );
             })}
-            <MoreDropdown />
+            <MoreDropdown layoutMode={layoutMode} pathname={path} />
           </nav>
 
           {/* ── Right side ── */}
@@ -234,7 +258,25 @@ export function Header() {
   );
 }
 
-function MoreDropdown() {
+function MoreDropdown({
+  layoutMode,
+  pathname,
+}: {
+  layoutMode: ReturnType<typeof getAnalyticsLayoutMode>;
+  pathname: string;
+}) {
+  const { openPreferences } = useCookieConsent();
+
+  const trackMoreNavigation = (destinationPath: string) => {
+    trackNavigationClicked({
+      component: 'more_menu',
+      destination_path: destinationPath,
+      layout_mode: layoutMode,
+      pathname,
+      surface: 'dashboard_header',
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -248,11 +290,26 @@ function MoreDropdown() {
         className="bg-[var(--bg-1)] border-[var(--bd)] text-[var(--t1)] [--accent:var(--bg-3)] [--accent-foreground:var(--t1)]"
       >
         <DropdownMenuItem asChild>
-          <Link href="/browse" className="no-underline">Browse</Link>
+          <Link href="/browse" className="no-underline" onClick={() => trackMoreNavigation('/browse')}>Browse</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/browse/api/reference" className="no-underline">API</Link>
+          <Link href="/browse/api/reference" className="no-underline" onClick={() => trackMoreNavigation('/browse/api/reference')}>API</Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-[var(--bd)]" />
+        <DropdownMenuItem asChild>
+          <Link href="/privacy" className="no-underline">Privacy</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/cookies" className="no-underline">Cookies</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/terms" className="no-underline">Terms</Link>
+        </DropdownMenuItem>
+        {SHOW_COOKIE_CONTROLS ? (
+          <DropdownMenuItem onClick={openPreferences}>
+            Cookie settings
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

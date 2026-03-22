@@ -8,14 +8,27 @@ import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
-const STORAGE_KEY = 'pharos:browse-article-banner-dismissed';
+import {
+  BROWSE_ARTICLE_BANNER_STORAGE_KEY,
+  hasPreferencesConsent,
+} from '@/shared/lib/analytics/consent';
 
-function subscribe() {
-  return () => {};
+function subscribe(callback: () => void) {
+  if (typeof window === 'undefined') return () => {};
+
+  const handleChange = () => callback();
+  window.addEventListener('storage', handleChange);
+  window.addEventListener('pharos-cookie-consent-changed', handleChange);
+
+  return () => {
+    window.removeEventListener('storage', handleChange);
+    window.removeEventListener('pharos-cookie-consent-changed', handleChange);
+  };
 }
 
 function getDismissedSnapshot() {
-  return localStorage.getItem(STORAGE_KEY) === '1';
+  if (!hasPreferencesConsent()) return false;
+  return localStorage.getItem(BROWSE_ARTICLE_BANNER_STORAGE_KEY) === '1';
 }
 
 function getDismissedServerSnapshot() {
@@ -31,7 +44,13 @@ export function BrowseArticleBanner() {
   const [isLocallyDismissed, setIsLocallyDismissed] = useState(false);
 
   function handleDismiss() {
-    localStorage.setItem(STORAGE_KEY, '1');
+    if (!hasPreferencesConsent()) {
+      setIsLocallyDismissed(true);
+      return;
+    }
+
+    localStorage.setItem(BROWSE_ARTICLE_BANNER_STORAGE_KEY, '1');
+    window.dispatchEvent(new CustomEvent('pharos-cookie-consent-changed'));
     setIsLocallyDismissed(true);
   }
 
