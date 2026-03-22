@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 
 import { BROWSE_SECTIONS } from '@/features/browse/constants';
 
-import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
+import { trackNavigationClicked } from '@/shared/lib/analytics';
+import { useAnalyticsLayoutMode } from '@/shared/hooks/use-analytics-layout-mode';
 
 import { GITHUB_URL, KOFI_URL } from '@/data/external-links';
 
@@ -19,7 +20,7 @@ type Props = {
 
 export function BrowseNav({ hamburgerSlot }: Props) {
   const pathname = usePathname();
-  const layoutMode = getAnalyticsLayoutMode({ isMobile: false });
+  const layoutMode = useAnalyticsLayoutMode();
 
   const trackBrowseNavigation = (destinationPath: string, component: string, ctaVariant?: string) => {
     trackNavigationClicked({
@@ -51,7 +52,10 @@ export function BrowseNav({ hamburgerSlot }: Props) {
                 <Link
                   key={s.href}
                   href={s.href}
-                  onClick={() => trackBrowseNavigation(s.href, 'top_nav')}
+                  onClick={() => {
+                    if (isActive) return;
+                    trackBrowseNavigation(s.href, 'top_nav');
+                  }}
                   className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
                     isActive
                       ? 'text-[var(--t1)] border-[var(--blue)]'
@@ -64,7 +68,10 @@ export function BrowseNav({ hamburgerSlot }: Props) {
             })}
             <Link
               href="/browse/api/reference"
-              onClick={() => trackBrowseNavigation('/browse/api/reference', 'top_nav')}
+              onClick={() => {
+                if (pathname.startsWith('/browse/api/reference')) return;
+                trackBrowseNavigation('/browse/api/reference', 'top_nav');
+              }}
               className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
                 pathname.startsWith('/browse/api/reference')
                   ? 'text-[var(--t1)] border-[var(--blue)]'

@@ -5,7 +5,6 @@ export type AnalyticsEventName =
   | 'actor_tab_changed'
   | 'brief_view_changed'
   | 'dashboard_view_changed'
-  | 'data_source_opened'
   | 'economics_index_focused'
   | 'economics_range_changed'
   | 'event_selected'

@@ -8,17 +8,27 @@ import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
-import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+import {
+  BROWSE_ARTICLE_BANNER_STORAGE_KEY,
+  hasPreferencesConsent,
+} from '@/shared/lib/analytics/consent';
 
-const STORAGE_KEY = 'pharos:browse-article-banner-dismissed';
+function subscribe(callback: () => void) {
+  if (typeof window === 'undefined') return () => {};
 
-function subscribe() {
-  return () => {};
+  const handleChange = () => callback();
+  window.addEventListener('storage', handleChange);
+  window.addEventListener('pharos-cookie-consent-changed', handleChange);
+
+  return () => {
+    window.removeEventListener('storage', handleChange);
+    window.removeEventListener('pharos-cookie-consent-changed', handleChange);
+  };
 }
 
 function getDismissedSnapshot() {
   if (!hasPreferencesConsent()) return false;
-  return localStorage.getItem(STORAGE_KEY) === '1';
+  return localStorage.getItem(BROWSE_ARTICLE_BANNER_STORAGE_KEY) === '1';
 }
 
 function getDismissedServerSnapshot() {
@@ -39,7 +49,8 @@ export function BrowseArticleBanner() {
       return;
     }
 
-    localStorage.setItem(STORAGE_KEY, '1');
+    localStorage.setItem(BROWSE_ARTICLE_BANNER_STORAGE_KEY, '1');
+    window.dispatchEvent(new CustomEvent('pharos-cookie-consent-changed'));
     setIsLocallyDismissed(true);
   }
 

@@ -17,8 +17,16 @@ export default function PrivacyPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-[var(--t1)]">Necessary storage</h2>
         <p>
-          The app uses strictly necessary storage for things like anonymous chat session continuity, workspace layout persistence,
-          map preferences, and similar product settings. These are used to keep the application functional and are not disabled by the analytics toggle.
+          Conflicts.app uses a small amount of strictly necessary storage for core request handling, security, and basic app delivery.
+          This category does not include optional remembered preferences or analytics.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-[var(--t1)]">Preference storage</h2>
+        <p>
+          Preference storage covers optional remembered behavior like anonymous chat continuity, workspace layout persistence,
+          map UI preferences, and dismissible interface state. These improve convenience, but they are separate from strictly necessary storage.
         </p>
       </section>
 
@@ -38,14 +46,15 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-semibold text-[var(--t1)]">Local storage and cookies</h2>
         <p>
           Conflicts.app uses both browser local storage and cookies. Local storage is used for interface state such as layouts
-          and filters. A necessary cookie is used for anonymous chat continuity. Optional analytics cookies or storage are only enabled after consent.
+          and filters. A chat visitor cookie may be used when remembered chat continuity is enabled. Analytics storage is separate from preference storage.
         </p>
       </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-[var(--t1)]">Your choices</h2>
         <p>
-          You can reject analytics on first visit, accept them, or reopen cookie settings later from the app navigation or footer.
+          Where consent controls are enabled, you can accept or reject optional storage and revisit those choices later.
+          In environments where those controls are not currently shown, the app may operate with analytics and preference storage enabled by default.
           You can also review our dedicated Cookie Policy for a more explicit breakdown of storage categories.
         </p>
       </section>

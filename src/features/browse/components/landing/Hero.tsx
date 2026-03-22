@@ -4,12 +4,13 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
-import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
+import { trackNavigationClicked } from '@/shared/lib/analytics';
+import { useAnalyticsLayoutMode } from '@/shared/hooks/use-analytics-layout-mode';
 
 import { GITHUB_URL } from '@/data/external-links';
 
 export function Hero() {
-  const layoutMode = getAnalyticsLayoutMode({ isMobile: false });
+  const layoutMode = useAnalyticsLayoutMode();
 
   return (
     <section className="px-5 pt-16 pb-12 max-w-3xl mx-auto">

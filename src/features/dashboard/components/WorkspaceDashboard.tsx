@@ -122,6 +122,8 @@ export function WorkspaceDashboard() {
               variant={activePreset === id ? 'outline' : 'ghost'}
               size="xs"
               onClick={() => {
+                if (activePreset === id) return;
+
                 dispatch(applyPreset(id));
                 trackDashboardViewChanged({
                   control: 'preset',
@@ -150,6 +152,8 @@ export function WorkspaceDashboard() {
           <DaySelector
             currentDay={effectiveDashDay}
             onDayChange={day => {
+              if (day === effectiveDashDay) return;
+
               setDashDay(day);
               trackDashboardViewChanged({
                 control: 'day',

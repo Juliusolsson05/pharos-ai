@@ -29,18 +29,19 @@ import mapReducer, {
   toggleType,
 } from '@/features/map/state/map-slice';
 
-import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+import {
+  hasPreferencesConsent,
+  WORKSPACE_STORAGE_KEY_V3,
+  WORKSPACE_STORAGE_KEY_V4,
+} from '@/shared/lib/analytics/consent';
 
 // localStorage persistence
-
-const STORAGE_KEY_V4 = 'pharos:workspace:v4';
-const STORAGE_KEY_V3 = 'pharos:workspace:v3';
 
 function loadPersistedState(): { workspace: WorkspaceState } | undefined {
   if (typeof window === 'undefined') return undefined;
   if (!hasPreferencesConsent()) return undefined;
   try {
-    const v4 = localStorage.getItem(STORAGE_KEY_V4);
+    const v4 = localStorage.getItem(WORKSPACE_STORAGE_KEY_V4);
     if (v4) {
       const parsed = JSON.parse(v4) as Partial<WorkspaceState> & Pick<WorkspaceState, 'columns' | 'activePreset' | 'editing'>;
       return {
@@ -53,7 +54,7 @@ function loadPersistedState(): { workspace: WorkspaceState } | undefined {
     }
 
     // Migrate from v3
-    const v3 = localStorage.getItem(STORAGE_KEY_V3);
+    const v3 = localStorage.getItem(WORKSPACE_STORAGE_KEY_V3);
     if (v3) {
       const parsed = JSON.parse(v3) as { columns: Column[] };
       const migrated: WorkspaceState = {
@@ -90,7 +91,7 @@ listenerMiddleware.startListening({
     if (!hasPreferencesConsent()) return;
     try {
       const state = listenerApi.getState() as RootState;
-      localStorage.setItem(STORAGE_KEY_V4, JSON.stringify(state.workspace));
+      localStorage.setItem(WORKSPACE_STORAGE_KEY_V4, JSON.stringify(state.workspace));
     } catch { /* quota exceeded, etc */ }
   },
 });

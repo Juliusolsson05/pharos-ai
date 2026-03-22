@@ -4,10 +4,11 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
-import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
+import { trackNavigationClicked } from '@/shared/lib/analytics';
+import { useAnalyticsLayoutMode } from '@/shared/hooks/use-analytics-layout-mode';
 
 export function FooterCta() {
-  const layoutMode = getAnalyticsLayoutMode({ isMobile: false });
+  const layoutMode = useAnalyticsLayoutMode();
 
   return (
     <section className="px-5 py-16 max-w-3xl mx-auto text-center">

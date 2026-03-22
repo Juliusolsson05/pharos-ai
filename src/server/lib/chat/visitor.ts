@@ -2,9 +2,9 @@ import { cookies } from 'next/headers';
 
 import { createHash, randomBytes } from 'crypto';
 
+import { CHAT_VISITOR_COOKIE_NAME } from '@/shared/lib/analytics/consent';
 import { prisma } from '@/server/lib/db';
 
-const COOKIE_NAME = 'pharos_vid';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 180;
 
 type ResolveAnonymousVisitorOptions = {
@@ -22,7 +22,7 @@ function createToken() {
 
 export async function resolveAnonymousVisitor(options?: ResolveAnonymousVisitorOptions) {
   const cookieStore = await cookies();
-  const existingToken = options?.visitorToken?.trim() || cookieStore.get(COOKIE_NAME)?.value;
+  const existingToken = options?.visitorToken?.trim() || cookieStore.get(CHAT_VISITOR_COOKIE_NAME)?.value;
 
   if (existingToken) {
     const visitor = await prisma.anonymousVisitor.findUnique({
@@ -46,7 +46,7 @@ export async function resolveAnonymousVisitor(options?: ResolveAnonymousVisitorO
   });
 
   if (options?.persistVisitor !== false) {
-    cookieStore.set(COOKIE_NAME, token, {
+    cookieStore.set(CHAT_VISITOR_COOKIE_NAME, token, {
       httpOnly: true,
       maxAge: COOKIE_MAX_AGE,
       path: '/',
@@ -56,4 +56,9 @@ export async function resolveAnonymousVisitor(options?: ResolveAnonymousVisitorO
   }
 
   return visitor;
+}
+
+export async function clearAnonymousVisitorCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete(CHAT_VISITOR_COOKIE_NAME);
 }

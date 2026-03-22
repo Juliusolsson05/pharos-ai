@@ -14,8 +14,9 @@ import { ConflictBanner } from '@/features/news/components/ConflictBanner';
 import { useRssCollections, useRssFeedItems, useRssFeeds } from '@/features/news/queries';
 import { EmptyState } from '@/shared/components/shared/EmptyState';
 
-import { getAnalyticsLayoutMode, track, trackNavigationClicked } from '@/shared/lib/analytics';
+import { track, trackNavigationClicked } from '@/shared/lib/analytics';
 import { queryKeys } from '@/shared/lib/query/keys';
+import { useAnalyticsLayoutMode } from '@/shared/hooks/use-analytics-layout-mode';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 import { useNow } from '@/shared/hooks/use-now';
@@ -28,7 +29,7 @@ export function NewsContent() {
   const [showImages, setShowImages] = useState(true);
   const isLandscapePhone = useIsLandscapePhone();
   const onLandscapeScroll = useLandscapeScrollEmitter(isLandscapePhone);
-  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone });
+  const layoutMode = useAnalyticsLayoutMode();
   const now = useNow();
   const queryClient = useQueryClient();
 
@@ -87,7 +88,11 @@ export function NewsContent() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => { setViewMode('conflict'); track('news_view_changed', { mode: 'conflict' }); }}
+                onClick={() => {
+                  if (viewMode === 'conflict') return;
+                  setViewMode('conflict');
+                  track('news_view_changed', { mode: 'conflict' });
+                }}
                 className={`px-3 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider ${
                   viewMode === 'conflict'
                     ? 'bg-[var(--danger-dim)] text-[var(--danger)] border border-[var(--danger-bd)]'
@@ -99,7 +104,11 @@ export function NewsContent() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => { setViewMode('all'); track('news_view_changed', { mode: 'all' }); }}
+                onClick={() => {
+                  if (viewMode === 'all') return;
+                  setViewMode('all');
+                  track('news_view_changed', { mode: 'all' });
+                }}
                 className={`px-3 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider ${
                   viewMode === 'all'
                     ? 'bg-white/10 text-white border border-white/20'

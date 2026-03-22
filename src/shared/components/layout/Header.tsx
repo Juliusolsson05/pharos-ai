@@ -71,6 +71,8 @@ export function Header() {
   const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone, isMobile });
 
   const trackHeaderNavigation = (destinationPath: string, component: string) => {
+    if (destinationPath === path) return;
+
     trackNavigationClicked({
       component,
       destination_path: destinationPath,

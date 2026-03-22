@@ -10,8 +10,8 @@ export default function CookiesPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-[var(--t1)]">Storage categories</h2>
         <p>
-          We separate storage into necessary functionality and optional analytics. Necessary storage stays enabled because the product depends on it.
-          Analytics stays off until you grant consent.
+          We separate storage into necessary functionality, optional preferences, and optional analytics. Necessary storage stays enabled because the product depends on it.
+          Preference storage and analytics may be controlled separately where consent controls are available.
         </p>
         <div>
           <OpenCookiePreferencesButton
@@ -24,8 +24,16 @@ export default function CookiesPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-[var(--t1)]">Necessary</h2>
         <p>
-          Necessary storage supports anonymous chat continuity, dashboard layout persistence, map preferences, and related interface behavior.
-          These items are used to provide the service and are not switched off by the analytics preference.
+          Necessary storage is limited to core request handling, security, and basic application delivery.
+          It does not include remembered preferences, analytics, or optional chat continuity.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-[var(--t1)]">Preferences</h2>
+        <p>
+          Preference storage covers remembered chat continuity, dashboard layout persistence, map preferences, and similar convenience features.
+          If optional storage is turned off, those features can still work in-session but may no longer be remembered on device.
         </p>
       </section>
 
@@ -40,8 +48,8 @@ export default function CookiesPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold text-[var(--t1)]">Changing your decision</h2>
         <p>
-          You can reopen cookie settings at any time from the dashboard menu, the public footer, or the button on this page.
-          If you turn analytics off later, future analytics capture in your browser is disabled.
+          When cookie controls are enabled in the product, you can reopen settings from the dashboard menu, public footer, or the button on this page.
+          If optional storage is turned off later, future analytics capture is disabled and remembered preference storage is cleared where supported.
         </p>
       </section>
     </LegalPage>

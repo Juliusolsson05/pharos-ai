@@ -19,6 +19,7 @@ import { CookiePreferencesDialog } from '@/shared/components/privacy/CookiePrefe
 
 import { capturePageview, syncAnalyticsConsent } from '@/shared/lib/analytics/client';
 import {
+  clearPreferenceStorage,
   COOKIE_CONSENT_STORAGE_KEY,
   type CookieConsent,
   createConsent,
@@ -47,12 +48,20 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
   const consent = getEffectiveConsent(storedConsent);
   const requiresConsentBanner = SHOW_COOKIE_CONTROLS && hasHydrated && isConsentRegion() && !storedConsent;
   const analyticsEnabled = consent?.analytics === true;
+  const preferencesEnabled = consent?.preferences === true;
 
   useEffect(() => {
     if (!hasHydrated) return;
 
     syncAnalyticsConsent(analyticsEnabled);
   }, [analyticsEnabled, hasHydrated]);
+
+  useEffect(() => {
+    if (!hasHydrated || preferencesEnabled) return;
+
+    clearPreferenceStorage();
+    void fetch('/api/v1/chat/visitor', { method: 'DELETE' }).catch(() => {});
+  }, [hasHydrated, preferencesEnabled]);
 
   useEffect(() => {
     if (!hasHydrated || !analyticsEnabled || !pathname) return;

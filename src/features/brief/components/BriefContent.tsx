@@ -59,6 +59,8 @@ export function BriefContent() {
             <DaySelector
               currentDay={currentDay}
               onDayChange={day => {
+                if (day === currentDay) return;
+
                 setDay(day);
                 trackBriefViewChanged({
                   control: 'day',

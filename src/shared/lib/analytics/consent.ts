@@ -2,6 +2,12 @@ import { SHOW_COOKIE_CONTROLS } from '@/shared/config/privacy';
 
 export const COOKIE_CONSENT_VERSION = '2026-03-22';
 export const COOKIE_CONSENT_STORAGE_KEY = 'pharos:cookie-consent:v1';
+export const BROWSE_ARTICLE_BANNER_STORAGE_KEY = 'pharos:browse-article-banner-dismissed';
+export const CHAT_VISITOR_COOKIE_NAME = 'pharos_vid';
+export const MAP_STORAGE_KEY = 'pharos:map:v1';
+export const PANEL_LAYOUT_STORAGE_PREFIX = 'react-resizable-panels:';
+export const WORKSPACE_STORAGE_KEY_V3 = 'pharos:workspace:v3';
+export const WORKSPACE_STORAGE_KEY_V4 = 'pharos:workspace:v4';
 
 export type CookieConsent = {
   analytics: boolean;
@@ -56,6 +62,7 @@ export function getDefaultConsent() {
 export function getEffectiveConsent(storedConsent: CookieConsent | null) {
   if (!SHOW_COOKIE_CONTROLS) return getDefaultConsent();
   if (storedConsent) return storedConsent;
+  if (typeof window === 'undefined') return null;
   if (!isConsentRegion()) return getDefaultConsent();
 
   return null;
@@ -113,4 +120,22 @@ export function hasAnalyticsConsent() {
 
 export function hasPreferencesConsent() {
   return getEffectiveConsent(readStoredConsent())?.preferences === true;
+}
+
+export function clearPreferenceStorage() {
+  if (typeof window === 'undefined') return;
+
+  window.localStorage.removeItem(BROWSE_ARTICLE_BANNER_STORAGE_KEY);
+  window.localStorage.removeItem(MAP_STORAGE_KEY);
+  window.localStorage.removeItem(WORKSPACE_STORAGE_KEY_V3);
+  window.localStorage.removeItem(WORKSPACE_STORAGE_KEY_V4);
+
+  for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
+    const key = window.localStorage.key(index);
+    if (key?.startsWith(PANEL_LAYOUT_STORAGE_PREFIX)) {
+      window.localStorage.removeItem(key);
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent('pharos-cookie-consent-changed'));
 }

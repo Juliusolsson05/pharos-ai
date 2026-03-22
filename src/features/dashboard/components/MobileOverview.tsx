@@ -15,10 +15,11 @@ import { useXPosts } from '@/features/events/queries/x-posts';
 import { useMapStories } from '@/features/map/queries';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
 
-import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
+import { trackNavigationClicked } from '@/shared/lib/analytics';
 import { getConflictForDay, getEventsForDay, getPostsForDay } from '@/shared/lib/day-filter';
 import { fmtTimeZ } from '@/shared/lib/format';
 import { SEV_C } from '@/shared/lib/severity-colors';
+import { useAnalyticsLayoutMode } from '@/shared/hooks/use-analytics-layout-mode';
 
 import type { XPost } from '@/types/domain';
 
@@ -72,7 +73,7 @@ export function MobileOverview() {
   };
   const actorsHref = latestDay ? `/dashboard/actors?day=${latestDay}` : '/dashboard/actors';
   const briefHref = latestDay ? `/dashboard/brief?day=${latestDay}` : '/dashboard/brief';
-  const layoutMode = getAnalyticsLayoutMode({ isMobile: true });
+  const layoutMode = useAnalyticsLayoutMode();
 
   const trackOverviewNavigation = (destinationPath: string, component: string, widgetKey?: string) => {
     trackNavigationClicked({

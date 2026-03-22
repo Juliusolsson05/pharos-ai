@@ -4,7 +4,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { SelectedItem } from '@/features/map/components/types';
 import { extractInitialState } from '@/features/map/lib/map-filter-engine';
 
-import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+import { hasPreferencesConsent, MAP_STORAGE_KEY } from '@/shared/lib/analytics/consent';
 
 import type { MapStory } from '@/types/domain';
 
@@ -43,8 +43,6 @@ export type MapState = {
 };
 
 // localStorage persistence
-
-const MAP_STORAGE_KEY = 'pharos:map:v1';
 
 type PersistedMapPrefs = {
   sidebarOpen: boolean;
