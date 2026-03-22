@@ -77,7 +77,17 @@ export function ActorsContent() {
                 <DaySelector currentDay={currentDay} onDayChange={setDay} />
               </div>
             </div>
-            <ActorDossier actor={selected} tab={tab} onTabChange={setTab} currentDay={currentDay} compact={usePageScroll} pageScroll={usePageScroll} />
+            <ActorDossier
+              actor={selected}
+              tab={tab}
+              onTabChange={nextTab => {
+                setTab(nextTab);
+                track('actor_tab_changed', { actor_id: selected.id, tab: nextTab });
+              }}
+              currentDay={currentDay}
+              compact={usePageScroll}
+              pageScroll={usePageScroll}
+            />
           </>
         ) : (
           <ActorList

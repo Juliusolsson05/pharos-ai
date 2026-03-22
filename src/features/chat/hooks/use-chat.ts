@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+
 import type { ChatMessage, ChatSessionData } from '@/types/domain';
 
 type UseChatOptions = {
@@ -15,10 +17,23 @@ export function useChat({ conflictId }: UseChatOptions) {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const visitorTokenRef = useRef<string>(crypto.randomUUID());
+
+  const buildHeaders = useCallback((headers?: HeadersInit) => {
+    const persistVisitor = hasPreferencesConsent();
+
+    return {
+      ...(headers ?? {}),
+      'x-pharos-persist-visitor': persistVisitor ? '1' : '0',
+      'x-pharos-visitor-token': persistVisitor ? '' : visitorTokenRef.current,
+    };
+  }, []);
 
   const loadSession = useCallback(async () => {
     try {
-      const res = await fetch(`/api/v1/chat?conflictId=${encodeURIComponent(conflictId)}`);
+      const res = await fetch(`/api/v1/chat?conflictId=${encodeURIComponent(conflictId)}`, {
+        headers: buildHeaders(),
+      });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error?.message ?? 'Failed to load chat');
 
@@ -30,7 +45,7 @@ export function useChat({ conflictId }: UseChatOptions) {
     } finally {
       setIsReady(true);
     }
-  }, [conflictId]);
+  }, [buildHeaders, conflictId]);
 
   useEffect(() => {
     void loadSession();
@@ -64,7 +79,7 @@ export function useChat({ conflictId }: UseChatOptions) {
     try {
       const res = await fetch('/api/v1/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: buildHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ conflictId, input: trimmed }),
         signal: controller.signal,
       });
@@ -100,7 +115,7 @@ export function useChat({ conflictId }: UseChatOptions) {
       abortRef.current = null;
       await loadSession();
     }
-  }, [conflictId, input, isLoading, loadSession]);
+  }, [buildHeaders, conflictId, input, isLoading, loadSession]);
 
   const stop = useCallback(() => {
     abortRef.current?.abort();
@@ -109,6 +124,7 @@ export function useChat({ conflictId }: UseChatOptions) {
 
   const clear = useCallback(async () => {
     const res = await fetch(`/api/v1/chat?conflictId=${encodeURIComponent(conflictId)}`, {
+      headers: buildHeaders(),
       method: 'DELETE',
     });
     const json = await res.json().catch(() => null);
@@ -119,7 +135,7 @@ export function useChat({ conflictId }: UseChatOptions) {
 
     setMessages([]);
     setError(null);
-  }, [conflictId]);
+  }, [buildHeaders, conflictId]);
 
   return { clear, error, handleSubmit, input, isLoading, isReady, messages, setInput, stop };
 }

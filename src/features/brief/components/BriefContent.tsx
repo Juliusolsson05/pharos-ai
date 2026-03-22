@@ -10,8 +10,10 @@ import { BriefScreenSkeleton } from '@/shared/components/loading/screen-skeleton
 import { DaySelector } from '@/shared/components/shared/DaySelector';
 import { Flag } from '@/shared/components/shared/Flag';
 
+import { getAnalyticsLayoutMode, trackBriefViewChanged } from '@/shared/lib/analytics';
 import { useConflictDay } from '@/shared/hooks/use-conflict-day';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 
 import { ACT_C, STA_C } from '@/data/iran-actors';
@@ -23,7 +25,9 @@ export function BriefContent() {
   const { data: snapshot, isLoading: snapshotLoading } = useConflictDaySnapshot(undefined, currentDay || undefined);
   const { data: actors, isLoading: actorsLoading } = useActors(undefined, currentDay || undefined);
   const isLandscapePhone = useIsLandscapePhone();
+  const isMobile = useIsMobile(1024);
   const onLandscapeScroll = useLandscapeScrollEmitter(isLandscapePhone);
+  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone, isMobile });
 
   const majorActors = actors?.filter(a => MAJOR_IDS.includes(a.id)) ?? [];
 
@@ -52,7 +56,20 @@ export function BriefContent() {
             <span className="mono text-[10px] text-[var(--t3)]">DAY {dayIndex + 1} OF OPERATIONS</span>
           </div>
           <div className="flex justify-center">
-            <DaySelector currentDay={currentDay} onDayChange={setDay} />
+            <DaySelector
+              currentDay={currentDay}
+              onDayChange={day => {
+                setDay(day);
+                trackBriefViewChanged({
+                  control: 'day',
+                  day,
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard/brief',
+                  surface: 'dashboard_brief',
+                  value: day,
+                });
+              }}
+            />
           </div>
         </div>
 

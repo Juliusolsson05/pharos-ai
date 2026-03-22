@@ -29,6 +29,7 @@ import { useXPosts } from '@/features/events/queries/x-posts';
 import { MobileOverviewSkeleton, OverviewScreenSkeleton } from '@/shared/components/loading/screen-skeletons';
 import { DaySelector } from '@/shared/components/shared/DaySelector';
 
+import { getAnalyticsLayoutMode, trackDashboardViewChanged, trackNavigationClicked } from '@/shared/lib/analytics';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
@@ -77,6 +78,7 @@ export function WorkspaceDashboard() {
   const usedWidgets = columns.flatMap(c => c.widgets);
   const availableWidgets = ALL_WIDGET_KEYS.filter(k => !usedWidgets.includes(k));
   const colSize = `${(100 / columns.length).toFixed(1)}%`;
+  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone, isMobile });
 
   const dashData: DashData = {
     day: effectiveDashDay,
@@ -119,7 +121,17 @@ export function WorkspaceDashboard() {
               key={id}
               variant={activePreset === id ? 'outline' : 'ghost'}
               size="xs"
-              onClick={() => dispatch(applyPreset(id))}
+              onClick={() => {
+                dispatch(applyPreset(id));
+                trackDashboardViewChanged({
+                  control: 'preset',
+                  day: effectiveDashDay,
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard',
+                  surface: 'dashboard_overview',
+                  value: id,
+                });
+              }}
               className={`text-[10px] font-semibold tracking-wide mono ${
                 activePreset === id
                   ? 'border-[var(--blue)] bg-[var(--blue-dim)] text-[var(--blue-l)]'
@@ -134,8 +146,21 @@ export function WorkspaceDashboard() {
           )}
         </div>
 
-        <div className="ml-1">
-          <DaySelector currentDay={effectiveDashDay} onDayChange={setDashDay} />
+          <div className="ml-1">
+          <DaySelector
+            currentDay={effectiveDashDay}
+            onDayChange={day => {
+              setDashDay(day);
+              trackDashboardViewChanged({
+                control: 'day',
+                day,
+                layout_mode: layoutMode,
+                pathname: '/dashboard',
+                surface: 'dashboard_overview',
+                value: day,
+              });
+            }}
+          />
         </div>
 
         {editing && (
@@ -266,7 +291,18 @@ export function WorkspaceDashboard() {
                             )}
 
                             {!editing && widgetLinks[widget] && (
-                              <Link href={widgetLinks[widget]!.href} className="no-underline ml-auto flex items-center gap-1">
+                              <Link
+                                href={widgetLinks[widget]!.href}
+                                className="no-underline ml-auto flex items-center gap-1"
+                                onClick={() => trackNavigationClicked({
+                                  component: 'widget_link',
+                                  destination_path: widgetLinks[widget]!.href,
+                                  layout_mode: layoutMode,
+                                  pathname: '/dashboard',
+                                  surface: 'dashboard_overview',
+                                  widget_key: widget,
+                                })}
+                              >
                                 <span className="text-[9px] text-[var(--blue-l)] font-semibold">{widgetLinks[widget]!.label}</span>
                                 <ArrowRight size={10} strokeWidth={2} className="text-[var(--blue-l)]" />
                               </Link>

@@ -15,6 +15,7 @@ import { useXPosts } from '@/features/events/queries/x-posts';
 import { useMapStories } from '@/features/map/queries';
 import { XPostCard } from '@/shared/components/shared/XPostCard';
 
+import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
 import { getConflictForDay, getEventsForDay, getPostsForDay } from '@/shared/lib/day-filter';
 import { fmtTimeZ } from '@/shared/lib/format';
 import { SEV_C } from '@/shared/lib/severity-colors';
@@ -71,6 +72,18 @@ export function MobileOverview() {
   };
   const actorsHref = latestDay ? `/dashboard/actors?day=${latestDay}` : '/dashboard/actors';
   const briefHref = latestDay ? `/dashboard/brief?day=${latestDay}` : '/dashboard/brief';
+  const layoutMode = getAnalyticsLayoutMode({ isMobile: true });
+
+  const trackOverviewNavigation = (destinationPath: string, component: string, widgetKey?: string) => {
+    trackNavigationClicked({
+      component,
+      destination_path: destinationPath,
+      layout_mode: layoutMode,
+      pathname: '/dashboard',
+      surface: 'dashboard_overview',
+      widget_key: widgetKey,
+    });
+  };
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto bg-[var(--bg-1)] safe-pb">
@@ -105,7 +118,7 @@ export function MobileOverview() {
       )}
 
       {/* ── GO TO MAP hero ── */}
-      <Link href={mapHref()} className="no-underline">
+      <Link href={mapHref()} className="no-underline" onClick={() => trackOverviewNavigation(mapHref(), 'widget_link', 'map')}>
         <div className="safe-px my-3 py-4 bg-[var(--blue-dim)] border border-[var(--blue)] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MapIcon size={20} strokeWidth={2} className="text-[var(--blue-l)]" />
@@ -137,7 +150,7 @@ export function MobileOverview() {
       <div className="border-t border-[var(--bd)]">
         <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
           <span className="section-title">Latest Events</span>
-          <Link href={feedHref()} className="no-underline flex items-center gap-1">
+            <Link href={feedHref()} className="no-underline flex items-center gap-1" onClick={() => trackOverviewNavigation(feedHref(), 'widget_link', 'latest')}>
             <span className="mono text-[9px] text-[var(--blue-l)] font-bold">See all</span>
             <ArrowRight size={10} className="text-[var(--blue-l)]" />
           </Link>
@@ -173,7 +186,7 @@ export function MobileOverview() {
         <div className="border-t border-[var(--bd)] mt-0">
           <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
             <span className="section-title">Active Stories</span>
-            <Link href={mapHref()} className="no-underline flex items-center gap-1">
+            <Link href={mapHref()} className="no-underline flex items-center gap-1" onClick={() => trackOverviewNavigation(mapHref(), 'widget_link', 'map')}>
               <span className="mono text-[9px] text-[var(--blue-l)] font-bold">Map</span>
               <ArrowRight size={10} className="text-[var(--blue-l)]" />
             </Link>
@@ -219,7 +232,7 @@ export function MobileOverview() {
         <div className="border-t border-[var(--bd)]">
           <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
             <span className="section-title">Breaking Signals</span>
-            <Link href="/dashboard/signals" className="no-underline flex items-center gap-1">
+            <Link href="/dashboard/signals" className="no-underline flex items-center gap-1" onClick={() => trackOverviewNavigation('/dashboard/signals', 'widget_link', 'signals')}>
               <span className="mono text-[9px] text-[var(--blue-l)] font-bold">All signals</span>
               <ArrowRight size={10} className="text-[var(--blue-l)]" />
             </Link>
@@ -240,7 +253,7 @@ export function MobileOverview() {
             { href: '/dashboard/predictions', label: 'PREDICTIONS', icon: TrendingUp, color: 'var(--warning)' },
             { href: briefHref, label: 'BRIEF', icon: BookOpen, color: 'var(--info)' },
           ].map(nav => (
-            <Link key={nav.href} href={nav.href} className="no-underline">
+            <Link key={nav.href} href={nav.href} className="no-underline" onClick={() => trackOverviewNavigation(nav.href, 'widget_link', nav.label.toLowerCase())}>
               <div className="flex items-center gap-2.5 px-3 py-3 border border-[var(--bd)] bg-[var(--bg-2)] hover:bg-[var(--bg-3)] transition-colors">
                 <nav.icon size={14} strokeWidth={2} style={{ color: nav.color }} />
                 <span className="mono text-[10px] font-bold text-[var(--t2)] tracking-[0.06em]">{nav.label}</span>

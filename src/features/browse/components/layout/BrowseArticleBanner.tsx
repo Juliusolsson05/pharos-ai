@@ -8,6 +8,8 @@ import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
+import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+
 const STORAGE_KEY = 'pharos:browse-article-banner-dismissed';
 
 function subscribe() {
@@ -15,6 +17,7 @@ function subscribe() {
 }
 
 function getDismissedSnapshot() {
+  if (!hasPreferencesConsent()) return false;
   return localStorage.getItem(STORAGE_KEY) === '1';
 }
 
@@ -31,6 +34,11 @@ export function BrowseArticleBanner() {
   const [isLocallyDismissed, setIsLocallyDismissed] = useState(false);
 
   function handleDismiss() {
+    if (!hasPreferencesConsent()) {
+      setIsLocallyDismissed(true);
+      return;
+    }
+
     localStorage.setItem(STORAGE_KEY, '1');
     setIsLocallyDismissed(true);
   }

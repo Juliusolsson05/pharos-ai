@@ -21,8 +21,15 @@ async function readBody(req: NextRequest): Promise<ChatBody | Response> {
   }
 }
 
-async function resolveSession(conflictId: string) {
-  const visitor = await resolveAnonymousVisitor();
+function readVisitorOptions(req: NextRequest) {
+  return {
+    persistVisitor: req.headers.get('x-pharos-persist-visitor') !== '0',
+    visitorToken: req.headers.get('x-pharos-visitor-token'),
+  };
+}
+
+async function resolveSession(req: NextRequest, conflictId: string) {
+  const visitor = await resolveAnonymousVisitor(readVisitorOptions(req));
   const session = await getOrCreateChatSession(conflictId, visitor.id);
   return { session, visitor };
 }
@@ -37,7 +44,7 @@ export async function GET(req: NextRequest) {
   const invalid = validateConflictId(conflictId);
   if (invalid) return invalid;
 
-  const { session } = await resolveSession(conflictId as string);
+  const { session } = await resolveSession(req, conflictId as string);
   const messages = await listChatMessages(session.id);
   return ok({ sessionId: session.id, messages });
 }
@@ -47,7 +54,7 @@ export async function DELETE(req: NextRequest) {
   const invalid = validateConflictId(conflictId);
   if (invalid) return invalid;
 
-  const visitor = await resolveAnonymousVisitor();
+  const visitor = await resolveAnonymousVisitor(readVisitorOptions(req));
   const deletedSessionId = await clearCurrentChatSession(conflictId as string, visitor.id);
   return ok({ deletedSessionId });
 }
@@ -71,7 +78,7 @@ export async function POST(req: NextRequest) {
     return err('NOT_FOUND', `Conflict ${conflictId} not found`, 404);
   }
 
-  const { session } = await resolveSession(conflictId);
+  const { session } = await resolveSession(req, conflictId);
   await appendChatMessage(session.id, ChatMessageRole.USER, input);
   const messages = await listChatMessages(session.id);
 

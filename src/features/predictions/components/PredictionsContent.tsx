@@ -18,6 +18,7 @@ import { MarketCard } from '@/features/predictions/components/MarketCard';
 import { COL,fmtVol, getLeadProb } from '@/features/predictions/components/utils';
 import { usePredictionMarkets } from '@/features/predictions/queries';
 
+import { getAnalyticsLayoutMode, trackPredictionMarketOpened, trackPredictionsViewChanged } from '@/shared/lib/analytics';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
@@ -35,7 +36,7 @@ type SortBy = typeof SORT_OPTS[number]['key'];
 
 export function PredictionsContent() {
   const { data, isLoading: loading, error: queryError, isFetching: isRefreshing, refetch } = usePredictionMarkets();
-  const markets = data?.markets ?? [];
+  const markets = useMemo(() => data?.markets ?? [], [data?.markets]);
   const fetchedAt = data?.fetchedAt ?? '';
   const error = queryError?.message ?? null;
 
@@ -47,6 +48,19 @@ export function PredictionsContent() {
   const isLandscapePhone = useIsLandscapePhone();
   const usePageScroll = isMobile && isLandscapePhone;
   const onLandscapeScroll = useLandscapeScrollEmitter(usePageScroll);
+  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone, isMobile });
+
+  const trackMarketOpen = (marketId: string, groupId: string) => {
+    trackPredictionMarketOpened({
+      active_only: showActiveOnly,
+      group_id: groupId,
+      layout_mode: layoutMode,
+      market_id: marketId,
+      pathname: '/dashboard/predictions',
+      sort_by: sortBy,
+      surface: 'dashboard_predictions',
+    });
+  };
 
   const handleRefresh = async () => {
     try {
@@ -151,7 +165,22 @@ export function PredictionsContent() {
           <div />
           <div className="label pl-0.5 text-[8px]">MARKET</div>
 
-          <ToggleGroup type="single" value={sortBy} onValueChange={v => v && setSortBy(v as SortBy)} className="contents">
+          <ToggleGroup
+            type="single"
+            value={sortBy}
+            onValueChange={value => {
+              if (!value || value === sortBy) return;
+              setSortBy(value as SortBy);
+              trackPredictionsViewChanged({
+                control: 'sort',
+                layout_mode: layoutMode,
+                pathname: '/dashboard/predictions',
+                surface: 'dashboard_predictions',
+                value,
+              });
+            }}
+            className="contents"
+          >
             {SORT_OPTS.map(col => (
               <ToggleGroupItem
                 key={col.key}
@@ -167,13 +196,41 @@ export function PredictionsContent() {
 
           <div className="flex justify-end items-center gap-1.5 pr-2">
             <span className="label text-[7px] font-bold" style={{ color: showActiveOnly ? 'var(--success)' : 'var(--t4)' }}>LIVE</span>
-            <Switch checked={showActiveOnly} onCheckedChange={setShowActiveOnly} className="scale-75 origin-right" />
+            <Switch
+              checked={showActiveOnly}
+              onCheckedChange={value => {
+                setShowActiveOnly(value);
+                trackPredictionsViewChanged({
+                  control: 'active_only',
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard/predictions',
+                  surface: 'dashboard_predictions',
+                  value,
+                });
+              }}
+              className="scale-75 origin-right"
+            />
           </div>
           <div />
         </div>
       ) : (
         <div className={`shrink-0 flex items-center gap-2 bg-[var(--bg-app)] border-b border-[var(--bd)] overflow-x-auto touch-scroll ${usePageScroll ? 'py-1.5 safe-px' : 'px-3 py-2'}`}>
-          <ToggleGroup type="single" value={sortBy} onValueChange={v => v && setSortBy(v as SortBy)} className="flex gap-1">
+          <ToggleGroup
+            type="single"
+            value={sortBy}
+            onValueChange={value => {
+              if (!value || value === sortBy) return;
+              setSortBy(value as SortBy);
+              trackPredictionsViewChanged({
+                control: 'sort',
+                layout_mode: layoutMode,
+                pathname: '/dashboard/predictions',
+                surface: 'dashboard_predictions',
+                value,
+              });
+            }}
+            className="flex gap-1"
+          >
             {SORT_OPTS.map(col => (
               <ToggleGroupItem
                 key={col.key}
@@ -186,7 +243,20 @@ export function PredictionsContent() {
           </ToggleGroup>
           <div className="ml-auto flex items-center gap-2 pr-1">
             <span className="label text-[8px]" style={{ color: showActiveOnly ? 'var(--success)' : 'var(--t4)' }}>LIVE</span>
-            <Switch checked={showActiveOnly} onCheckedChange={setShowActiveOnly} className="scale-80 origin-right" />
+            <Switch
+              checked={showActiveOnly}
+              onCheckedChange={value => {
+                setShowActiveOnly(value);
+                trackPredictionsViewChanged({
+                  control: 'active_only',
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard/predictions',
+                  surface: 'dashboard_predictions',
+                  value,
+                });
+              }}
+              className="scale-80 origin-right"
+            />
           </div>
         </div>
       )}
@@ -231,7 +301,10 @@ export function PredictionsContent() {
                   market={market}
                   group={group}
                   rank={i + 1}
-                  onFocus={() => setFocusedId(market.id)}
+                  onFocus={() => {
+                    setFocusedId(market.id);
+                    trackMarketOpen(market.id, group.id);
+                  }}
                 />
               );
             })}
@@ -243,7 +316,13 @@ export function PredictionsContent() {
               group={group}
               markets={grouped.get(group.id) ?? []}
               expandedId={expandedId}
-              onToggle={id => setExpandedId(expandedId === id ? null : id)}
+              onToggle={id => {
+                const nextId = expandedId === id ? null : id;
+                setExpandedId(nextId);
+                if (nextId) {
+                  trackMarketOpen(id, group.id);
+                }
+              }}
               globalRankOffset={rankOffsets[group.id] ?? 0}
               sortBy={sortBy}
             />

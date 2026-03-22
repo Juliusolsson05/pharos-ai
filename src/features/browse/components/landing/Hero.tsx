@@ -1,10 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
+import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
+
 import { GITHUB_URL } from '@/data/external-links';
 
 export function Hero() {
+  const layoutMode = getAnalyticsLayoutMode({ isMobile: false });
+
   return (
     <section className="px-5 pt-16 pb-12 max-w-3xl mx-auto">
       <p className="label mb-4">Open-source intelligence</p>
@@ -26,7 +32,19 @@ export function Hero() {
           asChild
           className="bg-[var(--blue)] text-[var(--bg-app)] font-bold hover:bg-[var(--blue-l)]"
         >
-          <Link href="/dashboard">Open dashboard &rarr;</Link>
+          <Link
+            href="/dashboard"
+            onClick={() => trackNavigationClicked({
+              component: 'hero_cta',
+              cta_variant: 'primary',
+              destination_path: '/dashboard',
+              layout_mode: layoutMode,
+              pathname: '/browse',
+              surface: 'browse_landing',
+            })}
+          >
+            Open dashboard &rarr;
+          </Link>
         </Button>
         <Button
           size="sm"

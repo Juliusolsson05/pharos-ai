@@ -6,10 +6,18 @@
 
 import { useDefaultLayout } from 'react-resizable-panels';
 
+import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+
 export function usePanelLayout(opts: Parameters<typeof useDefaultLayout>[0]) {
   // During SSR localStorage doesn't exist — useDefaultLayout crashes.
   // The typeof check is stripped at runtime but prevents the SSR error.
   if (typeof window === 'undefined') {
+    return {
+      defaultLayout: undefined,
+      onLayoutChanged: () => {},
+    };
+  }
+  if (!hasPreferencesConsent()) {
     return {
       defaultLayout: undefined,
       onLayoutChanged: () => {},

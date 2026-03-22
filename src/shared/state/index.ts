@@ -29,6 +29,8 @@ import mapReducer, {
   toggleType,
 } from '@/features/map/state/map-slice';
 
+import { hasPreferencesConsent } from '@/shared/lib/analytics/consent';
+
 // localStorage persistence
 
 const STORAGE_KEY_V4 = 'pharos:workspace:v4';
@@ -36,6 +38,7 @@ const STORAGE_KEY_V3 = 'pharos:workspace:v3';
 
 function loadPersistedState(): { workspace: WorkspaceState } | undefined {
   if (typeof window === 'undefined') return undefined;
+  if (!hasPreferencesConsent()) return undefined;
   try {
     const v4 = localStorage.getItem(STORAGE_KEY_V4);
     if (v4) {
@@ -84,6 +87,7 @@ listenerMiddleware.startListening({
   ),
   effect: (_action, listenerApi) => {
     if (typeof window === 'undefined') return;
+    if (!hasPreferencesConsent()) return;
     try {
       const state = listenerApi.getState() as RootState;
       localStorage.setItem(STORAGE_KEY_V4, JSON.stringify(state.workspace));

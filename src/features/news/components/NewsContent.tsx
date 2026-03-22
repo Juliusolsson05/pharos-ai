@@ -12,9 +12,9 @@ import { AllFeedsView } from '@/features/news/components/AllFeedsView';
 import { ChannelView } from '@/features/news/components/ChannelView';
 import { ConflictBanner } from '@/features/news/components/ConflictBanner';
 import { useRssCollections, useRssFeedItems, useRssFeeds } from '@/features/news/queries';
-
-import { track } from '@/shared/lib/analytics';
 import { EmptyState } from '@/shared/components/shared/EmptyState';
+
+import { getAnalyticsLayoutMode, track, trackNavigationClicked } from '@/shared/lib/analytics';
 import { queryKeys } from '@/shared/lib/query/keys';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
@@ -28,6 +28,7 @@ export function NewsContent() {
   const [showImages, setShowImages] = useState(true);
   const isLandscapePhone = useIsLandscapePhone();
   const onLandscapeScroll = useLandscapeScrollEmitter(isLandscapePhone);
+  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone });
   const now = useNow();
   const queryClient = useQueryClient();
 
@@ -50,7 +51,6 @@ export function NewsContent() {
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.rss.fetchItems(feedIds) });
-    track('news_manual_refresh');
   };
 
   const timeSinceRefresh = dataUpdatedAt
@@ -110,6 +110,13 @@ export function NewsContent() {
               </Button>
               <Link
                 href="/dashboard/data/news/timeline"
+                onClick={() => trackNavigationClicked({
+                  component: 'inline_link',
+                  destination_path: '/dashboard/data/news/timeline',
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard/data/news',
+                  surface: 'news',
+                })}
                 className="px-3 py-1 rounded text-[9px] mono font-bold tracking-wider text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
               >
                 TIMELINE →

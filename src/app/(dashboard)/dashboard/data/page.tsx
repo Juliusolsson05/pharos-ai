@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { track } from '@/shared/lib/analytics';
+import { getAnalyticsLayoutMode, trackNavigationClicked } from '@/shared/lib/analytics';
 import { useIsLandscapePhone } from '@/shared/hooks/use-is-landscape-phone';
 import { useLandscapeScrollEmitter } from '@/shared/hooks/use-landscape-scroll-emitter';
 
@@ -43,6 +45,7 @@ const DATA_SOURCES = [
 export default function DataIndexPage() {
   const isLandscapePhone = useIsLandscapePhone();
   const onLandscapeScroll = useLandscapeScrollEmitter(isLandscapePhone);
+  const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone });
 
   return (
     <div
@@ -60,6 +63,23 @@ export default function DataIndexPage() {
             <Link
               key={source.label}
               href={source.href}
+              onClick={() => {
+                track('data_source_opened', {
+                  data_source_id: source.href.replace('/dashboard/data/', ''),
+                  destination_path: source.href,
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard/data',
+                  surface: 'dashboard_data',
+                });
+                trackNavigationClicked({
+                  component: 'source_card',
+                  data_source_id: source.href.replace('/dashboard/data/', ''),
+                  destination_path: source.href,
+                  layout_mode: layoutMode,
+                  pathname: '/dashboard/data',
+                  surface: 'dashboard_data',
+                });
+              }}
               className={`
                 no-underline block p-5 border transition-colors
                  ${source.status === 'LIVE'
