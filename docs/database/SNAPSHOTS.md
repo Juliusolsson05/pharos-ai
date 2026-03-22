@@ -16,6 +16,21 @@ Pharos publishes a public onboarding snapshot every 12 hours so new contributors
 
 This keeps local onboarding easy while preserving an offline-safe fallback path.
 
+## Production snapshot role setup
+
+The publish workflow expects `PUBLIC_SNAPSHOT_DATABASE_URL` to point at a dedicated read-only database role named `snapshot_reader`.
+
+When you first set up snapshots on Supabase or when you add new allowlisted snapshot tables:
+
+1. Connect with a privileged role such as `postgres` using the direct or migration connection
+2. Run `scripts/db/sql/grant-snapshot-reader.sql`
+3. Run `scripts/db/sql/verify-snapshot-reader.sql`
+4. Confirm the verification query returns zero rows
+
+The grant script covers the full snapshot allowlist, not just recent patches, and it also sets default table privileges for future public tables created by `postgres` in the `public` schema.
+
+If the publish workflow fails with `permission denied for table ...`, that almost always means the allowlist changed in `scripts/db/manifest.ts` without refreshing `snapshot_reader` grants.
+
 ## Snapshot format
 
 - Release tag: `db-snapshot-latest`
