@@ -28,9 +28,9 @@ type Props = {
 
 export function MobileMapLayout({ ctx, embedded = false }: Props) {
   const {
-    viewState, activeStory, selectedItem, sidebarOpen, mapStyle, stories,
+    viewState, activeStory, selectedItem, showAllLabels, sidebarOpen, mapStyle, stories,
     overlayVisibility, toggleOverlay, f, tooltip, layers, handleMapClick, showTimeline,
-    setViewState, activateStory, setActiveStory, setSelectedItem,
+    setViewState, activateStory, setActiveStory, setSelectedItem, setShowAllLabels,
     toggleSidebar, setSidebarOpen, setMapStyle,
   } = ctx;
 
@@ -117,11 +117,13 @@ export function MobileMapLayout({ ctx, embedded = false }: Props) {
         )}
 
         <MapControls
+          showAllLabels={showAllLabels}
           viewState={viewState}
           mapStyle={mapStyle}
           hasPanel={false}
           timelineVisible={showTimeline}
           isMobile
+          onShowAllLabelsChange={setShowAllLabels}
           onStyleChange={setMapStyle}
         />
 

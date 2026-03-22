@@ -17,6 +17,7 @@ import {
   setActiveStory  as setActiveStoryAction,
   setMapStyle     as setMapStyleAction,
   setSelectedItem as setSelectedItemAction,
+  setShowAllLabels as setShowAllLabelsAction,
   setSidebarOpen  as setSidebarOpenAction,
   setViewState    as setViewStateAction,
   toggleSidebar   as toggleSidebarAction,
@@ -36,6 +37,7 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
   const viewState    = useAppSelector(s => s.map.viewState);
   const activeStory  = useAppSelector(s => s.map.activeStory);
   const selectedItem = useAppSelector(s => s.map.selectedItem);
+  const showAllLabels = useAppSelector(s => s.map.showAllLabels);
   const sidebarOpen  = useAppSelector(s => s.map.sidebarOpen);
   const mapStyle     = useAppSelector(s => s.map.mapStyle);
   const { data: stories = [], isLoading: storiesLoading } = useMapStories();
@@ -61,6 +63,7 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     viewState,
     isSatellite: mapStyle === 'satellite',
     isMobile,
+    showAllLabels,
   });
 
   const handleMapClick = useCallback(({ object, layer }: PickingInfo): SelectedItem | null => {
@@ -113,6 +116,7 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
     viewState,
     activeStory,
     selectedItem,
+    showAllLabels,
     sidebarOpen,
     mapStyle,
     stories,
@@ -136,6 +140,7 @@ export function useMapPage({ isMobile }: { isMobile: boolean }) {
       return dispatch(setActiveStoryAction(story));
     },
     setSelectedItem: (item: Parameters<typeof setSelectedItemAction>[0]) => dispatch(setSelectedItemAction(item)),
+    setShowAllLabels: (show: boolean) => dispatch(setShowAllLabelsAction(show)),
     toggleSidebar:   () => dispatch(toggleSidebarAction()),
     setSidebarOpen:  (open: boolean) => dispatch(setSidebarOpenAction(open)),
     setMapStyle:     (style: Parameters<typeof setMapStyleAction>[0]) => { track('map_style_changed', { style }); return dispatch(setMapStyleAction(style)); },

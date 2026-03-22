@@ -35,6 +35,7 @@ export type MapState = {
   selectedItem: SelectedItem | null;
 
   // UI chrome
+  showAllLabels: boolean;
   sidebarOpen: boolean;
   mapStyle: 'dark' | 'satellite';
 
@@ -45,6 +46,7 @@ export type MapState = {
 // localStorage persistence
 
 type PersistedMapPrefs = {
+  showAllLabels: boolean;
   sidebarOpen: boolean;
   mapStyle: 'dark' | 'satellite';
 };
@@ -64,6 +66,7 @@ export function persistMapPrefs(state: MapState): void {
   if (!hasPreferencesConsent()) return;
   try {
     const persisted: PersistedMapPrefs = {
+      showAllLabels: state.showAllLabels,
       sidebarOpen: state.sidebarOpen,
       mapStyle:    state.mapStyle,
     };
@@ -113,6 +116,7 @@ function buildInitialState(): MapState {
     viewExtent:     [0, 0],
     activeStory:  null,
     selectedItem: null,
+    showAllLabels: persisted?.showAllLabels ?? false,
     sidebarOpen: persisted?.sidebarOpen ?? true,
     mapStyle:    persisted?.mapStyle    ?? 'dark',
     _filtersFingerprint: null,
@@ -252,6 +256,9 @@ const mapSlice = createSlice({
     setSidebarOpen(state, action: PayloadAction<boolean>) {
       state.sidebarOpen = action.payload;
     },
+    setShowAllLabels(state, action: PayloadAction<boolean>) {
+      state.showAllLabels = action.payload;
+    },
     setMapStyle(state, action: PayloadAction<'dark' | 'satellite'>) {
       state.mapStyle = action.payload;
     },
@@ -275,6 +282,7 @@ export const {
   setSelectedItem,
   toggleSidebar,
   setSidebarOpen,
+  setShowAllLabels,
   setMapStyle,
 } = mapSlice.actions;
 

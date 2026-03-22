@@ -31,6 +31,7 @@ type Props = {
   viewState: MapViewState;
   isSatellite: boolean;
   isMobile?:   boolean;
+  showAllLabels?: boolean;
 };
 
 type RGBA = [number, number, number, number];
@@ -77,6 +78,7 @@ export function useMapLayers({
   viewState,
   isSatellite,
   isMobile = false,
+  showAllLabels = false,
 }: Props): Layer[] {
   return useMemo(() => {
     const activeEventIds = activeStory
@@ -125,6 +127,7 @@ export function useMapLayers({
       viewState,
       selectedItem,
       mergedActiveStory,
+      showAllLabels,
     );
 
     // Heat map
@@ -297,7 +300,7 @@ export function useMapLayers({
     const layers = [heatLayer, zoneLayer, strikeLayer, missileLayer, targetLayer, assetLayer, targetLabels, assetLabels].filter(Boolean);
 
     return layers as Layer[];
-  }, [filtered, actorMeta, activeStory, selectedItem, viewState, isSatellite, isMobile]);
+  }, [filtered, actorMeta, activeStory, selectedItem, viewState, isSatellite, isMobile, showAllLabels]);
 }
 
 // Re-export so tooltip handler can share STATUS_META without another import
