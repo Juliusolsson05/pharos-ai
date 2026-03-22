@@ -1,30 +1,9 @@
 import posthog from 'posthog-js';
 
-import { publicPosthogHost, publicPosthogKey } from '@/shared/lib/env';
-
 import { hasAnalyticsConsent } from './consent';
-
-let isInitialized = false;
-
-function initPostHog() {
-  if (isInitialized || !publicPosthogKey) return;
-
-  posthog.init(publicPosthogKey, {
-    api_host: publicPosthogHost,
-    autocapture: false,
-    capture_pageleave: true,
-    capture_pageview: false,
-    defaults: '2026-01-30',
-    person_profiles: 'identified_only',
-  });
-
-  isInitialized = true;
-}
 
 function ensurePostHog() {
   if (!hasAnalyticsConsent()) return false;
-
-  initPostHog();
   if (!posthog.__loaded) return false;
 
   if (typeof posthog.opt_in_capturing === 'function') {
@@ -40,7 +19,7 @@ export function syncAnalyticsConsent(consented: boolean) {
     return;
   }
 
-  if (!isInitialized) return;
+  if (!posthog.__loaded) return;
 
   if (typeof posthog.opt_out_capturing === 'function') {
     posthog.opt_out_capturing();
