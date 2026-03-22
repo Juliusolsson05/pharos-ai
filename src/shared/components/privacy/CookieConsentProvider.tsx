@@ -28,6 +28,7 @@ import {
   parseStoredConsent,
   writeStoredConsent,
 } from '@/shared/lib/analytics/consent';
+import { publicAnalyticsEnabled } from '@/shared/lib/env';
 
 import { SHOW_COOKIE_CONTROLS } from '@/shared/config/privacy';
 
@@ -47,7 +48,7 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
   const storedConsent = useMemo(() => parseStoredConsent(consentSnapshot), [consentSnapshot]);
   const consent = getEffectiveConsent(storedConsent);
   const requiresConsentBanner = SHOW_COOKIE_CONTROLS && hasHydrated && isConsentRegion() && !storedConsent;
-  const analyticsEnabled = consent?.analytics === true;
+  const analyticsEnabled = publicAnalyticsEnabled && consent?.analytics === true;
   const preferencesEnabled = consent?.preferences === true;
 
   useEffect(() => {
