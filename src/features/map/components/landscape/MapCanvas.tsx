@@ -28,9 +28,9 @@ type Props = {
 
 export function MapCanvas({ ctx, onOpenStories, onSelectFeature }: Props) {
   const {
-    viewState, mapStyle, layers, tooltip, handleMapClick, showTimeline,
+    viewState, mapStyle, layers, tooltip, handleMapClick, showAllLabels, showTimeline,
     overlayVisibility, toggleOverlay, f,
-    setViewState, setMapStyle,
+    setShowAllLabels, setViewState, setMapStyle,
   } = ctx;
 
   const handleClick = (...args: Parameters<typeof handleMapClick>) => {
@@ -87,6 +87,20 @@ export function MapCanvas({ ctx, onOpenStories, onSelectFeature }: Props) {
           title="Toggle map style"
         >
           <MapIcon size={14} strokeWidth={2} />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setShowAllLabels(!showAllLabels)}
+          className={`h-8 w-8 border transition-colors rounded-none ${
+            showAllLabels
+              ? 'bg-[var(--blue-dim)] border-[var(--blue)] text-[var(--blue-l)]'
+              : 'bg-[rgba(28,33,39,0.85)] border-[var(--bd)] text-[var(--t3)] hover:text-[var(--t1)]'
+          }`}
+          title={showAllLabels ? 'Use smart label filtering' : 'Show all labels'}
+        >
+          <span className="mono text-[8px] font-bold">LBL</span>
         </Button>
 
         {/* Visibility menu */}

@@ -30,9 +30,9 @@ type Props = {
 
 export function DesktopMapLayout({ ctx, embedded = false }: Props) {
   const {
-    viewState, activeStory, selectedItem, sidebarOpen, mapStyle, stories,
+    viewState, activeStory, selectedItem, showAllLabels, sidebarOpen, mapStyle, stories,
     overlayVisibility, toggleOverlay, f, tooltip, layers, handleMapClick, showTimeline,
-    setViewState, activateStory, setActiveStory, setSelectedItem,
+    setViewState, activateStory, setActiveStory, setSelectedItem, setShowAllLabels,
     toggleSidebar, setMapStyle,
   } = ctx;
 
@@ -95,11 +95,13 @@ export function DesktopMapLayout({ ctx, embedded = false }: Props) {
           )}
 
           <MapControls
+            showAllLabels={showAllLabels}
             viewState={viewState}
             mapStyle={mapStyle}
             hasPanel={!!selectedItem}
             timelineVisible={showTimeline}
             isMobile={false}
+            onShowAllLabelsChange={setShowAllLabels}
             onStyleChange={setMapStyle}
           />
 

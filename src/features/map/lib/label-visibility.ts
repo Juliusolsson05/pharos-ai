@@ -103,6 +103,7 @@ export function selectVisibleLabels(
   viewState: MapViewState,
   selectedItem: SelectedItem | null,
   activeStory: MapStory | null,
+  showAllLabels = false,
 ): LabelSelection {
   const budget = labelBudget(viewState.zoom);
   const candidates: LabelCandidate[] = [
@@ -129,6 +130,17 @@ export function selectVisibleLabels(
   const picked = new Set<string>();
   const cellCounts = new Map<string, number>();
   const selected: LabelCandidate[] = [];
+
+  if (showAllLabels) {
+    return {
+      targets: candidates
+        .filter((item): item is LabelCandidate & { point: Target; kind: 'target' } => item.kind === 'target')
+        .map((item) => item.point),
+      assets: candidates
+        .filter((item): item is LabelCandidate & { point: Asset; kind: 'asset' } => item.kind === 'asset')
+        .map((item) => item.point),
+    };
+  }
 
   for (const candidate of candidates) {
     const cellKey = toCellKey(candidate.position, viewState.zoom);
