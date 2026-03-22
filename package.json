@@ -27,6 +27,7 @@
     "db:snapshot:restore": "tsx --tsconfig tsconfig.json scripts/db/restore-snapshot.ts",
     "db:snapshot:verify": "tsx --tsconfig tsconfig.json scripts/db/verify-snapshot.ts",
     "db:snapshot:publish": "tsx --tsconfig tsconfig.json scripts/db/publish-snapshot.ts",
+    "x:image:fulfillment": "tsx --tsconfig tsconfig.json scripts/x-image-fulfillment/index.ts",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
     "setup": "npm run docker:up && npm run db:bootstrap",
