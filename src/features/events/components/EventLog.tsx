@@ -66,12 +66,12 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
     <div className={cn(pageScroll ? 'flex flex-col' : 'flex-1 flex flex-col overflow-hidden')}>
       <div className={cn('panel-header justify-between', compact && (pageScroll ? 'h-8 min-h-8 safe-px' : 'h-8 min-h-8 px-3'))}>
         <span className="section-title">Operation Epic Fury</span>
-        <Badge variant="outline" className="text-[9px] text-[var(--t4)] border-[var(--bd)]">{events.length}</Badge>
+        <Badge variant="outline" className="text-[length:var(--text-caption)] text-[var(--t4)] border-[var(--bd)]">{events.length}</Badge>
       </div>
 
       {/* Column headers */}
       <div className={cn('grid grid-cols-[40px_50px_1fr_24px] py-1 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0', pageScroll ? 'safe-px' : 'px-3', compact && 'py-0.5')}>
-        {['TIME', 'SEV', 'TITLE', ''].map(h => <span key={h} className="label text-[8px]">{h}</span>)}
+        {['TIME', 'SEV', 'TITLE', ''].map(h => <span key={h} className="label text-[length:var(--text-tiny)]">{h}</span>)}
       </div>
 
       {pageScroll ? (
@@ -97,10 +97,10 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
                   ? <ChevronDown size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
                   : <ChevronRight size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
                 }
-                <span className="mono text-[9px] text-[var(--t3)]">{date}</span>
-                <span className="mono text-[8px] text-[var(--t4)]">{dayEvents.length} events</span>
-                {critCount > 0 && <span className="mono text-[8px] text-[var(--danger)]">{critCount} CRIT</span>}
-                {highCount > 0 && <span className="mono text-[8px] text-[var(--warning)]">{highCount} HIGH</span>}
+                <span className="mono text-[length:var(--text-caption)] text-[var(--t3)]">{date}</span>
+                <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">{dayEvents.length} events</span>
+                {critCount > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--danger)]">{critCount} CRIT</span>}
+                {highCount > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--warning)]">{highCount} HIGH</span>}
               </Button>
               {isExpanded && dayEvents.map(evt => {
                 const isOn = selectedId === evt.id;
@@ -122,14 +122,14 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
                       background: isOn ? 'var(--bg-sel)' : 'transparent',
                     }}
                   >
-                    <span className="mono text-[9px] text-[var(--t3)] self-center">
+                    <span className="mono text-[length:var(--text-caption)] text-[var(--t3)] self-center">
                       {fmtTime(evt.timestamp)}
                     </span>
 
                     <div className="self-center">
                       <Badge
                         variant="outline"
-                        className="text-[7px] px-1 py-px tracking-[0.06em] rounded-sm"
+                        className="text-[length:var(--text-micro)] px-1 py-px tracking-[0.06em] rounded-sm"
                         style={{ color: sc, borderColor: sc, background: sbg }}
                       >
                         {evt.severity.slice(0, 4)}
@@ -137,12 +137,12 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
                     </div>
 
                     <div>
-                      <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
+                      <p className="text-[length:var(--text-body-sm)] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
                         {evt.title}
                       </p>
                       <div className="flex gap-1.5 mt-0.5">
-                        <span className="mono text-[8px] text-[var(--t3)]">{evt.sources.length}src</span>
-                        {xc > 0 && <span className="mono text-[8px] text-[var(--t2)]">𝕏{xc}</span>}
+                        <span className="mono text-[length:var(--text-tiny)] text-[var(--t3)]">{evt.sources.length}src</span>
+                        {xc > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--t2)]">𝕏{xc}</span>}
                         {evt.verified && <CheckCircle size={8} className="text-[var(--success)]" strokeWidth={2} />}
                       </div>
                     </div>
@@ -178,10 +178,10 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
                   ? <ChevronDown size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
                   : <ChevronRight size={10} strokeWidth={2} className="text-[var(--t4)] shrink-0" />
                 }
-                <span className="mono text-[9px] text-[var(--t3)]">{date}</span>
-                <span className="mono text-[8px] text-[var(--t4)]">{dayEvents.length} events</span>
-                {critCount > 0 && <span className="mono text-[8px] text-[var(--danger)]">{critCount} CRIT</span>}
-                {highCount > 0 && <span className="mono text-[8px] text-[var(--warning)]">{highCount} HIGH</span>}
+                <span className="mono text-[length:var(--text-caption)] text-[var(--t3)]">{date}</span>
+                <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">{dayEvents.length} events</span>
+                {critCount > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--danger)]">{critCount} CRIT</span>}
+                {highCount > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--warning)]">{highCount} HIGH</span>}
               </Button>
               {isExpanded && dayEvents.map(evt => {
                 const isOn = selectedId === evt.id;
@@ -203,14 +203,14 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
                       background: isOn ? 'var(--bg-sel)' : 'transparent',
                     }}
                   >
-                    <span className="mono text-[9px] text-[var(--t3)] self-center">
+                    <span className="mono text-[length:var(--text-caption)] text-[var(--t3)] self-center">
                       {fmtTime(evt.timestamp)}
                     </span>
 
                     <div className="self-center">
                       <Badge
                         variant="outline"
-                        className="text-[7px] px-1 py-px tracking-[0.06em] rounded-sm"
+                        className="text-[length:var(--text-micro)] px-1 py-px tracking-[0.06em] rounded-sm"
                         style={{ color: sc, borderColor: sc, background: sbg }}
                       >
                         {evt.severity.slice(0, 4)}
@@ -218,12 +218,12 @@ export function EventLog({ events, selectedId, onSelect, compact = false, pageSc
                     </div>
 
                     <div>
-                      <p className="text-[11px] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
+                      <p className="text-[length:var(--text-body-sm)] text-[var(--t1)] leading-[1.3] text-left line-clamp-2">
                         {evt.title}
                       </p>
                       <div className="flex gap-1.5 mt-0.5">
-                        <span className="mono text-[8px] text-[var(--t3)]">{evt.sources.length}src</span>
-                        {xc > 0 && <span className="mono text-[8px] text-[var(--t2)]">𝕏{xc}</span>}
+                        <span className="mono text-[length:var(--text-tiny)] text-[var(--t3)]">{evt.sources.length}src</span>
+                        {xc > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--t2)]">𝕏{xc}</span>}
                         {evt.verified && <CheckCircle size={8} className="text-[var(--success)]" strokeWidth={2} />}
                       </div>
                     </div>

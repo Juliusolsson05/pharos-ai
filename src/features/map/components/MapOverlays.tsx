@@ -24,7 +24,7 @@ function BackButton({ isMobile = false, safeTop = false }: { isMobile?: boolean;
         background: 'var(--blue)',
         color:      'var(--t1)',
         padding:    isMobile ? '6px 10px' : '6px 12px',
-        fontSize:   isMobile ? 9 : 10,
+        fontSize:   isMobile ? 'var(--text-caption)' : 'var(--text-label)',
         fontWeight: 700,
         borderRadius: 2,
         textDecoration: 'none',
@@ -65,7 +65,7 @@ function ActiveStoryPill({ story, onClear, isMobile = false, safeTop = false }: 
       zIndex:    10,
     }}>
       <StoryIcon iconName={story.iconName} category={story.category} size={12} boxSize={22} />
-      <span className="mono" style={{ fontSize: 11, color: 'var(--t1)', fontWeight: 700 }}>
+      <span className="mono" style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t1)', fontWeight: 700 }}>
         STORY: {story.title.toUpperCase()}
       </span>
       <Button variant="ghost" size="sm" onClick={onClear} className="h-5 w-5 p-0" style={{ color: 'var(--t4)' }}>
@@ -108,7 +108,7 @@ export function MapOverlays({ activeStory, onClearStory, sidebarOpen, onToggleSi
             border:       '1px solid var(--bd)',
             borderRadius: 2,
             color:        'var(--t3)',
-            fontSize:     10,
+            fontSize: 'var(--text-label)',
             fontWeight:   700,
             zIndex:       10,
             display:      'flex',

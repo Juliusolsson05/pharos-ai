@@ -162,7 +162,7 @@ export function SignalsContent() {
             variant="outline"
             size="sm"
             onClick={() => setFiltersOpen(p => !p)}
-            className={`text-[10px] h-auto px-2.5 py-1 font-semibold tracking-wide transition-colors mono ${
+            className={`text-[length:var(--text-label)] h-auto px-2.5 py-1 font-semibold tracking-wide transition-colors mono ${
               filtersOpen
                 ? 'border-[var(--blue)] bg-[var(--blue-dim)] text-[var(--blue-l)]'
                 : 'border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t3)]'
@@ -170,13 +170,13 @@ export function SignalsContent() {
           >
             FILTERS
           </Button>
-          <span className="mono text-[9px] text-[var(--t4)]">{filtered.length} / {allPosts?.length ?? 0} signals</span>
-          <span className="mono text-[9px] text-[var(--t4)]">·</span>
-          <span className="mono text-[9px] text-[var(--t3)]">{showAll ? 'ALL DAYS' : currentDay}</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{filtered.length} / {allPosts?.length ?? 0} signals</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">·</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t3)]">{showAll ? 'ALL DAYS' : currentDay}</span>
           {lastUpdated && (
             <>
-              <span className="mono text-[9px] text-[var(--t4)]">·</span>
-              <span className="mono text-[9px] text-[var(--t3)]">UPDATED {lastUpdated}</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">·</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--t3)]">UPDATED {lastUpdated}</span>
             </>
           )}
         </div>

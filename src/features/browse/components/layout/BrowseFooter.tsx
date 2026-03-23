@@ -79,10 +79,10 @@ export function BrowseFooter() {
         </div>
 
         <div className="flex flex-col gap-1 border-t border-[var(--bd-s)] pt-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-[11px] text-[var(--t4)]">
+          <span className="text-[length:var(--text-body-sm)] text-[var(--t4)]">
             AGPL-3.0 License
           </span>
-          <span className="text-[11px] text-[var(--t4)]">
+          <span className="text-[length:var(--text-body-sm)] text-[var(--t4)]">
             conflicts.app
           </span>
         </div>

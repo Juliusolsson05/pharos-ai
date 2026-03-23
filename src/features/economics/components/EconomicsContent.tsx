@@ -78,13 +78,13 @@ export function EconomicsContent() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/data"
-            className="mono text-[10px] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
+            className="mono text-[length:var(--text-label)] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
           >
             ← DATA
           </Link>
           <div className="w-px h-4 bg-[var(--bd)]" />
-          <span className="mono text-[10px] font-bold text-[var(--t1)] tracking-wider">ECONOMIC INDICATORS</span>
-          <span className="mono text-[9px] text-[var(--t4)]">{ECONOMIC_INDEXES.length} indexes</span>
+          <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t1)] tracking-wider">ECONOMIC INDICATORS</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{ECONOMIC_INDEXES.length} indexes</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -96,7 +96,7 @@ export function EconomicsContent() {
                 variant="ghost"
                 size="sm"
                 onClick={() => { setRangeIdx(i); track('economics_range_changed', { range: r.label }); }}
-                className={`px-2 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider shrink-0 ${
+                className={`px-2 py-1 h-auto rounded text-[length:var(--text-caption)] mono font-bold tracking-wider shrink-0 ${
                   i === rangeIdx
                     ? 'bg-white/10 text-white border border-white/20'
                     : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -115,7 +115,7 @@ export function EconomicsContent() {
             size="sm"
             onClick={() => void fetchAll()}
             disabled={refreshing}
-            className="flex items-center gap-2 h-auto px-2 py-1 text-[9px] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
+            className="flex items-center gap-2 h-auto px-2 py-1 text-[length:var(--text-caption)] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
           >
             <svg
               width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"
@@ -129,7 +129,7 @@ export function EconomicsContent() {
 
           <div className="flex items-center gap-2">
             <div className={`dot ${refreshing ? 'dot-warn' : 'dot-live'}`} />
-            <span className="mono text-[9px] text-[var(--t4)]">
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">
               {refreshing ? 'refreshing…' : timeSince}
             </span>
           </div>
@@ -139,7 +139,7 @@ export function EconomicsContent() {
       {/* ── Filter bar ── */}
       <div className={`flex items-center gap-3 py-2 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0 overflow-x-auto ${isLandscapePhone ? 'safe-px' : 'px-5'}`}>
         {/* Tier filters */}
-        <span className="mono text-[8px] text-[var(--t4)] shrink-0">TIER:</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] shrink-0">TIER:</span>
         <div className="flex gap-1">
           {TIER_FILTERS.map(t => (
             <Button
@@ -147,7 +147,7 @@ export function EconomicsContent() {
               variant="ghost"
               size="sm"
               onClick={() => setTierFilter(t.key)}
-              className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+              className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
                 tierFilter === t.key
                   ? 'bg-white/10 text-white border border-white/20'
                   : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -161,13 +161,13 @@ export function EconomicsContent() {
         <div className="w-px h-4 bg-[var(--bd)]" />
 
         {/* Category filters */}
-        <span className="mono text-[8px] text-[var(--t4)] shrink-0">SECTOR:</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] shrink-0">SECTOR:</span>
         <div className="flex gap-1">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setCatFilter('ALL')}
-            className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+            className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
               catFilter === 'ALL'
                 ? 'bg-white/10 text-white border border-white/20'
                 : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -181,7 +181,7 @@ export function EconomicsContent() {
               variant="ghost"
               size="sm"
               onClick={() => setCatFilter(c.key)}
-              className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+              className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
                 catFilter === c.key
                   ? 'border'
                   : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -196,7 +196,7 @@ export function EconomicsContent() {
           ))}
         </div>
 
-        <span className="mono text-[8px] text-[var(--t4)] ml-auto shrink-0">{filtered.length} shown</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] ml-auto shrink-0">{filtered.length} shown</span>
       </div>
 
       {/* ── Grid ── */}
@@ -215,7 +215,7 @@ export function EconomicsContent() {
 
         {filtered.length === 0 && (
           <div className="flex items-center justify-center py-20">
-            <span className="mono text-[11px] text-[var(--t4)]">No indexes match current filters</span>
+            <span className="mono text-[length:var(--text-body-sm)] text-[var(--t4)]">No indexes match current filters</span>
           </div>
         )}
       </div>

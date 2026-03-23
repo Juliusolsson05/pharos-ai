@@ -50,7 +50,7 @@ export function FloatingChannelWindow() {
         style={{ left: position.x, top: position.y }}
       >
         <div className="dot dot-live" />
-        <span className="mono max-w-[160px] truncate text-[9px] text-[var(--t2)]">{activeChannel.name}</span>
+        <span className="mono max-w-[160px] truncate text-[length:var(--text-caption)] text-[var(--t2)]">{activeChannel.name}</span>
         <Button variant="ghost" size="icon-xs" onPointerDown={(event) => event.stopPropagation()} onClick={restoreWindow} aria-label="Restore live window">
           <ExternalLink size={11} />
         </Button>
@@ -72,7 +72,7 @@ export function FloatingChannelWindow() {
       >
         <div className="flex min-w-0 items-center gap-2">
           <div className="dot dot-live" />
-          <span className="mono truncate text-[10px] tracking-wider text-[var(--t2)]">{activeChannel.name}</span>
+          <span className="mono truncate text-[length:var(--text-label)] tracking-wider text-[var(--t2)]">{activeChannel.name}</span>
         </div>
         <div className="flex items-center gap-1" onPointerDown={(event) => event.stopPropagation()}>
           <Button asChild variant="ghost" size="icon-xs" aria-label="Open on YouTube">

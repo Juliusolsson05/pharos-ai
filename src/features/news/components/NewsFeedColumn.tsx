@@ -81,19 +81,19 @@ export function NewsFeedColumn({ feed, color, showImages = true, preloaded }: Ne
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="mono text-[11px] font-bold text-[var(--t1)] tracking-wide truncate">
+          <h3 className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--t1)] tracking-wide truncate">
             {feed.name}
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[8px] mono text-[var(--t4)]">{feed.country}</span>
+            <span className="text-[length:var(--text-tiny)] mono text-[var(--t4)]">{feed.country}</span>
             {feed.stateFunded && (
-              <span className="px-1 py-0 bg-amber-500/15 border border-amber-500/30 rounded text-[7px] mono font-bold text-amber-400">
+              <span className="px-1 py-0 bg-amber-500/15 border border-amber-500/30 rounded text-[length:var(--text-micro)] mono font-bold text-amber-400">
                 STATE FUNDED
               </span>
             )}
           </div>
         </div>
-        <span className="text-[9px] mono text-[var(--t4)] shrink-0">
+        <span className="text-[length:var(--text-caption)] mono text-[var(--t4)] shrink-0">
           {items.length > 0 ? `${items.length}` : ''}
         </span>
       </div>
@@ -111,14 +111,14 @@ export function NewsFeedColumn({ feed, color, showImages = true, preloaded }: Ne
 
         {error && !loading && (
           <div className="px-3 py-6 text-center">
-            <span className="text-[10px] text-red-400/60 mono">FEED ERROR</span>
-            <p className="text-[9px] text-[var(--t4)] mt-1 break-all">{error}</p>
+            <span className="text-[length:var(--text-label)] text-red-400/60 mono">FEED ERROR</span>
+            <p className="text-[length:var(--text-caption)] text-[var(--t4)] mt-1 break-all">{error}</p>
           </div>
         )}
 
         {!loading && !error && items.length === 0 && (
           <div className="px-3 py-6 text-center">
-            <span className="text-[10px] text-[var(--t4)] mono">NO ITEMS</span>
+            <span className="text-[length:var(--text-label)] text-[var(--t4)] mono">NO ITEMS</span>
           </div>
         )}
 
@@ -132,20 +132,20 @@ export function NewsFeedColumn({ feed, color, showImages = true, preloaded }: Ne
           >
             <div className={showImages && item.imageUrl ? 'flex gap-3' : ''}>
               <div className="flex-1 min-w-0">
-                <h4 className="text-[11px] text-[var(--t1)] font-medium leading-tight group-hover:text-white line-clamp-3">
+                <h4 className="text-[length:var(--text-body-sm)] text-[var(--t1)] font-medium leading-tight group-hover:text-white line-clamp-3">
                   {item.title}
                 </h4>
                 {item.contentSnippet && (
-                  <p className="text-[9px] text-[var(--t4)] mt-1 leading-relaxed line-clamp-2">
+                  <p className="text-[length:var(--text-caption)] text-[var(--t4)] mt-1 leading-relaxed line-clamp-2">
                     {item.contentSnippet}
                   </p>
                 )}
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[8px] mono text-[var(--t4)]">
+                  <span className="text-[length:var(--text-tiny)] mono text-[var(--t4)]">
                     {timeAgo(item.isoDate ?? item.pubDate)}
                   </span>
                   {item.creator && (
-                    <span className="text-[8px] mono text-[var(--t4)] truncate max-w-[120px]">
+                    <span className="text-[length:var(--text-tiny)] mono text-[var(--t4)] truncate max-w-[120px]">
                       {item.creator}
                     </span>
                   )}

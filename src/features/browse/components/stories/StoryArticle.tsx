@@ -42,7 +42,7 @@ export function StoryArticle({ story }: Props) {
       <header className="mt-6 mb-8">
         <div className="flex items-center gap-2.5 mb-3">
           <CategoryBadge category={story.category} />
-          <span className="mono text-[10px] text-[var(--t4)]">
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">
             {fmtDate(story.timestamp)}
           </span>
         </div>
@@ -54,7 +54,7 @@ export function StoryArticle({ story }: Props) {
       </header>
 
       <section className="mb-8">
-        <p className="text-[15px] text-[var(--t2)] leading-[1.8]">
+        <p className="text-[length:var(--text-subhead)] text-[var(--t2)] leading-[1.8]">
           {story.narrative}
         </p>
       </section>
@@ -66,7 +66,7 @@ export function StoryArticle({ story }: Props) {
             {story.keyFacts.map((fact, i) => (
               <li
                 key={i}
-                className="flex gap-2.5 text-[13px] text-[var(--t2)] leading-relaxed"
+                className="flex gap-2.5 text-[length:var(--text-body)] text-[var(--t2)] leading-relaxed"
               >
                 <span className="text-[var(--t4)] shrink-0 mt-0.5">&bull;</span>
                 {fact}
@@ -91,10 +91,10 @@ export function StoryArticle({ story }: Props) {
                       className="absolute left-[-4px] top-[6px] size-[9px] rounded-full border-2 border-[var(--bg-1)]"
                       style={{ background: color }}
                     />
-                    <div className="mono text-[11px] font-medium mb-0.5" style={{ color }}>
+                    <div className="mono text-[length:var(--text-body-sm)] font-medium mb-0.5" style={{ color }}>
                       {fmtTimeZ(ev.time)}
                     </div>
-                    <p className="text-[13px] text-[var(--t2)] leading-relaxed">
+                    <p className="text-[length:var(--text-body)] text-[var(--t2)] leading-relaxed">
                       {ev.label}
                     </p>
                   </div>

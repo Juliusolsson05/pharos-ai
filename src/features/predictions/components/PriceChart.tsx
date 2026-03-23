@@ -112,19 +112,19 @@ export function PriceChart({ yesTokenId }: Props) {
       <div className="flex items-center gap-2.5">
         <span className="mono label">PRICE HISTORY</span>
         <span
-          className="mono text-[9px] font-bold tracking-[0.06em]"
+          className="mono text-[length:var(--text-caption)] font-bold tracking-[0.06em]"
           style={{ color: change >= 0 ? 'var(--success)' : 'var(--danger)' }}
         >
           {change >= 0 ? '+' : ''}{(change * 100).toFixed(1)}%
         </span>
         {hPt && hDate && (
-          <span className="mono text-[9px] text-[var(--t4)] ml-1">
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)] ml-1">
             {hDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}
             {' '}{hDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
             {'  '}<span className="font-bold" style={{ color: hColor }}>{Math.round(hPt.p * 100)}%</span>
           </span>
         )}
-        <span className="mono ml-auto text-[9px] text-[var(--t4)] opacity-50">{pts.length} pts</span>
+        <span className="mono ml-auto text-[length:var(--text-caption)] text-[var(--t4)] opacity-50">{pts.length} pts</span>
       </div>
 
       {/* ── SVG chart ── */}
@@ -221,7 +221,7 @@ export function PriceChart({ yesTokenId }: Props) {
               </span>
             </div>
             <div
-              className="mono mt-1 text-[8px] tracking-[0.04em]"
+              className="mono mt-1 text-[length:var(--text-tiny)] tracking-[0.04em]"
               style={{ color: hDelta >= 0 ? 'var(--success)' : 'var(--danger)' }}
             >
               {hDelta >= 0 ? '▲' : '▼'} {Math.abs(hDelta * 100).toFixed(1)}% from open

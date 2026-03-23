@@ -35,7 +35,7 @@ export function AllFeedsView({ showImages, feedData }: Props) {
     <div className="flex-1 flex flex-col min-h-0 w-full">
       {/* Filter bar */}
       <div className={`${isLandscapePhone ? 'safe-px' : 'px-5'} py-2 bg-[var(--bg-2)] border-b border-[var(--bd)] flex items-center gap-2 shrink-0`}>
-        <span className="text-[9px] mono text-[var(--t4)] mr-2 shrink-0">FILTER:</span>
+        <span className="text-[length:var(--text-caption)] mono text-[var(--t4)] mr-2 shrink-0">FILTER:</span>
         <div className="flex gap-1 overflow-x-auto">
           {PERSPECTIVES.map(p => (
             <Button
@@ -44,7 +44,7 @@ export function AllFeedsView({ showImages, feedData }: Props) {
               size="sm"
               onClick={() => setFilter(p)}
               className={`
-                px-2 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider transition-colors shrink-0
+                px-2 py-1 h-auto rounded text-[length:var(--text-caption)] mono font-bold tracking-wider transition-colors shrink-0
                 ${filter === p
                   ? 'bg-white/10 text-white border border-white/20'
                   : 'text-[var(--t4)] hover:text-[var(--t2)] hover:bg-[var(--bg-1)] border border-transparent'
@@ -58,7 +58,7 @@ export function AllFeedsView({ showImages, feedData }: Props) {
             </Button>
           ))}
         </div>
-        <span className="text-[8px] mono text-[var(--t4)] ml-auto shrink-0">
+        <span className="text-[length:var(--text-tiny)] mono text-[var(--t4)] ml-auto shrink-0">
           {filtered.length} feeds
         </span>
       </div>

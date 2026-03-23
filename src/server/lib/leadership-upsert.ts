@@ -118,5 +118,8 @@ export async function upsertLeadershipBatch(conflictId: string, actorId: string,
       await tx.leadershipRole.deleteMany({ where: { conflictId, actorId, id: { notIn: roleIds.length ? roleIds : ['__none__'] } } });
       await tx.leadershipPerson.deleteMany({ where: { conflictId, actorId, id: { notIn: personIds.length ? personIds : ['__none__'] } } });
     }
+  }, {
+    maxWait: 15_000,
+    timeout: 120_000,
   });
 }

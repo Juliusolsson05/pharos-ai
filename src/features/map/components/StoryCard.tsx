@@ -49,10 +49,10 @@ function EventLog({ events }: { events: StoryEvent[] }) {
                 width: 7, height: 7, borderRadius: '50%',
                 background: color, border: `1px solid ${color}`,
               }} />
-              <p className="mono" style={{ fontSize: 9, color, fontWeight: 700, marginBottom: 1 }}>
+              <p className="mono" style={{ fontSize: 'var(--text-caption)', color, fontWeight: 700, marginBottom: 1 }}>
                 {new Date(ev.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).toUpperCase()} · {fmtTimeZ(ev.time)}
               </p>
-              <p style={{ fontSize: 11, color: 'var(--t3)', lineHeight: 1.4 }}>{ev.label}</p>
+              <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t3)', lineHeight: 1.4 }}>{ev.label}</p>
             </div>
           );
         })}
@@ -119,12 +119,12 @@ function StoryFeatures({ story }: { story: MapStory }) {
               border: `1px solid color-mix(in srgb, ${color} 25%, var(--bd-s))`,
               borderRadius: 2,
             }}>
-              <span style={{ color, fontSize: 10, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <span style={{ color, fontSize: 'var(--text-label)', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>{icon}</span>
               <div className="flex-1 min-w-0">
-                <p style={{ fontSize: 10, color: 'var(--t2)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</p>
+                <p style={{ fontSize: 'var(--text-label)', color: 'var(--t2)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="mono" style={{ fontSize: 8, color, fontWeight: 700 }}>{f.kind.toUpperCase()}</span>
-                  {ts && <span className="mono" style={{ fontSize: 8, color: 'var(--blue-l)' }}>{fmtDate(ts)} · {fmtTimeZ(ts)}</span>}
+                  <span className="mono" style={{ fontSize: 'var(--text-tiny)', color, fontWeight: 700 }}>{f.kind.toUpperCase()}</span>
+                  {ts && <span className="mono" style={{ fontSize: 'var(--text-tiny)', color: 'var(--blue-l)' }}>{fmtDate(ts)} · {fmtTimeZ(ts)}</span>}
                 </div>
               </div>
             </div>
@@ -165,19 +165,19 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
         <div className="flex items-center gap-0">
           <StoryIcon iconName={story.iconName} category={story.category} size={12} boxSize={22} style={{ marginRight: 8, flexShrink: 0 }} />
           <div className="flex-1 min-w-0">
-            <p style={{ fontWeight: 600, fontSize: 11, color: 'var(--t1)', lineHeight: 1.3 }} className="line-clamp-1">
+            <p style={{ fontWeight: 600, fontSize: 'var(--text-body-sm)', color: 'var(--t1)', lineHeight: 1.3 }} className="line-clamp-1">
               {story.title}
             </p>
-            <p style={{ fontSize: 9, color: 'var(--t3)', marginTop: 1 }} className="truncate">{story.tagline}</p>
+            <p style={{ fontSize: 'var(--text-caption)', color: 'var(--t3)', marginTop: 1 }} className="truncate">{story.tagline}</p>
           </div>
           <div className="flex items-center gap-1 ml-2 shrink-0">
             <span className="mono" style={{
               background: catColor.bg, color: catColor.text,
-              fontSize: 7, fontWeight: 700, padding: '2px 4px', borderRadius: 2,
+              fontSize: 'var(--text-micro)', fontWeight: 700, padding: '2px 4px', borderRadius: 2,
             }}>
               {story.category}
             </span>
-            <span style={{ color: 'var(--t4)', fontSize: 11 }}>{isOpen ? '∨' : '›'}</span>
+            <span style={{ color: 'var(--t4)', fontSize: 'var(--text-body-sm)' }}>{isOpen ? '∨' : '›'}</span>
           </div>
         </div>
       </Button>
@@ -185,7 +185,7 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
       {/* Expanded body */}
       {isOpen && (
         <div style={{ background: 'var(--bg-app)', padding: '12px 16px' }}>
-          <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>
+          <p style={{ fontSize: 'var(--text-body)', color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>
             {story.narrative}
           </p>
 
@@ -198,19 +198,19 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
           <div style={{ marginBottom: 10 }}>
             <p className="label" style={{ color: 'var(--t4)', marginBottom: 6 }}>KEY FACTS</p>
             {story.keyFacts.map((fact, i) => (
-              <p key={i} className="mono" style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 3 }}>
+              <p key={i} className="mono" style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t3)', marginBottom: 3 }}>
                 → {fact}
               </p>
             ))}
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={onFlyTo} className="flex-1 font-mono text-[10px] tracking-widest"
+            <Button variant="outline" size="sm" onClick={onFlyTo} className="flex-1 font-mono text-[length:var(--text-label)] tracking-widest"
               style={{ color: 'var(--blue-l)', borderColor: 'var(--blue)', background: 'var(--blue-dim)' }}
             >
               ⊙ FLY TO
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setModalOpen(true)} className="flex-1 font-mono text-[10px] tracking-widest"
+            <Button variant="outline" size="sm" onClick={() => setModalOpen(true)} className="flex-1 font-mono text-[length:var(--text-label)] tracking-widest"
               style={{ color: 'var(--t2)', borderColor: 'var(--bd)', background: 'var(--bg-1)' }}
             >
               ⊞ OPEN
@@ -238,7 +238,7 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
               </div>
               <span className="mono shrink-0" style={{
                 background: catColor.bg, color: catColor.text,
-                fontSize: 9, fontWeight: 700, padding: '3px 7px', borderRadius: 3,
+                fontSize: 'var(--text-caption)', fontWeight: 700, padding: '3px 7px', borderRadius: 3,
               }}>
                 {story.category}
               </span>
@@ -247,7 +247,7 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
 
           {/* Narrative */}
           <div style={{ borderTop: '1px solid var(--bd-s)', paddingTop: 16 }}>
-            <p style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7 }}>
+            <p style={{ fontSize: 'var(--text-body)', color: 'var(--t2)', lineHeight: 1.7 }}>
               {story.narrative}
             </p>
           </div>
@@ -268,7 +268,7 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
           <div style={{ borderTop: '1px solid var(--bd-s)', paddingTop: 16 }}>
             <p className="label" style={{ color: 'var(--t4)', marginBottom: 8 }}>KEY FACTS</p>
             {story.keyFacts.map((fact, i) => (
-              <p key={i} className="mono" style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 4 }}>
+              <p key={i} className="mono" style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t3)', marginBottom: 4 }}>
                 → {fact}
               </p>
             ))}
@@ -276,7 +276,7 @@ export function StoryCard({ story, isOpen, onToggle, onFlyTo }: Props) {
 
           {/* Fly to */}
           <Button variant="outline" size="sm" onClick={() => { onFlyTo(); setModalOpen(false); }}
-            className="w-full font-mono text-[10px] tracking-widest"
+            className="w-full font-mono text-[length:var(--text-label)] tracking-widest"
             style={{ color: 'var(--blue-l)', borderColor: 'var(--blue)', background: 'var(--blue-dim)' }}
           >
             ⊙ FLY TO

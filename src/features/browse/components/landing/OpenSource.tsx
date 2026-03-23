@@ -41,7 +41,7 @@ export function OpenSource() {
             {TECH_STACK.map((tech) => (
               <span
                 key={tech}
-                className="mono text-[11px] px-2 py-1 border border-[var(--bd-s)] text-[var(--t2)]"
+                className="mono text-[length:var(--text-body-sm)] px-2 py-1 border border-[var(--bd-s)] text-[var(--t2)]"
               >
                 {tech}
               </span>

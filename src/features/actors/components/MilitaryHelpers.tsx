@@ -81,7 +81,7 @@ export function YoyBadge({ pts }: { pts: MilSpendPoint[] }) {
   const arrow = positive ? '\u25B2' : '\u25BC';
 
   return (
-    <span className="mono text-[10px] ml-2" style={{ color }}>
+    <span className="mono text-[length:var(--text-label)] ml-2" style={{ color }}>
       {arrow} {Math.abs(change.pct).toFixed(1)}% YoY
     </span>
   );
@@ -100,9 +100,9 @@ export function MetricCard({
 }) {
   return (
     <div className="border border-[var(--bd)] bg-[var(--bg-2)] px-3 py-3">
-      <div className="label text-[8px] text-[var(--t4)] mb-1">{label}</div>
+      <div className="label text-[length:var(--text-tiny)] text-[var(--t4)] mb-1">{label}</div>
       <div className="mono text-[18px] font-bold leading-none" style={{ color: tone }}>{value}</div>
-      <div className="mono text-[8px] text-[var(--t4)] mt-2">{sublabel}</div>
+      <div className="mono text-[length:var(--text-tiny)] text-[var(--t4)] mt-2">{sublabel}</div>
     </div>
   );
 }

@@ -34,7 +34,7 @@ export function SourceList({ sources }: Props) {
             ) : (
               <span className="text-xs text-[var(--t2)]">{s.name}</span>
             )}
-            <span className="mono text-[10px] text-[var(--t4)] ml-auto">
+            <span className="mono text-[length:var(--text-label)] text-[var(--t4)] ml-auto">
               {formatReliability(s.reliability)}% reliability
             </span>
           </div>

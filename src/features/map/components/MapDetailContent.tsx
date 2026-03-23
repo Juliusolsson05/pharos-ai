@@ -54,7 +54,7 @@ export function Row({ label, value, color }: { label: string; value: string; col
 export function Badge({ label, color }: { label: string; color: string }) {
   return (
     <span className="mono" style={{
-      fontSize: 8, fontWeight: 700, padding: '2px 6px', borderRadius: 2,
+      fontSize: 'var(--text-tiny)', fontWeight: 700, padding: '2px 6px', borderRadius: 2,
       color, background: `color-mix(in srgb, ${color} 14%, transparent)`,
       border: `1px solid color-mix(in srgb, ${color} 35%, transparent)`,
       letterSpacing: '0.07em',
@@ -78,7 +78,7 @@ export function HierarchyBreadcrumb({ actor, category, type, actorMeta }: { acto
   const m = am(actor, actorMeta);
   const catLabel = CATEGORY_LABEL[category as keyof typeof CATEGORY_LABEL] ?? category;
   return (
-    <div className="flex items-center gap-1 mono" style={{ fontSize: 9, marginBottom: 10, flexWrap: 'wrap' }}>
+    <div className="flex items-center gap-1 mono" style={{ fontSize: 'var(--text-caption)', marginBottom: 10, flexWrap: 'wrap' }}>
       <span style={{ color: m.cssVar, fontWeight: 700 }}>{m.label}</span>
       <span style={{ color: 'var(--bd)' }}>›</span>
       <span style={{ color: 'var(--t3)' }}>{catLabel}</span>
@@ -119,10 +119,10 @@ export function RelatedStories({ stories, onActivate }: { stories: MapStory[]; o
           >
             <StoryIcon iconName={story.iconName} category={story.category} size={12} boxSize={22} />
             <div className="flex-1 min-w-0">
-              <p style={{ fontSize: 11, color: 'var(--t2)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{story.title}</p>
-              <p className="mono" style={{ fontSize: 9, color: 'var(--blue)', marginTop: 1 }}>{story.category}</p>
+              <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t2)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{story.title}</p>
+              <p className="mono" style={{ fontSize: 'var(--text-caption)', color: 'var(--blue)', marginTop: 1 }}>{story.category}</p>
             </div>
-            <span style={{ color: 'var(--t4)', fontSize: 10 }}>›</span>
+            <span style={{ color: 'var(--t4)', fontSize: 'var(--text-label)' }}>›</span>
           </Button>
         ))}
       </div>
@@ -162,8 +162,8 @@ export function StrikeContent({ d, onSelectItem, onActivateStory }: {
           >
             <span className="dot" style={{ background: statusMeta(relatedTarget.status).cssVar }} />
             <div className="flex-1 min-w-0">
-              <p style={{ fontSize: 11, color: 'var(--t2)', fontWeight: 600 }}>{relatedTarget.name}</p>
-              <p className="mono" style={{ fontSize: 9, color: 'var(--t4)', marginTop: 1 }}>
+              <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t2)', fontWeight: 600 }}>{relatedTarget.name}</p>
+              <p className="mono" style={{ fontSize: 'var(--text-caption)', color: 'var(--t4)', marginTop: 1 }}>
                 {relatedTarget.type.replace('_', ' ')} · {relatedTarget.status}
               </p>
             </div>
@@ -199,10 +199,10 @@ export function MissileContent({ d, onActivateStory }: {
       <Row label="IMPACT POINT" value={`[${d.to[1].toFixed(2)}°N, ${d.to[0].toFixed(2)}°E]`} />
       <Divider />
       <div style={{ background: `color-mix(in srgb, ${statusColor} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${statusColor} 30%, transparent)`, borderRadius: 2, padding: '8px 10px' }}>
-        <p className="mono" style={{ fontSize: 9, color: statusColor, fontWeight: 700, marginBottom: 4 }}>
+        <p className="mono" style={{ fontSize: 'var(--text-caption)', color: statusColor, fontWeight: 700, marginBottom: 4 }}>
           {isIntercepted ? 'INTERCEPTED' : 'IMPACT CONFIRMED'}
         </p>
-        <p style={{ fontSize: 11, color: 'var(--t2)', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--t2)', lineHeight: 1.5 }}>
           {isIntercepted ? 'Missile neutralized in-flight. No ground impact recorded.' : 'Missile reached target. Damage assessment ongoing.'}
         </p>
       </div>
@@ -229,7 +229,7 @@ export function TargetContent({ d, onSelectItem, onActivateStory }: {
         <Badge label={d.type.replace('_', ' ')} color={m.cssVar} />
         <Badge label={tStatusMeta.label}        color={tStatusMeta.cssVar} />
       </div>
-      <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>{d.description}</p>
+      <p style={{ fontSize: 'var(--text-body)', color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>{d.description}</p>
       {d.timestamp && <Row label="TIME" value={`${fmtDate(d.timestamp)} · ${fmtTimeZ(d.timestamp)}`} color="var(--blue-l)" />}
       <Row label="ACTOR"       value={m.label} color={m.cssVar} />
       <Row label="COORDINATES" value={`${d.position[1].toFixed(4)}°N, ${d.position[0].toFixed(4)}°E`} />
@@ -246,8 +246,8 @@ export function TargetContent({ d, onSelectItem, onActivateStory }: {
                 >
                   <div style={{ width: 10, height: 3, background: sm.cssVar, flexShrink: 0 }} />
                   <div className="flex-1 min-w-0">
-                    <p style={{ fontSize: 10, color: 'var(--t2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{strike.label}</p>
-                    <p className="mono" style={{ fontSize: 9, color: sm.cssVar, marginTop: 1 }}>
+                    <p style={{ fontSize: 'var(--text-label)', color: 'var(--t2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{strike.label}</p>
+                    <p className="mono" style={{ fontSize: 'var(--text-caption)', color: sm.cssVar, marginTop: 1 }}>
                       {sm.label} · {strike.type.replace('_', ' ')} · {strike.severity}
                     </p>
                   </div>
@@ -281,7 +281,7 @@ export function AssetContent({ d, onActivateStory }: {
         {d.type === 'CARRIER' && <Badge label="CARRIER STRIKE GROUP" color="var(--warning)" />}
       </div>
       {d.description && (
-        <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>{d.description}</p>
+        <p style={{ fontSize: 'var(--text-body)', color: 'var(--t2)', lineHeight: 1.6, marginBottom: 12 }}>{d.description}</p>
       )}
       <Row label="COORDINATES"  value={`${d.position[1].toFixed(2)}°N, ${d.position[0].toFixed(2)}°E`} />
       <Row label="NATION/ACTOR" value={m.label} color={m.cssVar} />
@@ -310,7 +310,7 @@ export function ZoneContent({ d }: { d: ThreatZone }) {
         <Badge label={m.label}    color={m.cssVar} />
       </div>
       <div style={{ background: `color-mix(in srgb, ${meta.color} 6%, transparent)`, border: `1px solid color-mix(in srgb, ${meta.color} 25%, transparent)`, borderRadius: 2, padding: '10px 12px', marginBottom: 12 }}>
-        <p style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.6 }}>{meta.description}</p>
+        <p style={{ fontSize: 'var(--text-body)', color: 'var(--t2)', lineHeight: 1.6 }}>{meta.description}</p>
       </div>
       <Row label="ZONE TYPE"  value={d.type.replace('_', ' ')} color={meta.color} />
       <Row label="CONTROLLED BY" value={m.label} color={m.cssVar} />

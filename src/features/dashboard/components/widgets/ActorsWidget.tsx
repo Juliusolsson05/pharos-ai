@@ -33,20 +33,20 @@ export function ActorsWidget() {
               <div className="shrink-0 w-28">
                 <div className="flex items-center gap-1 mb-0.5">
                   <Flag actorId={actor.id} code={actor.countryCode} size={18} />
-                  <span className="text-[11px] font-bold text-[var(--t1)]">{actor.name}</span>
+                  <span className="text-[length:var(--text-body-sm)] font-bold text-[var(--t1)]">{actor.name}</span>
                 </div>
                 <span
-                  className="text-[7px] font-bold px-1 py-px tracking-[0.05em]"
+                  className="text-[length:var(--text-micro)] font-bold px-1 py-px tracking-[0.05em]"
                   style={{ background: staC + '18', color: staC }}
                 >
                   {snap.stance}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10.5px] text-[var(--t2)] leading-snug line-clamp-2">▸ {snap.doing[0]}</p>
+                <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-snug line-clamp-2">▸ {snap.doing[0]}</p>
               </div>
               <div className="shrink-0 w-10 flex flex-col gap-0.5 items-end">
-                <span className="mono text-[10px] font-bold" style={{ color: actC }}>{snap.activityScore}</span>
+                <span className="mono text-[length:var(--text-label)] font-bold" style={{ color: actC }}>{snap.activityScore}</span>
                 <div className="w-9 h-[3px] bg-[var(--bd)]">
                   <div className="h-full" style={{ width: `${snap.activityScore}%`, background: actC }} />
                 </div>

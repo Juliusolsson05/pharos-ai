@@ -75,9 +75,9 @@ export function ActorMilitaryTab({ actor, iso3, pageScroll = false }: Props) {
     <ScrollArea className="h-full">
       <div className={pageScroll ? 'safe-px py-[18px]' : 'px-[22px] py-[18px]'}>
         <div className="mb-5 border border-[var(--bd)] bg-[var(--bg-2)] px-3 py-3">
-          <div className="label text-[8px] text-[var(--t4)] mb-1">WORLD BANK COUNTRY PROFILE</div>
-          <div className="text-[13px] font-bold text-[var(--t1)]">{actor.fullName}</div>
-          <div className="mono text-[9px] text-[var(--t4)] mt-1">
+          <div className="label text-[length:var(--text-tiny)] text-[var(--t4)] mb-1">WORLD BANK COUNTRY PROFILE</div>
+          <div className="text-[length:var(--text-body)] font-bold text-[var(--t1)]">{actor.fullName}</div>
+          <div className="mono text-[length:var(--text-caption)] text-[var(--t4)] mt-1">
             Long-range state capacity and macro-stability indicators for actor-linked country data.
           </div>
         </div>
@@ -108,13 +108,13 @@ export function ActorMilitaryTab({ actor, iso3, pageScroll = false }: Props) {
             <SectionDivider label="SPENDING TREND" />
             <div className="border border-[var(--bd)] p-2">
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-[11px] font-semibold text-[var(--t2)]">Military expenditure</span>
+                <span className="text-[length:var(--text-body-sm)] font-semibold text-[var(--t2)]">Military expenditure</span>
                 <YoyBadge pts={profile.spending} />
               </div>
               <Sparkline data={profile.spending} color={trendColor} />
               <div className="flex justify-between mt-1">
-                <span className="mono text-[8px] text-[var(--t4)]">{profile.spending[0].year}</span>
-                <span className="mono text-[8px] text-[var(--t4)]">{profile.spending[profile.spending.length - 1].year}</span>
+                <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">{profile.spending[0].year}</span>
+                <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">{profile.spending[profile.spending.length - 1].year}</span>
               </div>
             </div>
           </div>

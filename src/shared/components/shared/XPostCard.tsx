@@ -26,7 +26,7 @@ export function XPostCard({ post, compact }: Props) {
             className="min-h-0 overflow-y-auto border-b border-[var(--bd-s)] px-1 py-2 [&_>_div]:!my-0 lg:border-r lg:border-b-0"
           >
             <div className="flex items-center gap-1 px-2 pb-1.5">
-              <span className="mono text-[8px] text-[var(--t4)] tracking-[0.08em]">ORIGINAL</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-[0.08em]">ORIGINAL</span>
             </div>
             <Suspense fallback={<EmbedSkeleton />}>
               <Tweet id={post.tweetId!} />
@@ -35,7 +35,7 @@ export function XPostCard({ post, compact }: Props) {
 
           <div className="flex min-h-0 min-w-0 flex-col overflow-y-auto">
             <div className="flex items-center gap-1 px-3 py-1.5">
-              <span className="mono text-[8px] text-[var(--blue-l)] tracking-[0.08em]">PHAROS INTEL</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--blue-l)] tracking-[0.08em]">PHAROS INTEL</span>
             </div>
             <PharosView post={post} acct={acct} postUrl={postUrl} />
           </div>

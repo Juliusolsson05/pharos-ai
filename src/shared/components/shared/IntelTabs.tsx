@@ -40,7 +40,7 @@ export function IntelTabBar<T extends string>({
             value={tab.value}
             className={cn(
               'rounded-none h-full font-bold uppercase shrink-0 transition-[color,border-color,background] duration-100',
-              compact ? 'px-3 text-[9px] tracking-[0.05em]' : 'px-[18px] text-[10px] tracking-[0.06em]',
+              compact ? 'px-3 text-[length:var(--text-caption)] tracking-[0.05em]' : 'px-[18px] text-[length:var(--text-label)] tracking-[0.06em]',
             )}
             style={{
               color: value === tab.value ? 'var(--t1)' : 'var(--t2)',

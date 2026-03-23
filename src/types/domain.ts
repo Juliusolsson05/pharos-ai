@@ -153,6 +153,7 @@ export type ActorResponse = {
 export type IntelEvent = {
   id: string;
   timestamp: string;
+  createdAt?: string;
   severity: Severity;
   type: EventType;
   title: string;
@@ -163,6 +164,19 @@ export type IntelEvent = {
   sources: Source[];
   actorResponses: ActorResponse[];
   tags: string[];
+};
+
+export type EventNotificationCandidate = {
+  id: string;
+  createdAt: string;
+  timestamp: string;
+  severity: Severity;
+  type: EventType;
+  title: string;
+  location: string;
+  summary: string;
+  verified: boolean;
+  sourceCount: number;
 };
 
 // X Posts (Field Signals)

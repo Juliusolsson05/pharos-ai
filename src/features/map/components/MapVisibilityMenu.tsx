@@ -82,7 +82,7 @@ export function MapVisibilityMenu({ visibility, onToggle, direction = 'up' }: Pr
                 className="mono flex items-center gap-2 w-full justify-start h-auto rounded-none"
                 style={{
                   padding:   '5px 12px',
-                  fontSize:  9,
+                  fontSize: 'var(--text-caption)',
                   fontWeight: 700,
                   color:     visible ? 'var(--t2)' : 'var(--t4)',
                   background: 'transparent',

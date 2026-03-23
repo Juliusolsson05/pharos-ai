@@ -92,7 +92,7 @@ export function MobileOverview() {
       {/* ── Situation summary ── */}
       {snap && (
         <div className="safe-px py-3 border-b border-[var(--bd)]">
-          <div className="mono text-[8px] text-[var(--t4)] tracking-[0.10em] mb-1">
+          <div className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-[0.10em] mb-1">
             {snap.dayLabel} — SITUATION
           </div>
           <p
@@ -102,7 +102,7 @@ export function MobileOverview() {
 
           {/* Escalation */}
           <div className="flex items-center gap-3 mt-2.5">
-            <span className="mono text-[8px] text-[var(--t4)]">ESCALATION</span>
+            <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">ESCALATION</span>
             <div className="flex-1 h-[4px] bg-[var(--bg-3)] rounded-sm overflow-hidden">
               <div className="h-full bg-[var(--danger)] rounded-sm" style={{ width: `${snap.escalation}%` }} />
             </div>
@@ -125,7 +125,7 @@ export function MobileOverview() {
             <MapIcon size={20} strokeWidth={2} className="text-[var(--blue-l)]" />
             <div>
               <span className="mono text-xs font-bold text-[var(--blue-l)] tracking-[0.06em]">OPEN LIVE MAP</span>
-              <p className="mono text-[9px] text-[var(--t3)] mt-0.5">{totalStories} stories · {totalEvents} events tracked</p>
+              <p className="mono text-[length:var(--text-caption)] text-[var(--t3)] mt-0.5">{totalStories} stories · {totalEvents} events tracked</p>
             </div>
           </div>
           <ArrowRight size={18} strokeWidth={2} className="text-[var(--blue-l)]" />
@@ -142,7 +142,7 @@ export function MobileOverview() {
         ].map(s => (
           <div key={s.label} className="bg-[var(--bg-2)] px-2 py-2.5 flex flex-col items-center gap-1">
             <span className="mono text-base font-bold" style={{ color: s.color }}>{s.val}</span>
-            <span className="mono text-[7px] text-[var(--t4)] tracking-[0.08em]">{s.label}</span>
+            <span className="mono text-[length:var(--text-micro)] text-[var(--t4)] tracking-[0.08em]">{s.label}</span>
           </div>
         ))}
       </div>
@@ -152,7 +152,7 @@ export function MobileOverview() {
         <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
           <span className="section-title">Latest Events</span>
             <Link href={feedHref()} className="no-underline flex items-center gap-1" onClick={() => trackOverviewNavigation(feedHref(), 'widget_link', 'latest')}>
-            <span className="mono text-[9px] text-[var(--blue-l)] font-bold">See all</span>
+            <span className="mono text-[length:var(--text-caption)] text-[var(--blue-l)] font-bold">See all</span>
             <ArrowRight size={10} className="text-[var(--blue-l)]" />
           </Link>
         </div>
@@ -169,11 +169,11 @@ export function MobileOverview() {
               >
                 <div className="shrink-0 w-14">
                   <span className={SEV_CLS[evt.severity]}>{evt.severity.slice(0, 4)}</span>
-                  <div className="mono text-[8px] text-[var(--t4)] mt-0.5">{fmtTimeZ(evt.timestamp)}</div>
+                  <div className="mono text-[length:var(--text-tiny)] text-[var(--t4)] mt-0.5">{fmtTimeZ(evt.timestamp)}</div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] text-[var(--t1)] leading-snug">{evt.title}</p>
-                  <span className="mono text-[8px] text-[var(--t4)]">{evt.location}</span>
+                  <p className="text-[length:var(--text-body-sm)] text-[var(--t1)] leading-snug">{evt.title}</p>
+                  <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">{evt.location}</span>
                 </div>
                 <ArrowRight size={10} className="text-[var(--t4)] shrink-0 mt-1" />
               </div>
@@ -188,7 +188,7 @@ export function MobileOverview() {
           <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
             <span className="section-title">Active Stories</span>
             <Link href={mapHref()} className="no-underline flex items-center gap-1" onClick={() => trackOverviewNavigation(mapHref(), 'widget_link', 'map')}>
-              <span className="mono text-[9px] text-[var(--blue-l)] font-bold">Map</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--blue-l)] font-bold">Map</span>
               <ArrowRight size={10} className="text-[var(--blue-l)]" />
             </Link>
           </div>
@@ -210,15 +210,15 @@ export function MobileOverview() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span
-                        className="mono text-[7px] font-bold tracking-[0.06em] px-[4px] py-[1px]"
+                        className="mono text-[length:var(--text-micro)] font-bold tracking-[0.06em] px-[4px] py-[1px]"
                         style={{ color: c, background: c + '18', border: `1px solid ${c}40` }}
                       >
                         {story.category}
                       </span>
-                      <span className="mono text-[8px] text-[var(--t4)]">{fmtTimeZ(story.timestamp)}</span>
+                      <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">{fmtTimeZ(story.timestamp)}</span>
                     </div>
-                    <p className="text-[11px] font-bold text-[var(--t1)] leading-snug">{story.title}</p>
-                    <p className="text-[10px] text-[var(--t3)] leading-snug mt-0.5">{story.tagline}</p>
+                    <p className="text-[length:var(--text-body-sm)] font-bold text-[var(--t1)] leading-snug">{story.title}</p>
+                    <p className="text-[length:var(--text-label)] text-[var(--t3)] leading-snug mt-0.5">{story.tagline}</p>
                   </div>
                   <ArrowRight size={10} className="text-[var(--t4)] shrink-0 mt-1" />
                 </div>
@@ -234,7 +234,7 @@ export function MobileOverview() {
           <div className="flex items-center justify-between safe-px py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
             <span className="section-title">Breaking Signals</span>
             <Link href="/dashboard/signals" className="no-underline flex items-center gap-1" onClick={() => trackOverviewNavigation('/dashboard/signals', 'widget_link', 'signals')}>
-              <span className="mono text-[9px] text-[var(--blue-l)] font-bold">All signals</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--blue-l)] font-bold">All signals</span>
               <ArrowRight size={10} className="text-[var(--blue-l)]" />
             </Link>
           </div>
@@ -257,7 +257,7 @@ export function MobileOverview() {
             <Link key={nav.href} href={nav.href} className="no-underline" onClick={() => trackOverviewNavigation(nav.href, 'widget_link', nav.label.toLowerCase())}>
               <div className="flex items-center gap-2.5 px-3 py-3 border border-[var(--bd)] bg-[var(--bg-2)] hover:bg-[var(--bg-3)] transition-colors">
                 <nav.icon size={14} strokeWidth={2} style={{ color: nav.color }} />
-                <span className="mono text-[10px] font-bold text-[var(--t2)] tracking-[0.06em]">{nav.label}</span>
+                <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t2)] tracking-[0.06em]">{nav.label}</span>
                 <ArrowRight size={10} className="text-[var(--t4)] ml-auto" />
               </div>
             </Link>

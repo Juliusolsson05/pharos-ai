@@ -101,13 +101,13 @@ export function TimelineCanvas({
 
         {filteredCount === 0 && (
           <div className="absolute" style={{ top: `${SPINE_Y - 20}px`, left: '100px' }}>
-            <span className="mono text-[13px] text-white/60">No articles for selected tiers</span>
+            <span className="mono text-[length:var(--text-body)] text-white/60">No articles for selected tiers</span>
           </div>
         )}
       </div>
 
       {/* Bottom-left hint */}
-      <div className="absolute bottom-4 left-4 mono text-[10px] text-white/40 pointer-events-none">
+      <div className="absolute bottom-4 left-4 mono text-[length:var(--text-label)] text-white/40 pointer-events-none">
         {zoomPct}% · scroll to zoom · drag to pan
       </div>
 

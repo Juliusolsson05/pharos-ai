@@ -132,8 +132,8 @@ export function FocusedChart({ index, data: initialData, initialRangeKey = '5d',
           style={{ cursor: anchorMode ? 'crosshair' : 'default' }}
         />
         <div className="flex items-center justify-between px-4 py-2 border-t border-[var(--bd)] bg-[var(--bg-2)] shrink-0">
-          <p className="text-[9px] text-[var(--t4)] leading-snug">{index.description}</p>
-          <span className="mono text-[8px] text-[var(--t4)] shrink-0 ml-4">
+          <p className="text-[length:var(--text-caption)] text-[var(--t4)] leading-snug">{index.description}</p>
+          <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] shrink-0 ml-4">
             {data.chart.length} data points · scroll/pinch to zoom · ESC to close
           </span>
         </div>

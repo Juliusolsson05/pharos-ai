@@ -10,7 +10,7 @@ type Props = {
 
 export function SourceBadge({ tier }: Props) {
   return (
-    <span className={`mono text-[9px] font-bold px-1.5 py-0.5 border ${TIER_STYLE[tier] ?? TIER_STYLE[3]}`}>
+    <span className={`mono text-[length:var(--text-caption)] font-bold px-1.5 py-0.5 border ${TIER_STYLE[tier] ?? TIER_STYLE[3]}`}>
       T{tier}
     </span>
   );

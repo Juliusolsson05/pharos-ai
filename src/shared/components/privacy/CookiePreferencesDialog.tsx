@@ -67,7 +67,7 @@ function CookiePreferencesForm({
                 Required for core page rendering and request handling. This does not turn on persistent analytics or remembered preferences.
               </p>
             </div>
-            <span className="mono rounded border border-[var(--success)] bg-[var(--success-dim)] px-2 py-1 text-[10px] text-[var(--success)]">
+            <span className="mono rounded border border-[var(--success)] bg-[var(--success-dim)] px-2 py-1 text-[length:var(--text-label)] text-[var(--success)]">
               ALWAYS ON
             </span>
           </div>

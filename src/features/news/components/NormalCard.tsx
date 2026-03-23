@@ -63,18 +63,18 @@ export function NormalCard({ article, x, cardTop, isHovered, onMouseEnter, onMou
         <div className="px-3 py-2.5">
           <div className="flex items-center gap-2 mb-1.5">
             <div
-              className="px-1.5 py-0.5 rounded text-[8px] mono font-bold leading-none"
+              className="px-1.5 py-0.5 rounded text-[length:var(--text-tiny)] mono font-bold leading-none"
               style={{ backgroundColor: `${color}30`, color, border: `1px solid ${color}50` }}
             >
               {article.feed.name.length > 14 ? article.feed.id.toUpperCase() : article.feed.name.toUpperCase()}
             </div>
             {article.feed.stateFunded && (
-              <span className="text-[8px] mono font-bold text-amber-400 tracking-wider">STATE</span>
+              <span className="text-[length:var(--text-tiny)] mono font-bold text-amber-400 tracking-wider">STATE</span>
             )}
-            <span className="mono text-[11px] font-bold text-white ml-auto shrink-0">
+            <span className="mono text-[length:var(--text-body-sm)] font-bold text-white ml-auto shrink-0">
               {formatHour(article.time)}
             </span>
-            <span className="mono text-[9px] text-white/70 shrink-0">
+            <span className="mono text-[length:var(--text-caption)] text-white/70 shrink-0">
               {formatTimeAgo(article.time)}
             </span>
           </div>
@@ -82,12 +82,12 @@ export function NormalCard({ article, x, cardTop, isHovered, onMouseEnter, onMou
             {article.title}
           </h4>
           {article.snippet && (
-            <p className="text-[10px] text-white/70 mt-1 leading-relaxed line-clamp-2">
+            <p className="text-[length:var(--text-label)] text-white/70 mt-1 leading-relaxed line-clamp-2">
               {article.snippet}
             </p>
           )}
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-[9px] mono font-bold text-white/60">{article.feed.country}</span>
+            <span className="text-[length:var(--text-caption)] mono font-bold text-white/60">{article.feed.country}</span>
             <div className="flex gap-0.5">
               {Array.from({ length: 5 - article.feed.tier }).map((_, i) => (
                 <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
@@ -97,7 +97,7 @@ export function NormalCard({ article, x, cardTop, isHovered, onMouseEnter, onMou
               ))}
             </div>
             {isHovered && (
-              <span className="ml-auto text-[8px] mono text-white/40">click to expand</span>
+              <span className="ml-auto text-[length:var(--text-tiny)] mono text-white/40">click to expand</span>
             )}
           </div>
         </div>

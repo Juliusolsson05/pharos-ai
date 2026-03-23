@@ -20,7 +20,7 @@ export function Hero() {
         Real-Time Iran Conflict Intelligence Dashboard
       </h1>
 
-      <p className="text-[15px] sm:text-base text-[var(--t2)] leading-[1.7] max-w-xl mb-8">
+      <p className="text-[length:var(--text-subhead)] sm:text-base text-[var(--t2)] leading-[1.7] max-w-xl mb-8">
         Conflicts.app is an open-source intelligence dashboard built to track
         the Iran conflict in real time. 30+ sources spanning Western, Iranian,
         Israeli, Arab, Russian, and Chinese outlets processed through an AI

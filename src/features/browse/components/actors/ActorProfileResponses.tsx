@@ -33,19 +33,19 @@ export function ActorProfileResponses({ responses }: Props) {
               {r.event && (
                 <Link
                   href={`/browse/events/${r.event.id}`}
-                  className="no-underline text-[11px] font-bold text-[var(--blue)] hover:text-[var(--t1)] transition-colors block mb-1"
+                  className="no-underline text-[length:var(--text-body-sm)] font-bold text-[var(--blue)] hover:text-[var(--t1)] transition-colors block mb-1"
                 >
                   {r.event.title}
                 </Link>
               )}
               <div className="flex items-center gap-2 mb-1">
                 <span
-                  className="mono text-[8px] font-bold px-1.5 py-0.5 rounded-sm"
+                  className="mono text-[length:var(--text-tiny)] font-bold px-1.5 py-0.5 rounded-sm"
                   style={{ color: rStaC, border: `1px solid ${rStaC}`, background: `${rStaC}15` }}
                 >
                   {r.stance}
                 </span>
-                <span className="mono text-[9px] text-[var(--t4)]">{r.type}</span>
+                <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{r.type}</span>
               </div>
               <p className="text-xs text-[var(--t2)] leading-relaxed">{r.statement}</p>
             </div>

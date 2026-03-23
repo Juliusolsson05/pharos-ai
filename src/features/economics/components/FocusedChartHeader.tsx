@@ -24,13 +24,13 @@ export function FocusedChartHeader({ index, data, rangeIdx, setRangeIdx, fetchin
     <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--bd)] shrink-0">
       <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: index.color }} />
       <div>
-        <span className="mono text-[13px] font-bold text-[var(--t1)] tracking-wide">{index.shortName}</span>
-        <span className="mono text-[10px] text-[var(--t4)] ml-3">{index.name}</span>
+        <span className="mono text-[length:var(--text-body)] font-bold text-[var(--t1)] tracking-wide">{index.shortName}</span>
+        <span className="mono text-[length:var(--text-label)] text-[var(--t4)] ml-3">{index.name}</span>
       </div>
 
       {/* Badges */}
       <span
-        className="mono text-[7px] font-bold px-[5px] py-[2px] tracking-wider"
+        className="mono text-[length:var(--text-micro)] font-bold px-[5px] py-[2px] tracking-wider"
         style={{
           color: index.tier === 1 ? 'var(--danger)' : index.tier === 2 ? 'var(--warning)' : 'var(--t4)',
           background: index.tier === 1 ? 'var(--danger-dim)' : index.tier === 2 ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.05)',
@@ -40,7 +40,7 @@ export function FocusedChartHeader({ index, data, rangeIdx, setRangeIdx, fetchin
         T{index.tier}
       </span>
       <span
-        className="mono text-[7px] font-bold px-[5px] py-[2px] tracking-wider"
+        className="mono text-[length:var(--text-micro)] font-bold px-[5px] py-[2px] tracking-wider"
         style={{ color: cat.color, background: `${cat.color}18`, border: `1px solid ${cat.color}30` }}
       >
         {cat.label}
@@ -55,7 +55,7 @@ export function FocusedChartHeader({ index, data, rangeIdx, setRangeIdx, fetchin
             size="sm"
             onClick={() => setRangeIdx(i)}
             disabled={fetching}
-            className={`px-2 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider disabled:opacity-40 ${
+            className={`px-2 py-1 h-auto rounded text-[length:var(--text-caption)] mono font-bold tracking-wider disabled:opacity-40 ${
               i === rangeIdx
                 ? 'bg-white/12 text-white border border-white/25'
                 : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent hover:bg-white/5'
@@ -76,7 +76,7 @@ export function FocusedChartHeader({ index, data, rangeIdx, setRangeIdx, fetchin
             {fmtPrice(data.price, index.unit)}
           </div>
           <div
-            className="mono text-[11px] font-bold mt-0.5"
+            className="mono text-[length:var(--text-body-sm)] font-bold mt-0.5"
             style={{ color: positive ? 'var(--success)' : 'var(--danger)' }}
           >
             {positive ? '▲' : '▼'} {fmtPrice(Math.abs(data.change), index.unit)} ({Math.abs(data.changePct).toFixed(2)}%)

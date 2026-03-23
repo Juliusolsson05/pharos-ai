@@ -42,9 +42,9 @@ export function EventArticle({ event, signals }: Props) {
       <header className="mt-8 mb-8">
         <div className="flex items-center gap-2 mb-4">
           <SeverityBadge severity={event.severity} />
-          <span className="mono text-[10px] text-[var(--t4)]">{event.type}</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{event.type}</span>
           {event.verified && (
-            <span className="mono text-[9px] font-bold text-[var(--success)]">VERIFIED</span>
+            <span className="mono text-[length:var(--text-caption)] font-bold text-[var(--success)]">VERIFIED</span>
           )}
         </div>
 
@@ -68,7 +68,7 @@ export function EventArticle({ event, signals }: Props) {
       </p>
 
       {event.fullContent && (
-        <div className="text-[15px] text-[var(--t2)] leading-[1.8] whitespace-pre-line mb-10">
+        <div className="text-[length:var(--text-subhead)] text-[var(--t2)] leading-[1.8] whitespace-pre-line mb-10">
           {event.fullContent}
         </div>
       )}
@@ -78,7 +78,7 @@ export function EventArticle({ event, signals }: Props) {
           {event.tags.map((tag) => (
             <span
               key={tag}
-              className="mono text-[10px] px-2 py-0.5 border border-[var(--bd)] text-[var(--t3)]"
+              className="mono text-[length:var(--text-label)] px-2 py-0.5 border border-[var(--bd)] text-[var(--t3)]"
             >
               {tag}
             </span>

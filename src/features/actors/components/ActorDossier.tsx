@@ -83,7 +83,7 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
     <div className={cn(pageScroll ? 'flex flex-col' : 'flex-1 flex flex-col overflow-hidden')}>
       {/* Header */}
       <div className={cn('border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0', compact ? (pageScroll ? 'safe-px py-2' : 'px-3 py-2') : 'px-5 py-3')}>
-        <div className="label text-[8px] text-[var(--t3)] mb-2">
+        <div className="label text-[length:var(--text-tiny)] text-[var(--t3)] mb-2">
           ACTOR INTELLIGENCE DOSSIER // PHAROS THREAT ANALYSIS // OPERATION EPIC FURY
         </div>
         <div className="flex items-start gap-3.5 mb-2.5">
@@ -94,20 +94,20 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
                 {actor.name.toUpperCase()}
               </h1>
               <span
-                className="text-[8px] font-bold tracking-[0.06em] px-2 py-0.5"
+                className="text-[length:var(--text-tiny)] font-bold tracking-[0.06em] px-2 py-0.5"
                 style={{ border: `1px solid ${actC}`, color: actC }}
               >
                 {snap.activityLevel}
               </span>
               <span
-                className="text-[8px] font-bold tracking-[0.06em] px-2 py-0.5"
+                className="text-[length:var(--text-tiny)] font-bold tracking-[0.06em] px-2 py-0.5"
                 style={{ border: `1px solid ${staC}`, color: staC }}
               >
                 {snap.stance}
               </span>
             </div>
-            <span className="mono text-[10px] text-[var(--t2)]">{actor.fullName}</span>
-            <span className="label ml-2.5 text-[8px] text-[var(--t3)]">{actor.type}</span>
+            <span className="mono text-[length:var(--text-label)] text-[var(--t2)]">{actor.fullName}</span>
+            <span className="label ml-2.5 text-[length:var(--text-tiny)] text-[var(--t3)]">{actor.type}</span>
           </div>
           <div className="shrink-0 flex items-center gap-1.5">
             {!isMobile && (
@@ -115,13 +115,13 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
                 <div style={{ width: `${snap.activityScore}%`, height: '100%', background: actC }} />
               </div>
             )}
-            <span className="mono text-[11px]" style={{ color: actC }}>{snap.activityScore}%</span>
+            <span className="mono text-[length:var(--text-body-sm)]" style={{ color: actC }}>{snap.activityScore}%</span>
           </div>
         </div>
 
         {/* Stance timeline */}
         <div className="flex items-center gap-1 mt-1 overflow-x-auto touch-scroll hide-scrollbar">
-          <span className="label text-[7px] text-[var(--t4)] mr-1">STANCE</span>
+          <span className="label text-[length:var(--text-micro)] text-[var(--t4)] mr-1">STANCE</span>
           {allDays.map(day => {
             const ds = getActorForDay(actor, day);
             if (!ds) return null;
@@ -136,8 +136,8 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
                   border: `1px solid ${isCurrent ? sc : 'transparent'}`,
                 }}
               >
-                <span className="mono text-[7px] font-bold" style={{ color: sc }}>{dayAbbrev(day, allDays)}</span>
-                <span className="text-[7px] font-bold tracking-[0.04em]" style={{ color: sc }}>{ds.stance}</span>
+                <span className="mono text-[length:var(--text-micro)] font-bold" style={{ color: sc }}>{dayAbbrev(day, allDays)}</span>
+                <span className="text-[length:var(--text-micro)] font-bold tracking-[0.04em]" style={{ color: sc }}>{ds.stance}</span>
               </div>
             );
           })}
@@ -161,11 +161,11 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
                 <div className="border border-[var(--bd)] bg-[var(--bg-1)]">
                   <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-[var(--bg-2)]">
                     <div>
-                      <div className="label mb-1 text-[8px] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
-                      <div className="section-title text-[11px] text-[var(--t1)]">Leadership tree available</div>
+                      <div className="label mb-1 text-[length:var(--text-tiny)] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
+                      <div className="section-title text-[length:var(--text-body-sm)] text-[var(--t1)]">Leadership tree available</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="mono text-[10px] text-[var(--t4)]">{inlineLeadershipOpen ? 'Expanded' : 'Collapsed'}</span>
+                      <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{inlineLeadershipOpen ? 'Expanded' : 'Collapsed'}</span>
                       <ChevronDown className={cn('h-4 w-4 text-[var(--t3)] transition-transform', inlineLeadershipOpen && 'rotate-180')} />
                     </div>
                   </CollapsibleTrigger>
@@ -193,7 +193,7 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
               ) : (
                 <>
                   <div className="mb-2.5">
-                    <span className="label text-[8px]">
+                    <span className="label text-[length:var(--text-tiny)]">
                       {posts.length} POSTS · PHAROS-CURATED · {actor.name.toUpperCase()}
                     </span>
                   </div>
@@ -214,7 +214,7 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
                 ) : (
                   <>
                     <div className="mb-2.5">
-                      <span className="label text-[8px]">
+                      <span className="label text-[length:var(--text-tiny)]">
                         {posts.length} POSTS · PHAROS-CURATED · {actor.name.toUpperCase()}
                       </span>
                     </div>

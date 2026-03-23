@@ -21,7 +21,7 @@ export function ChatMessage({ message }: Props) {
   return (
     <div ref={ref} className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-2`}>
       <div
-        className={`max-w-[85%] rounded px-3 py-2 text-[13px] leading-relaxed ${
+        className={`max-w-[85%] rounded px-3 py-2 text-[length:var(--text-body)] leading-relaxed ${
           isUser
             ? 'bg-[var(--blue-dim)] text-[var(--t1)]'
             : 'bg-[var(--bg-2)] text-[var(--t2)]'

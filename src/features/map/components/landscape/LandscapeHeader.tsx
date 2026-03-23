@@ -23,7 +23,7 @@ export function LandscapeHeader({ title, onBack, right }: Props) {
         className="flex items-center gap-1.5 px-2 py-1 text-[var(--t3)] hover:text-[var(--t1)] transition-colors rounded-none"
       >
         <ArrowLeft size={14} strokeWidth={2} />
-        <span className="mono text-[10px] font-bold tracking-[0.06em]">{title}</span>
+        <span className="mono text-[length:var(--text-label)] font-bold tracking-[0.06em]">{title}</span>
       </Button>
       {right && <div className="ml-auto flex items-center gap-2">{right}</div>}
     </div>

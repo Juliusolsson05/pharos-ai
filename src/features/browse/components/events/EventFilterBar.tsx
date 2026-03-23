@@ -95,7 +95,7 @@ export function EventFilterBar({ eventDates }: Props) {
           <Button
             variant="ghost"
             size="xs"
-            className="mono text-[10px] text-[var(--t4)] hover:text-[var(--t2)]"
+            className="mono text-[length:var(--text-label)] text-[var(--t4)] hover:text-[var(--t2)]"
             aria-label="Pick date"
           >
             <CalendarIcon className="size-3" />
@@ -123,7 +123,7 @@ export function EventFilterBar({ eventDates }: Props) {
           variant="ghost"
           size="xs"
           onClick={() => updateParams({ severity: null, date: null })}
-          className="mono text-[10px] text-[var(--t4)] hover:text-[var(--t2)]"
+          className="mono text-[length:var(--text-label)] text-[var(--t4)] hover:text-[var(--t2)]"
         >
           Clear
         </Button>

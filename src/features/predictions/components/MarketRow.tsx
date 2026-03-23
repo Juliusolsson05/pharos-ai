@@ -61,7 +61,7 @@ export function MarketRow({ market, rank, isExpanded, onToggle }: Props) {
             {isGroup && (
               <Badge
                 variant="outline"
-                className="shrink-0 text-[8px] px-[5px] py-px text-[var(--blue-l)] border-[var(--info-bd)] bg-[var(--blue-dim)]"
+                className="shrink-0 text-[length:var(--text-tiny)] px-[5px] py-px text-[var(--blue-l)] border-[var(--info-bd)] bg-[var(--blue-dim)]"
               >
                 {market.subMarkets.length}
               </Badge>
@@ -94,7 +94,7 @@ export function MarketRow({ market, rank, isExpanded, onToggle }: Props) {
           </span>
 
           {/* End date */}
-          <span className="mono text-right pr-3 text-[10px] text-[var(--t3)]">
+          <span className="mono text-right pr-3 text-[length:var(--text-label)] text-[var(--t3)]">
             {fmtMarketDate(market.endDate)}
           </span>
 
@@ -102,7 +102,7 @@ export function MarketRow({ market, rank, isExpanded, onToggle }: Props) {
           <div className="flex justify-end pr-2">
             <Badge
               variant="outline"
-              className="text-[8px] px-[5px] py-px tracking-[0.06em]"
+              className="text-[length:var(--text-tiny)] px-[5px] py-px tracking-[0.06em]"
               style={{ color: status.color, borderColor: status.border, background: status.bg }}
             >
               {status.label}
@@ -137,7 +137,7 @@ export function MarketRow({ market, rank, isExpanded, onToggle }: Props) {
             {/* Description + outcomes */}
             <div className="flex flex-col gap-2.5 flex-1 min-w-[200px]">
               {market.description && (
-                <p className="text-[11px] text-[var(--t3)] leading-[1.7] max-w-[600px]">{market.description}</p>
+                <p className="text-[length:var(--text-body-sm)] text-[var(--t3)] leading-[1.7] max-w-[600px]">{market.description}</p>
               )}
               {!isBinary && market.outcomes.length > 0 && (
                 <OutcomeList outcomes={market.outcomes} prices={market.prices} />
@@ -151,14 +151,14 @@ export function MarketRow({ market, rank, isExpanded, onToggle }: Props) {
               {market.startDate && (
                 <div className="text-right">
                   <div className="label">OPENED</div>
-                  <span className="mono text-[10px] text-[var(--t3)]">{fmtMarketDate(market.startDate)}</span>
+                  <span className="mono text-[length:var(--text-label)] text-[var(--t3)]">{fmtMarketDate(market.startDate)}</span>
                 </div>
               )}
               <Button
                 asChild
                 variant="outline"
                 size="sm"
-                className="mono text-[9px] tracking-[0.08em] text-[var(--blue-l)] border-[var(--info-bd)] bg-[var(--blue-dim)]"
+                className="mono text-[length:var(--text-caption)] tracking-[0.08em] text-[var(--blue-l)] border-[var(--info-bd)] bg-[var(--blue-dim)]"
               >
                 <a href={market.polyUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
                   <ExternalLink size={10} /> POLYMARKET ↗
@@ -193,13 +193,13 @@ function OutcomeList({ outcomes, prices }: { outcomes: string[]; prices: number[
         const c = p >= 0.65 ? 'var(--success)' : p >= 0.5 ? 'var(--blue)' : p >= 0.35 ? 'var(--warning)' : 'var(--danger)';
         return (
           <div key={outcome} className="flex items-center gap-2">
-            <span className="mono truncate text-[10px] text-[var(--t2)] w-[150px] shrink-0">{outcome}</span>
+            <span className="mono truncate text-[length:var(--text-label)] text-[var(--t2)] w-[150px] shrink-0">{outcome}</span>
             <Progress
               value={p * 100}
               className="flex-1 h-px max-w-[180px] bg-[var(--bg-3)]"
               indicatorStyle={{ background: c }}
             />
-            <span className="mono text-[10px] font-bold w-8 text-right shrink-0" style={{ color: c }}>
+            <span className="mono text-[length:var(--text-label)] font-bold w-8 text-right shrink-0" style={{ color: c }}>
               {Math.round(p * 100)}%
             </span>
           </div>
@@ -221,7 +221,7 @@ function OrderBook({ market }: { market: PredictionMarket }) {
       <div className="flex gap-2.5 justify-end">
         {entries.map(({ label, val, color }) => (
           <div key={label} className="text-right">
-            <div className="label text-[7px]">{label}</div>
+            <div className="label text-[length:var(--text-micro)]">{label}</div>
             <span className="mono font-bold" style={{ color }}>{val}</span>
           </div>
         ))}
@@ -243,8 +243,8 @@ function StatGrid({ market }: { market: PredictionMarket }) {
     <div className="grid grid-cols-2 gap-x-4 gap-y-1 w-full">
       {rows.map(({ label, val }) => (
         <div key={label} className="text-right">
-          <div className="label text-[7px]">{label}</div>
-          <span className="mono text-[11px] font-bold text-[var(--t1)]">{val}</span>
+          <div className="label text-[length:var(--text-micro)]">{label}</div>
+          <span className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--t1)]">{val}</span>
         </div>
       ))}
     </div>
