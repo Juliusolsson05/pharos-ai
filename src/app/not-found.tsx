@@ -10,7 +10,7 @@ export default function NotFound() {
           This route does not exist in the current intelligence workspace.
         </p>
         <Link href="/dashboard" className="no-underline">
-          <span className="mono text-[11px] font-bold text-[var(--blue-l)]">Return to Dashboard</span>
+          <span className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--blue-l)]">Return to Dashboard</span>
         </Link>
       </div>
     </div>

@@ -24,7 +24,7 @@ export function EventSignalsContent({ xPosts, compact = false, pageScroll = fals
       ) : (
         <>
           <div className="mb-2.5">
-            <span className="label text-[8px]">
+            <span className="label text-[length:var(--text-tiny)]">
               {xPosts.length} POSTS · PHAROS-CURATED · CHRONOLOGICAL
             </span>
           </div>

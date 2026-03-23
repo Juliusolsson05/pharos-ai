@@ -91,24 +91,24 @@ function LeadershipNode({ data }: NodeProps<Node<GraphNodeData>>) {
 
       <div className="h-[10px] w-full" style={{ background: getLeadershipHeaderColor(data.tier, data.status) }} />
       <div className="border-b border-[var(--bd)] bg-[linear-gradient(180deg,var(--bg-2),var(--bg-1))] px-3 py-2">
-        <div className="label text-[8px] text-[var(--t4)]">{data.title}</div>
+        <div className="label text-[length:var(--text-tiny)] text-[var(--t4)]">{data.title}</div>
         <div className="mt-2 flex items-start gap-3">
           <div className={`relative shrink-0 overflow-hidden border border-[var(--bd)] bg-[var(--bg-app)] ${portraitSize}`}>
             <Portrait name={data.name} imageUrl={data.wikipediaImageUrl} />
           </div>
           <div className="min-w-0 flex-1">
-            <div className={`${compact ? 'text-[11px]' : 'text-[13px]'} font-semibold leading-snug text-[var(--t1)]`}>{data.name}</div>
+            <div className={`${compact ? 'text-[length:var(--text-body-sm)]' : 'text-[length:var(--text-body)]'} font-semibold leading-snug text-[var(--t1)]`}>{data.name}</div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[data.status]}`}>{data.status}</span>
-              {data.dateLabel && <span className="mono text-[9px] text-[var(--t4)]">{data.dateLabel}</span>}
+              <span className={`mono inline-flex border px-2 py-0.5 text-[length:var(--text-caption)] font-bold ${STATUS_STYLE[data.status]}`}>{data.status}</span>
+              {data.dateLabel && <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{data.dateLabel}</span>}
             </div>
           </div>
         </div>
       </div>
 
       <div className="px-3 py-3">
-        <p className={`${compact ? 'text-[10px]' : 'text-[11px]'} leading-relaxed text-[var(--t2)]`}>{data.summary}</p>
-        {!compact && data.reportsTo && data.reportsTo.length > 0 && <div className="mt-2 mono text-[10px] text-[var(--t4)]">Reports to {data.reportsTo.join(' / ')}</div>}
+        <p className={`${compact ? 'text-[length:var(--text-label)]' : 'text-[length:var(--text-body-sm)]'} leading-relaxed text-[var(--t2)]`}>{data.summary}</p>
+        {!compact && data.reportsTo && data.reportsTo.length > 0 && <div className="mt-2 mono text-[length:var(--text-label)] text-[var(--t4)]">Reports to {data.reportsTo.join(' / ')}</div>}
       </div>
 
       <Handle id="out-bottom" type="source" position={Position.Bottom} className="!h-2 !w-2 !border-[var(--blue)] !bg-[var(--bg-app)]" />
@@ -280,8 +280,8 @@ function LeadershipDetailPanel({ selectedNode, headerCollapsed, onHeaderCollapse
           <div className="min-w-0 flex-1">
             <div className="mb-2 h-[10px] w-full" style={{ background: getLeadershipHeaderColor(selectedNode.tier, selectedNode.status) }} />
             <div className="flex flex-wrap items-center gap-2">
-              <DialogTitle className="text-[15px] leading-tight text-[var(--t1)] md:text-[16px]">{selectedNode.name}</DialogTitle>
-              <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
+              <DialogTitle className="text-[length:var(--text-subhead)] leading-tight text-[var(--t1)] md:text-[16px]">{selectedNode.name}</DialogTitle>
+              <span className={`mono inline-flex border px-2 py-0.5 text-[length:var(--text-caption)] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
             </div>
           </div>
           <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={() => onHeaderCollapsedChange(false)}>
@@ -304,14 +304,14 @@ function LeadershipDetailPanel({ selectedNode, headerCollapsed, onHeaderCollapse
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="label mb-1 text-[8px] text-[var(--t4)]">{selectedNode.title}</div>
+              <div className="label mb-1 text-[length:var(--text-tiny)] text-[var(--t4)]">{selectedNode.title}</div>
               <DialogTitle className="text-[17px] leading-tight text-[var(--t1)] md:text-[18px]">{selectedNode.name}</DialogTitle>
               <DialogDescription className="mt-2 flex flex-wrap items-center gap-2 text-[var(--t3)]">
-                <span className={`mono inline-flex border px-2 py-0.5 text-[9px] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
-                {selectedNode.dateLabel && <span className="mono text-[10px] text-[var(--t4)]">{selectedNode.dateLabel}</span>}
-                <span className="mono text-[10px] text-[var(--t4)]">Tier {selectedNode.tier + 1}</span>
+                <span className={`mono inline-flex border px-2 py-0.5 text-[length:var(--text-caption)] font-bold ${STATUS_STYLE[selectedNode.status]}`}>{selectedNode.status}</span>
+                {selectedNode.dateLabel && <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{selectedNode.dateLabel}</span>}
+                <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">Tier {selectedNode.tier + 1}</span>
               </DialogDescription>
-              <p className="mt-3 text-[12px] leading-relaxed text-[var(--t2)]">{selectedNode.summary}</p>
+              <p className="mt-3 text-[length:var(--text-body)] leading-relaxed text-[var(--t2)]">{selectedNode.summary}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {selectedNode.wikipediaPageUrl && (
                   <Button asChild variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]">
@@ -330,7 +330,7 @@ function LeadershipDetailPanel({ selectedNode, headerCollapsed, onHeaderCollapse
       <ScrollArea className={bodyHeight}>
         <div className="px-4 py-4 md:px-5 md:py-5">
           <div className="mb-4 flex items-center justify-between border-b border-[var(--bd-s)] pb-2">
-            <div className="section-title text-[10px]">Wikipedia dossier</div>
+            <div className="section-title text-[length:var(--text-label)]">Wikipedia dossier</div>
           </div>
 
           {selectedNode.wikipediaPageUrl ? (
@@ -346,7 +346,7 @@ function LeadershipDetailPanel({ selectedNode, headerCollapsed, onHeaderCollapse
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-[12px] leading-relaxed text-[var(--t3)]">No stored Wikipedia article is available for this node yet.</p>
+              <p className="text-[length:var(--text-body)] leading-relaxed text-[var(--t3)]">No stored Wikipedia article is available for this node yet.</p>
             </div>
           )}
         </div>
@@ -385,14 +385,14 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
       <div className="px-4 py-4 md:px-5">
         <div className="mb-4 flex items-end justify-between gap-3 border-b border-[var(--bd)] pb-3">
           <div>
-            <div className="label mb-1 text-[8px]">WARTIME SUCCESSION / COMMAND GRAPH</div>
-            <h2 className="section-title text-[12px]">{getLeadershipTitle(tree?.actorName ?? actor.name)}</h2>
+            <div className="label mb-1 text-[length:var(--text-tiny)]">WARTIME SUCCESSION / COMMAND GRAPH</div>
+            <h2 className="section-title text-[length:var(--text-body)]">{getLeadershipTitle(tree?.actorName ?? actor.name)}</h2>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-8 border-[var(--bd)] bg-[var(--bg-2)] text-[var(--t2)] hover:bg-[var(--bg-3)]" onClick={resetView}>
               Reset view
             </Button>
-            <div className="mono text-[10px] text-[var(--t4)]">{isMobile ? 'Tap a node for full profile' : 'Click a node for full profile'}</div>
+            <div className="mono text-[length:var(--text-label)] text-[var(--t4)]">{isMobile ? 'Tap a node for full profile' : 'Click a node for full profile'}</div>
           </div>
         </div>
 
@@ -421,7 +421,7 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
             >
               <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="rgba(120,138,168,0.2)" />
             </ReactFlow>
-            {isLoading && <div className="pointer-events-none absolute inset-0 flex items-center justify-center mono text-[12px] text-[var(--t4)]">Loading leadership tree...</div>}
+            {isLoading && <div className="pointer-events-none absolute inset-0 flex items-center justify-center mono text-[length:var(--text-body)] text-[var(--t4)]">Loading leadership tree...</div>}
           </div>
         </div>
       </div>

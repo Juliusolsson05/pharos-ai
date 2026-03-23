@@ -29,7 +29,7 @@ export function CheckboxRow({
         }}
       />
       <span
-        className="text-[10px]"
+        className="text-[length:var(--text-label)]"
         style={{ color: checked ? 'var(--t1)' : 'var(--t2)' }}
       >
         {label}
@@ -51,7 +51,7 @@ export function ToggleRow({
       className="w-full flex justify-between items-center px-3 py-[7px] hover:bg-[var(--bg-sel)] cursor-pointer"
     >
       <span
-        className="text-[10px]"
+        className="text-[length:var(--text-label)]"
         style={{ color: checked ? 'var(--t1)' : 'var(--t2)' }}
       >
         {label}

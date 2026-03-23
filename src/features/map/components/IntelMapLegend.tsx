@@ -28,11 +28,11 @@ export function IntelMapLegend() {
         pointerEvents: 'none',
       }}
     >
-      <div style={{ fontSize: 8, color: 'var(--t4)', marginBottom: 6 }}>LEGEND</div>
+      <div style={{ fontSize: 'var(--text-tiny)', color: 'var(--t4)', marginBottom: 6 }}>LEGEND</div>
       {LEGEND_ITEMS.map(({ color, shape, label }) => (
         <div
           key={label}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 9, color: 'var(--t3)' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 'var(--text-caption)', color: 'var(--t3)' }}
         >
           {shape === 'rect' ? (
             <div style={{ width: 12, height: 3, background: color, flexShrink: 0 }} />

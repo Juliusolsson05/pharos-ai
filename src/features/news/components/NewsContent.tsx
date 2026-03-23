@@ -80,7 +80,7 @@ export function NewsContent() {
       <div className={`py-2 border-b border-[var(--bd)] bg-[var(--bg-app)] shrink-0 overflow-x-auto ${isLandscapePhone ? 'safe-px' : 'px-5'}`}>
         <div className="flex items-center justify-between gap-6 min-w-max">
           <div className="flex items-center gap-3">
-            <span className="mono text-[10px] font-bold text-[var(--t3)] tracking-wider">
+            <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t3)] tracking-wider">
               RSS MONITOR
             </span>
             <div className="w-px h-4 bg-[var(--bd)]" />
@@ -93,7 +93,7 @@ export function NewsContent() {
                   setViewMode('conflict');
                   track('news_view_changed', { mode: 'conflict' });
                 }}
-                className={`px-3 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider ${
+                className={`px-3 py-1 h-auto rounded text-[length:var(--text-caption)] mono font-bold tracking-wider ${
                   viewMode === 'conflict'
                     ? 'bg-[var(--danger-dim)] text-[var(--danger)] border border-[var(--danger-bd)]'
                     : 'text-[var(--t4)] hover:text-[var(--t2)]'
@@ -109,7 +109,7 @@ export function NewsContent() {
                   setViewMode('all');
                   track('news_view_changed', { mode: 'all' });
                 }}
-                className={`px-3 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider ${
+                className={`px-3 py-1 h-auto rounded text-[length:var(--text-caption)] mono font-bold tracking-wider ${
                   viewMode === 'all'
                     ? 'bg-white/10 text-white border border-white/20'
                     : 'text-[var(--t4)] hover:text-[var(--t2)]'
@@ -126,7 +126,7 @@ export function NewsContent() {
                   pathname: '/dashboard/data/news',
                   surface: 'news',
                 })}
-                className="px-3 py-1 rounded text-[9px] mono font-bold tracking-wider text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
+                className="px-3 py-1 rounded text-[length:var(--text-caption)] mono font-bold tracking-wider text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
               >
                 TIMELINE →
               </Link>
@@ -138,7 +138,7 @@ export function NewsContent() {
             variant="outline"
             size="sm"
             onClick={() => setShowImages(v => !v)}
-            className={`flex items-center gap-2 h-auto px-2.5 py-1 text-[9px] mono tracking-wider ${
+            className={`flex items-center gap-2 h-auto px-2.5 py-1 text-[length:var(--text-caption)] mono tracking-wider ${
               showImages
                 ? 'bg-[var(--blue-dim)] text-[var(--blue-l)] border-[var(--blue)]'
                 : 'text-[var(--t4)] hover:text-[var(--t2)] border-transparent'
@@ -157,7 +157,7 @@ export function NewsContent() {
             size="sm"
             onClick={handleRefresh}
             disabled={isFetching}
-            className="flex items-center gap-2 h-auto px-2 py-1 text-[9px] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
+            className="flex items-center gap-2 h-auto px-2 py-1 text-[length:var(--text-caption)] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
           >
             <svg
               width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"
@@ -171,7 +171,7 @@ export function NewsContent() {
 
           <div className="flex items-center gap-2">
             <div className={`dot ${isFetching ? 'dot-warn' : 'dot-live'}`} />
-            <span className="mono text-[9px] text-[var(--t4)]">
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">
               {isFetching ? 'refreshing...' : timeSinceRefresh}
             </span>
           </div>

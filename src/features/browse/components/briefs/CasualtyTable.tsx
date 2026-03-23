@@ -12,11 +12,11 @@ export function CasualtyTable({ casualties }: Props) {
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-[var(--bd)]">
-            <th className="text-left py-2 pr-4 text-[var(--t4)] font-normal uppercase tracking-wider text-[10px]">Faction</th>
-            <th className="text-right py-2 px-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[10px]">Killed</th>
-            <th className="text-right py-2 px-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[10px]">Wounded</th>
-            <th className="text-right py-2 px-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[10px]">Civilians</th>
-            <th className="text-right py-2 pl-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[10px]">Injured</th>
+            <th className="text-left py-2 pr-4 text-[var(--t4)] font-normal uppercase tracking-wider text-[length:var(--text-label)]">Faction</th>
+            <th className="text-right py-2 px-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[length:var(--text-label)]">Killed</th>
+            <th className="text-right py-2 px-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[length:var(--text-label)]">Wounded</th>
+            <th className="text-right py-2 px-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[length:var(--text-label)]">Civilians</th>
+            <th className="text-right py-2 pl-3 text-[var(--t4)] font-normal uppercase tracking-wider text-[length:var(--text-label)]">Injured</th>
           </tr>
         </thead>
         <tbody>

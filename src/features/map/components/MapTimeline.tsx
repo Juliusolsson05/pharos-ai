@@ -116,7 +116,7 @@ export function MapTimeline({ rawData, dataExtent, viewExtent, onViewExtent, tim
         <div className="flex items-center gap-0.5 overflow-x-auto touch-scroll hide-scrollbar pr-2">
           {ZOOM_LEVELS.map(z => (
             <Button key={z.label} variant="ghost" size="xs" onClick={() => handleZoom(z.ms)}
-              className={`mono rounded-sm px-1.5 py-0 text-[8px] font-bold tracking-wider ${isMobile ? 'h-5' : 'h-4'}`}
+              className={`mono rounded-sm px-1.5 py-0 text-[length:var(--text-tiny)] font-bold tracking-wider ${isMobile ? 'h-5' : 'h-4'}`}
               style={{
                 border: `1px solid ${activeZoom === z.label ? 'var(--blue)' : 'var(--bd)'}`,
                 background: activeZoom === z.label ? 'var(--blue-dim)' : 'transparent',
@@ -127,9 +127,9 @@ export function MapTimeline({ rawData, dataExtent, viewExtent, onViewExtent, tim
         </div>
         {isActive && (
           <div className="flex items-center gap-2">
-            <span className="mono text-[9px] text-[var(--t2)]">{fmt(rng[0])} — {fmt(rng[1])}</span>
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t2)]">{fmt(rng[0])} — {fmt(rng[1])}</span>
             <Button variant="ghost" size="xs" onClick={() => onTimeRange(null)}
-              className="mono rounded-sm px-1 py-0 h-4 text-[8px]"
+              className="mono rounded-sm px-1 py-0 h-4 text-[length:var(--text-tiny)]"
               style={{ color: 'var(--danger)', background: 'var(--danger-dim)', border: '1px solid var(--danger)' }}
             >×</Button>
           </div>

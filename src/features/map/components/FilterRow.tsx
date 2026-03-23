@@ -33,7 +33,7 @@ export function FilterRow({ option, isOn, onToggle }: Props) {
       {/* Label */}
       <span
         className="mono flex-shrink-0 ml-1.5 truncate text-left"
-        style={{ color: isOn ? 'var(--t2)' : 'var(--t4)', fontSize: 10 }}
+        style={{ color: isOn ? 'var(--t2)' : 'var(--t4)', fontSize: 'var(--text-label)' }}
       >
         {option.label}
       </span>
@@ -44,7 +44,7 @@ export function FilterRow({ option, isOn, onToggle }: Props) {
       {/* Count */}
       <span
         className="mono flex-shrink-0 tabular-nums"
-        style={{ color: isOn ? 'var(--t3)' : 'var(--t4)', fontSize: 9, minWidth: 16, textAlign: 'right' }}
+        style={{ color: isOn ? 'var(--t3)' : 'var(--t4)', fontSize: 'var(--text-caption)', minWidth: 16, textAlign: 'right' }}
       >
         {option.count}
       </span>

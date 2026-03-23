@@ -40,7 +40,7 @@ export function ProbChart({ data, color, height = 80, interactive = false, onCro
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
         textColor:  'rgba(255,255,255,0.4)',
-        fontSize:   9,
+        fontSize: 9,
         fontFamily: 'monospace',
       },
       grid: {

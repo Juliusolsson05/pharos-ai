@@ -34,7 +34,7 @@ export function ChannelTileActions({
           variant="ghost"
           size="sm"
           onClick={onPopOut}
-          className="h-auto px-1.5 py-0.5 text-[8px] mono tracking-wider text-[var(--t4)] hover:text-[var(--t2)]"
+          className="h-auto px-1.5 py-0.5 text-[length:var(--text-tiny)] mono tracking-wider text-[var(--t4)] hover:text-[var(--t2)]"
         >
           <PanelsTopLeft className="size-3" />
           POP
@@ -46,7 +46,7 @@ export function ChannelTileActions({
         size="sm"
         onClick={onFocus}
         disabled={!canEmbedLive}
-        className={`h-auto px-1.5 py-0.5 text-[8px] mono tracking-wider ${
+        className={`h-auto px-1.5 py-0.5 text-[length:var(--text-tiny)] mono tracking-wider ${
           isFocused
             ? 'text-[var(--blue-l)]'
             : 'text-[var(--t4)] hover:text-[var(--t2)]'
@@ -64,7 +64,7 @@ export function ChannelTileActions({
         >
           <a href={getLiveUrl(handle)} target="_blank" rel="noopener noreferrer">
             <ExternalLink className="size-3" />
-            <span className="mono text-[8px] tracking-wider">WATCH</span>
+            <span className="mono text-[length:var(--text-tiny)] tracking-wider">WATCH</span>
           </a>
         </Button>
       )}

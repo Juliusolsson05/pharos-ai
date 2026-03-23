@@ -42,8 +42,8 @@ export function FocusedChartStats({
         { label: 'CHANGE', value: fmtPct(pctFromOpen), color: pctFromOpen >= 0 ? 'var(--success)' : 'var(--danger)' },
       ].map((s) => (
         <div key={s.label} className="flex items-center gap-3 pr-4 mr-4 border-r border-[var(--bd)] last:border-r-0">
-          <span className="mono text-[8px] text-[var(--t4)] tracking-widest shrink-0">{s.label}</span>
-          <span className="mono text-[11px] font-bold" style={{ color: s.color ?? 'var(--t1)' }}>{s.value}</span>
+          <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest shrink-0">{s.label}</span>
+          <span className="mono text-[length:var(--text-body-sm)] font-bold" style={{ color: s.color ?? 'var(--t1)' }}>{s.value}</span>
         </div>
       ))}
 
@@ -51,13 +51,13 @@ export function FocusedChartStats({
       {crosshairValue && (
         <>
           <div className="w-px h-4 bg-[var(--bd)] mx-3" />
-          <span className="mono text-[8px] text-[var(--t4)] tracking-widest shrink-0">CURSOR</span>
-          <span className="mono text-[11px] font-bold text-[var(--t1)] ml-2 shrink-0">
+          <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest shrink-0">CURSOR</span>
+          <span className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--t1)] ml-2 shrink-0">
             {fmtPrice(crosshairValue.price, index.unit)}
           </span>
           {anchorPrice && (
             <span
-              className="mono text-[11px] font-bold ml-3 shrink-0 px-2 py-0.5 rounded"
+              className="mono text-[length:var(--text-body-sm)] font-bold ml-3 shrink-0 px-2 py-0.5 rounded"
               style={{
                 color: (pctFromAnchor ?? 0) >= 0 ? 'var(--success)' : 'var(--danger)',
                 background: (pctFromAnchor ?? 0) >= 0 ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
@@ -73,14 +73,14 @@ export function FocusedChartStats({
       <div className="ml-auto flex items-center gap-2 shrink-0">
         {anchorPrice && (
           <div className="flex items-center gap-2">
-            <span className="mono text-[8px] text-amber-400/80 tracking-wider">
+            <span className="mono text-[length:var(--text-tiny)] text-amber-400/80 tracking-wider">
               ANCHOR: {fmtPrice(anchorPrice, index.unit)}
             </span>
             <Button
               variant="ghost"
               size="sm"
               onClick={clearAnchor}
-              className="mono text-[8px] h-auto px-1 py-0 text-[var(--t4)] hover:text-[var(--danger)]"
+              className="mono text-[length:var(--text-tiny)] h-auto px-1 py-0 text-[var(--t4)] hover:text-[var(--danger)]"
             >
               ✕ CLEAR
             </Button>
@@ -90,7 +90,7 @@ export function FocusedChartStats({
           variant="outline"
           size="sm"
           onClick={() => setAnchorMode(v => !v)}
-          className={`mono text-[8px] h-auto font-bold px-2 py-1 tracking-wider ${
+          className={`mono text-[length:var(--text-tiny)] h-auto font-bold px-2 py-1 tracking-wider ${
             anchorMode
               ? 'text-amber-300 bg-amber-400/15 border-amber-400/40'
               : 'text-[var(--t4)] border-[var(--bd)] hover:text-[var(--t2)] hover:border-white/20'

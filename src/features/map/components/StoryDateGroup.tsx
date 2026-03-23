@@ -32,13 +32,13 @@ export function StoryDateGroup({
       <Button
         variant="ghost"
         onClick={onToggle}
-        className="w-full flex items-center gap-2 h-auto rounded-none justify-start mono px-4 py-2 text-[10px] font-bold text-[var(--t4)] bg-[var(--bg-1)] border-b border-[var(--bd-s)] tracking-[0.06em]"
+        className="w-full flex items-center gap-2 h-auto rounded-none justify-start mono px-4 py-2 text-[length:var(--text-label)] font-bold text-[var(--t4)] bg-[var(--bg-1)] border-b border-[var(--bd-s)] tracking-[0.06em]"
       >
         {isExpanded
           ? <ChevronDown size={12} strokeWidth={2.5} />
           : <ChevronRight size={12} strokeWidth={2.5} />}
         {group.label}
-        <span className="bg-[var(--bg-3)] text-[var(--t4)] text-[8px] px-1.5 py-px rounded-sm ml-0.5">
+        <span className="bg-[var(--bg-3)] text-[var(--t4)] text-[length:var(--text-tiny)] px-1.5 py-px rounded-sm ml-0.5">
           {group.stories.length}
         </span>
       </Button>

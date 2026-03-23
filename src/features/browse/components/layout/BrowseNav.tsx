@@ -40,7 +40,7 @@ export function BrowseNav({ hamburgerSlot }: Props) {
         <div className="flex items-center gap-5">
           {hamburgerSlot}
           <Link href="/browse" className="no-underline">
-            <span className="text-[15px] font-bold text-[var(--t1)] tracking-[0.12em]">
+            <span className="text-[length:var(--text-subhead)] font-bold text-[var(--t1)] tracking-[0.12em]">
               PHAROS
             </span>
           </Link>
@@ -56,7 +56,7 @@ export function BrowseNav({ hamburgerSlot }: Props) {
                     if (isActive) return;
                     trackBrowseNavigation(s.href, 'top_nav');
                   }}
-                  className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
+                  className={`no-underline text-[length:var(--text-body-sm)] font-medium px-2.5 py-1 border-b-2 transition-colors ${
                     isActive
                       ? 'text-[var(--t1)] border-[var(--blue)]'
                       : 'text-[var(--t3)] border-transparent hover:text-[var(--t1)]'
@@ -72,7 +72,7 @@ export function BrowseNav({ hamburgerSlot }: Props) {
                 if (pathname.startsWith('/browse/api/reference')) return;
                 trackBrowseNavigation('/browse/api/reference', 'top_nav');
               }}
-              className={`no-underline text-[11px] font-medium px-2.5 py-1 border-b-2 transition-colors ${
+              className={`no-underline text-[length:var(--text-body-sm)] font-medium px-2.5 py-1 border-b-2 transition-colors ${
                 pathname.startsWith('/browse/api/reference')
                   ? 'text-[var(--t1)] border-[var(--blue)]'
                   : 'text-[var(--t3)] border-transparent hover:text-[var(--t1)]'
@@ -110,7 +110,7 @@ export function BrowseNav({ hamburgerSlot }: Props) {
               aria-label="Support Pharos server costs on Ko-fi"
             >
               <Heart size={12} fill="currentColor" strokeWidth={0} />
-              <span className="mono hidden text-[10px] font-bold tracking-[0.04em] md:inline">SUPPORT</span>
+              <span className="mono hidden text-[length:var(--text-label)] font-bold tracking-[0.04em] md:inline">SUPPORT</span>
             </a>
           </Button>
 
@@ -121,7 +121,7 @@ export function BrowseNav({ hamburgerSlot }: Props) {
           >
             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
               <Github size={13} fill="currentColor" strokeWidth={0} />
-              <span className="mono text-[10px] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
+              <span className="mono text-[length:var(--text-label)] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
             </a>
           </Button>
         </div>

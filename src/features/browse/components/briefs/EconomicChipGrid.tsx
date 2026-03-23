@@ -15,9 +15,9 @@ export function EconomicChipGrid({ chips }: Props) {
           className="rounded-md border px-3 py-2"
           style={{ borderColor: chip.color }}
         >
-          <p className="text-[10px] text-[var(--t4)] uppercase tracking-wider mb-1">{chip.label}</p>
+          <p className="text-[length:var(--text-label)] text-[var(--t4)] uppercase tracking-wider mb-1">{chip.label}</p>
           <p className="text-sm font-bold text-[var(--t1)]">{chip.val}</p>
-          <p className="text-[10px] text-[var(--t3)]">{chip.sub}</p>
+          <p className="text-[length:var(--text-label)] text-[var(--t3)]">{chip.sub}</p>
         </div>
       ))}
     </div>

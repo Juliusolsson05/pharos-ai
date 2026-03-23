@@ -32,10 +32,10 @@ export function SignalCard({
   return (
     <div className="card">
       <div className="card-header">
-        <span className="mono text-[11px] font-bold text-[var(--t1)]">
+        <span className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--t1)]">
           {displayName}
         </span>
-        <span className="mono text-[10px] text-[var(--t4)]">@{handle}</span>
+        <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">@{handle}</span>
         <span className={`sev ml-auto ${SIG_STYLE[significance] ?? ''}`}>
           {significance}
         </span>
@@ -48,13 +48,13 @@ export function SignalCard({
       </div>
 
       <div className="card-footer">
-        <span className="mono text-[10px] text-[var(--t4)]">
+        <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">
           {fmtDate(timestamp)} {fmtTimeZ(timestamp)}
         </span>
         <div className="flex items-center gap-3 ml-auto">
-          <span className="mono text-[10px] text-[var(--t4)]">{fmt(likes)} likes</span>
-          <span className="mono text-[10px] text-[var(--t4)]">{fmt(retweets)} RT</span>
-          <span className="mono text-[10px] text-[var(--t4)]">{fmt(views)} views</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{fmt(likes)} likes</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{fmt(retweets)} RT</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{fmt(views)} views</span>
         </div>
       </div>
 

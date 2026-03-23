@@ -105,7 +105,7 @@ export function WorkspaceDashboard() {
           variant={editing ? 'outline' : 'ghost'}
           size="xs"
           onClick={() => dispatch(toggleEditing())}
-          className={`text-[10px] font-semibold tracking-wide mono ${
+          className={`text-[length:var(--text-label)] font-semibold tracking-wide mono ${
             editing
               ? 'border-[var(--blue)] bg-[var(--blue-dim)] text-[var(--blue-l)]'
               : 'border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t3)]'
@@ -134,7 +134,7 @@ export function WorkspaceDashboard() {
                   value: id,
                 });
               }}
-              className={`text-[10px] font-semibold tracking-wide mono ${
+              className={`text-[length:var(--text-label)] font-semibold tracking-wide mono ${
                 activePreset === id
                   ? 'border-[var(--blue)] bg-[var(--blue-dim)] text-[var(--blue-l)]'
                   : 'border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t4)] hover:text-[var(--t2)]'
@@ -144,7 +144,7 @@ export function WorkspaceDashboard() {
             </Button>
           ))}
           {activePreset === 'custom' && (
-            <span className="text-[9px] text-[var(--t4)] ml-1 mono">CUSTOM</span>
+            <span className="text-[length:var(--text-caption)] text-[var(--t4)] ml-1 mono">CUSTOM</span>
           )}
         </div>
 
@@ -173,7 +173,7 @@ export function WorkspaceDashboard() {
               <div className="flex items-center gap-1">
                 <select
                   id="add-widget-select"
-                  className="text-[10px] px-2 py-1 border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t2)]"
+                  className="text-[length:var(--text-label)] px-2 py-1 border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t2)]"
                   defaultValue=""
                   onChange={() => {}}
                 >
@@ -182,13 +182,13 @@ export function WorkspaceDashboard() {
                     <option key={k} value={k}>{WIDGET_LABELS[k]}</option>
                   ))}
                 </select>
-                <span className="text-[9px] text-[var(--t4)]">→ col:</span>
+                <span className="text-[length:var(--text-caption)] text-[var(--t4)]">→ col:</span>
                 {columns.map((col, ci) => (
                   <Button
                     key={col.id}
                     variant="ghost"
                     size="xs"
-                    className="text-[10px] border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t2)]"
+                    className="text-[length:var(--text-label)] border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t2)]"
                     onClick={() => {
                       const sel = document.getElementById('add-widget-select') as HTMLSelectElement;
                       const val = sel.value as WidgetKey;
@@ -203,7 +203,7 @@ export function WorkspaceDashboard() {
                 <Button
                   variant="ghost"
                   size="xs"
-                  className="text-[10px] border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t2)]"
+                  className="text-[length:var(--text-label)] border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t2)]"
                   onClick={() => {
                     const sel = document.getElementById('add-widget-select') as HTMLSelectElement;
                     const val = sel.value as WidgetKey;
@@ -217,12 +217,12 @@ export function WorkspaceDashboard() {
                 </Button>
               </div>
             )}
-            <span className="text-[9px] text-[var(--t4)] mono ml-2">drag splitters to resize</span>
+            <span className="text-[length:var(--text-caption)] text-[var(--t4)] mono ml-2">drag splitters to resize</span>
             <Button
               variant="ghost"
               size="xs"
               onClick={() => dispatch(resetToPreset())}
-              className="ml-auto text-[10px] border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t4)]"
+              className="ml-auto text-[length:var(--text-label)] border border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t4)]"
             >
               Reset
             </Button>
@@ -307,7 +307,7 @@ export function WorkspaceDashboard() {
                                   widget_key: widget,
                                 })}
                               >
-                                <span className="text-[9px] text-[var(--blue-l)] font-semibold">{widgetLinks[widget]!.label}</span>
+                                <span className="text-[length:var(--text-caption)] text-[var(--blue-l)] font-semibold">{widgetLinks[widget]!.label}</span>
                                 <ArrowRight size={10} strokeWidth={2} className="text-[var(--blue-l)]" />
                               </Link>
                             )}

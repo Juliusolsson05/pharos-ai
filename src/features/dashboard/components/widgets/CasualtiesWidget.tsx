@@ -22,15 +22,15 @@ export function CasualtiesWidget() {
       <div className="grid grid-cols-1 min-[260px]:grid-cols-2 gap-3 mb-4">
         {rows.map(r => (
           <div key={r.label} className="px-3 py-3 bg-[var(--bg-2)] border border-[var(--bd)]" style={{ borderLeft: `3px solid ${r.color}` }}>
-            <div className="label text-[8px] mb-1 text-[var(--t4)]">{r.label}</div>
+            <div className="label text-[length:var(--text-tiny)] mb-1 text-[var(--t4)]">{r.label}</div>
             <div className="mono text-lg sm:text-xl font-bold leading-none mb-1 break-all" style={{ color: r.color }}>
               {r.val?.toLocaleString?.() ?? r.val}
             </div>
-            <div className="mono text-[9px] text-[var(--t4)]">{r.sub}</div>
+            <div className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{r.sub}</div>
           </div>
         ))}
       </div>
-      <div className="text-[10px] text-[var(--t3)] leading-relaxed border-t border-[var(--bd)] pt-3">
+      <div className="text-[length:var(--text-label)] text-[var(--t3)] leading-relaxed border-t border-[var(--bd)] pt-3">
         {Object.entries(cas.regional).map(([k, v]) => `${k.toUpperCase()}: ${v.killed} killed, ${v.injured} injured`).join(' · ')}
       </div>
     </div>

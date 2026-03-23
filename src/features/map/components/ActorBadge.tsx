@@ -25,7 +25,7 @@ export function ActorBadge({ actor, actorMeta, isActive = true }: Props) {
         gap:           4,
         padding:       '2px 7px',
         borderRadius:  2,
-        fontSize:      9,
+        fontSize: 'var(--text-caption)',
         fontWeight:    700,
         letterSpacing: '0.07em',
         color:         isActive ? meta.cssVar : 'var(--t4)',

@@ -38,6 +38,14 @@ type RGBA = [number, number, number, number];
 
 // Helpers
 
+/** Read a --text-* CSS token as a numeric pixel value for DeckGL layers. */
+function textToken(name: string, fallback: number): number {
+  if (typeof document === 'undefined') return fallback;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const n = parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 const activeAlpha = (isSatellite: boolean) => (isSatellite ? 255 : 220);
 
 const withAlpha = (rgb: number[], a: number): RGBA => [rgb[0] ?? 0, rgb[1] ?? 0, rgb[2] ?? 0, a];
@@ -116,8 +124,9 @@ export function useMapLayers({
 
     const highlighted = (id: string, arr: string[]) => !dimActive || arr.includes(id);
 
-    // Label appearance boosts in satellite mode
-    const labelSize    = isSatellite ? 12 : 11;
+    // Label appearance — reads CSS scale tokens so DeckGL respects UI scale
+    const baseLabelSize = textToken('--text-body-sm', 11);
+    const labelSize    = isSatellite ? baseLabelSize + 1 : baseLabelSize;
     const labelWeight  = isSatellite ? 700 : 400;
     const labelBg: RGBA = isSatellite ? [10, 14, 22, 230] : [28, 33, 39, 200];
     const strokeWidth  = isSatellite ? 2 : 1;
@@ -281,7 +290,7 @@ export function useMapLayers({
       data: visibleLabels.assets,
       getPosition:       (d: Asset): [number, number] => d.position,
       getText:           (d: Asset): string => d.name,
-      getSize:           isSatellite ? 11 : 10,
+      getSize:           isSatellite ? baseLabelSize : textToken('--text-label', 10),
       getColor:          (d: Asset): RGBA => {
         const [r, g, b] = (actorMeta[d.actor] ?? FALLBACK_META).rgb;
         return isSatellite ? [r + 40, g + 40, b + 40, 255] : [r, g, b, 200];

@@ -15,19 +15,19 @@ export function SituationWidget() {
   return (
     <div className="h-full overflow-y-auto px-4 py-3">
       <div className="mb-2.5">
-        <span className="label text-[8px] text-[var(--t4)]">
+        <span className="label text-[length:var(--text-tiny)] text-[var(--t4)]">
           UNCLASSIFIED // PHAROS ANALYTICAL // {snap.dayLabel} — {day}
         </span>
       </div>
-      <p className="text-[13px] text-[var(--t1)] leading-relaxed mb-2.5">{snap.summary}</p>
+      <p className="text-[length:var(--text-body)] text-[var(--t1)] leading-relaxed mb-2.5">{snap.summary}</p>
       <div className="flex flex-col sm:flex-row gap-3 mt-2.5">
         <div className="flex-1 px-3 py-2 bg-[var(--bg-2)] border border-[var(--bd)] [border-left:3px_solid_var(--blue)]">
-          <div className="label text-[8px] mb-1 text-[var(--blue)]">US OBJECTIVE</div>
-          <p className="text-[11px] text-[var(--t2)] leading-snug">{conflict?.objectives?.us}</p>
+          <div className="label text-[length:var(--text-tiny)] mb-1 text-[var(--blue)]">US OBJECTIVE</div>
+          <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-snug">{conflict?.objectives?.us}</p>
         </div>
         <div className="flex-1 px-3 py-2 bg-[var(--bg-2)] border border-[var(--bd)] [border-left:3px_solid_var(--info)]">
-          <div className="label text-[8px] mb-1 text-[var(--info)]">ISRAELI OBJECTIVE</div>
-          <p className="text-[11px] text-[var(--t2)] leading-snug">{conflict?.objectives?.il}</p>
+          <div className="label text-[length:var(--text-tiny)] mb-1 text-[var(--info)]">ISRAELI OBJECTIVE</div>
+          <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-snug">{conflict?.objectives?.il}</p>
         </div>
       </div>
       <div className="flex gap-3 mt-3 flex-wrap">

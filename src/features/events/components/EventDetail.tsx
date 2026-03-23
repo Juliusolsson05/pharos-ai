@@ -40,19 +40,19 @@ export function EventDetail({ event, tab, onTabChange, compact = false, pageScro
             style={{ border: `1px solid ${sc}`, background: sc + '18' }}
           >
             <div className="w-[5px] h-[5px] rounded-full" style={{ background: sc }} />
-            <span className="text-[9px] font-bold tracking-[0.08em]" style={{ color: sc }}>
+            <span className="text-[length:var(--text-caption)] font-bold tracking-[0.08em]" style={{ color: sc }}>
               {event.severity}
             </span>
           </div>
-          <span className="label text-[8px] text-[var(--t3)]">{event.type}</span>
+          <span className="label text-[length:var(--text-tiny)] text-[var(--t3)]">{event.type}</span>
           {event.verified && (
             <div className="flex items-center gap-[3px]">
               <CheckCircle size={9} className="text-[var(--success)]" strokeWidth={2} />
-              <span className="label text-[8px] text-[var(--success)]">VERIFIED</span>
+              <span className="label text-[length:var(--text-tiny)] text-[var(--success)]">VERIFIED</span>
             </div>
           )}
         </div>
-        <h1 className={cn('font-bold text-[var(--t1)] leading-[1.25] mb-2', compact ? 'text-[13px]' : 'text-[15px]')}>
+        <h1 className={cn('font-bold text-[var(--t1)] leading-[1.25] mb-2', compact ? 'text-[length:var(--text-body)]' : 'text-[length:var(--text-subhead)]')}>
           {event.title}
         </h1>
         <div className="flex gap-5">

@@ -40,7 +40,7 @@ export function CriticalTimeline() {
       </h2>
 
       {items.length === 0 ? (
-        <p className="text-[11px] text-[var(--t4)]">No critical events</p>
+        <p className="text-[length:var(--text-body-sm)] text-[var(--t4)]">No critical events</p>
       ) : (
         <ol className="relative list-none">
           {items.map((event, i) => {
@@ -75,11 +75,11 @@ export function CriticalTimeline() {
                   href={`/browse/events/${event.id}`}
                   className="block no-underline group"
                 >
-                  <time className="mono text-[10px] text-[var(--t4)]">
+                  <time className="mono text-[length:var(--text-label)] text-[var(--t4)]">
                     {timeAgo(event.timestamp)}
                   </time>
                   <p
-                    className={`text-[11px] line-clamp-2 transition-colors ${
+                    className={`text-[length:var(--text-body-sm)] line-clamp-2 transition-colors ${
                       isActive
                         ? 'text-[var(--t1)]'
                         : 'text-[var(--t2)] group-hover:text-[var(--t1)]'

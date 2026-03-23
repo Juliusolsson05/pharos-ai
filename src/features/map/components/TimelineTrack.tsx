@@ -43,7 +43,7 @@ export function TimelineTrack({ histogram, ticks, leftPct, rightPct, isActive, i
       {ticks.map((t, i) => (
         <div key={i} className="absolute top-0 bottom-0" style={{ left: `${t.pct}%` }}>
           <div className="absolute inset-0 w-px bg-[var(--bd)]" />
-          <span className="mono absolute text-[7px] text-[var(--t4)]" style={{ top: 0, left: 3 }}>{t.label}</span>
+          <span className="mono absolute text-[length:var(--text-micro)] text-[var(--t4)]" style={{ top: 0, left: 3 }}>{t.label}</span>
         </div>
       ))}
 

@@ -29,7 +29,7 @@ function DatasetBtn({ name, isOn, isActive, onToggle, onDrill }: {
     <div className="flex items-center">
       <Button
         variant="ghost" size="xs" onClick={onToggle}
-        className="mono rounded-none rounded-l-sm px-1.5 py-0 h-5 text-[8px] font-bold tracking-wider"
+        className="mono rounded-none rounded-l-sm px-1.5 py-0 h-5 text-[length:var(--text-tiny)] font-bold tracking-wider"
         style={{
           border: `1px solid ${isOn ? m.border : 'var(--bd)'}`,
           borderRight: 'none',
@@ -104,7 +104,7 @@ export function MapFilterPanel(props: Props) {
             ))}
 
             <Button variant="ghost" size="xs" onClick={onToggleHeat}
-              className="mono rounded-sm px-1.5 py-0 h-5 text-[8px] font-bold tracking-wider"
+              className="mono rounded-sm px-1.5 py-0 h-5 text-[length:var(--text-tiny)] font-bold tracking-wider"
               style={{
                 border: `1px solid ${state.heat ? heatMeta.border : 'var(--bd)'}`,
                 background: state.heat ? heatMeta.bg : 'var(--bg-1)',
@@ -117,7 +117,7 @@ export function MapFilterPanel(props: Props) {
             <div className="w-px h-3.5 bg-[var(--bd)] mx-0.5 flex-shrink-0" />
             {isFiltered && (
               <Button variant="ghost" size="xs" onClick={onReset}
-                className="mono rounded-sm px-1.5 py-0 h-5 text-[8px] font-bold tracking-wider"
+                className="mono rounded-sm px-1.5 py-0 h-5 text-[length:var(--text-tiny)] font-bold tracking-wider"
                 style={{ border: '1px solid var(--danger)', background: 'var(--danger-dim)', color: 'var(--danger)' }}
               >CLEAR</Button>
             )}
@@ -126,7 +126,7 @@ export function MapFilterPanel(props: Props) {
               variant="ghost"
               size="xs"
               onClick={() => { setExpanded(false); setDrillDataset(null); }}
-              className="mono rounded-sm px-1.5 py-0 h-5 text-[8px] font-bold tracking-wider"
+              className="mono rounded-sm px-1.5 py-0 h-5 text-[length:var(--text-tiny)] font-bold tracking-wider"
               style={{ border: '1px solid var(--bd)', background: 'var(--bg-1)', color: 'var(--t4)' }}
               title="Close filters"
             >

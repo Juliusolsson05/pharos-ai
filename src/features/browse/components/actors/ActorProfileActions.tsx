@@ -32,13 +32,13 @@ export function ActorProfileActions({ actions }: Props) {
               className="py-3 border-b border-[var(--bd-s)]"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="mono text-[10px] text-[var(--t4)]">{action.date}</span>
-                <span className="mono text-[9px] font-bold px-1.5 py-0.5 rounded-sm" style={{ color: sigC, border: `1px solid ${sigC}` }}>
+                <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{action.date}</span>
+                <span className="mono text-[length:var(--text-caption)] font-bold px-1.5 py-0.5 rounded-sm" style={{ color: sigC, border: `1px solid ${sigC}` }}>
                   {action.significance}
                 </span>
-                <span className="mono text-[9px] text-[var(--t4)]">{action.type}</span>
+                <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{action.type}</span>
                 {action.verified && (
-                  <span className="mono text-[8px] font-bold text-[var(--success)]">VERIFIED</span>
+                  <span className="mono text-[length:var(--text-tiny)] font-bold text-[var(--success)]">VERIFIED</span>
                 )}
               </div>
               <p className="text-xs text-[var(--t2)] leading-relaxed">{action.description}</p>

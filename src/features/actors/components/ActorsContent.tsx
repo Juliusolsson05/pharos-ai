@@ -68,7 +68,7 @@ export function ActorsContent() {
                 variant="ghost"
                 size="xs"
                 onClick={() => handleSelect(null)}
-                className="mono h-7 px-2 text-[9px] font-bold tracking-[0.06em]"
+                className="mono h-7 px-2 text-[length:var(--text-caption)] font-bold tracking-[0.06em]"
               >
                 <ArrowLeft size={12} />
                 BACK

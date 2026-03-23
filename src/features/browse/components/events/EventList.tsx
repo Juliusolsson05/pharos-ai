@@ -46,7 +46,7 @@ export function EventList({ events, page = 1, filterBar }: Props) {
         <section key={day} className="mt-10">
           <div className="flex items-center gap-3 mb-5">
             <h2 className="text-sm font-semibold text-[var(--t1)]">{day}</h2>
-            <span className="mono text-[10px] text-[var(--t4)]">
+            <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">
               {dayEvents.length} events
             </span>
             <div className="flex-1 h-px bg-[var(--bd)]" />
@@ -70,13 +70,13 @@ function LatestEvent({ event }: { event: EventItem }) {
         <div className="h-[3px] w-10 bg-[var(--danger)] mb-5" />
 
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-[11px] font-bold text-[var(--danger)] tracking-[0.08em]">
+          <span className="text-[length:var(--text-body-sm)] font-bold text-[var(--danger)] tracking-[0.08em]">
             LATEST
           </span>
           <SeverityBadge severity={event.severity} />
-          <span className="mono text-[10px] text-[var(--t4)]">{event.type}</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{event.type}</span>
           {event.verified && (
-            <span className="mono text-[9px] font-bold text-[var(--success)]">VERIFIED</span>
+            <span className="mono text-[length:var(--text-caption)] font-bold text-[var(--success)]">VERIFIED</span>
           )}
         </div>
 
@@ -84,16 +84,16 @@ function LatestEvent({ event }: { event: EventItem }) {
           {event.title}
         </h2>
 
-        <p className="text-[15px] text-[var(--t2)] leading-[1.7] mb-4">
+        <p className="text-[length:var(--text-subhead)] text-[var(--t2)] leading-[1.7] mb-4">
           {event.summary}
         </p>
 
         <div className="flex items-center gap-2 text-[var(--t4)]">
-          <time className="mono text-[11px]">
+          <time className="mono text-[length:var(--text-body-sm)]">
             {fmtDate(event.timestamp)} · {fmtTimeZ(event.timestamp)}
           </time>
-          <span className="text-[11px]">·</span>
-          <span className="text-[11px]">{event.location}</span>
+          <span className="text-[length:var(--text-body-sm)]">·</span>
+          <span className="text-[length:var(--text-body-sm)]">{event.location}</span>
         </div>
       </article>
     </Link>
@@ -109,13 +109,13 @@ function EventListItem({ event }: { event: EventItem }) {
       <article>
         <div className="flex items-center gap-2 mb-1.5">
           <SeverityBadge severity={event.severity} />
-          <span className="mono text-[10px] text-[var(--t4)]">{event.type}</span>
-          <span className="mono text-[10px] text-[var(--t4)]">·</span>
-          <span className="mono text-[10px] text-[var(--t4)]">
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{event.type}</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">·</span>
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">
             {fmtTimeZ(event.timestamp)}
           </span>
           {event.verified && (
-            <span className="mono text-[9px] text-[var(--success)] font-bold">VERIFIED</span>
+            <span className="mono text-[length:var(--text-caption)] text-[var(--success)] font-bold">VERIFIED</span>
           )}
         </div>
 
@@ -123,11 +123,11 @@ function EventListItem({ event }: { event: EventItem }) {
           {event.title}
         </h3>
 
-        <p className="text-[13px] text-[var(--t3)] leading-relaxed line-clamp-2 mb-1.5">
+        <p className="text-[length:var(--text-body)] text-[var(--t3)] leading-relaxed line-clamp-2 mb-1.5">
           {event.summary}
         </p>
 
-        <span className="text-[11px] text-[var(--t4)]">{event.location}</span>
+        <span className="text-[length:var(--text-body-sm)] text-[var(--t4)]">{event.location}</span>
       </article>
     </Link>
   );

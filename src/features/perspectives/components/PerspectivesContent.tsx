@@ -44,13 +44,13 @@ export function PerspectivesContent() {
           <div className="flex items-center gap-3 min-w-0">
             <Link
               href="/dashboard/data"
-              className="mono text-[10px] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
+              className="mono text-[length:var(--text-label)] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
             >
               {'<-'} DATA
             </Link>
             <div className="w-px h-4 bg-[var(--bd)] shrink-0" />
-            <span className="mono text-[10px] font-bold text-[var(--t3)] tracking-wider">PERSPECTIVES</span>
-            <span className="mono text-[9px] text-[var(--t4)]">{activeChannels.length} live desks</span>
+            <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t3)] tracking-wider">PERSPECTIVES</span>
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{activeChannels.length} live desks</span>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@ export function PerspectivesContent() {
         <div className={`${isLandscapePhone ? 'safe-px' : 'px-5'} flex items-baseline gap-3 pt-4 pb-2`}>
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[var(--teal)] animate-pulse" />
-            <h2 className="mono text-[13px] font-bold text-[var(--t1)] tracking-[0.12em]">
+            <h2 className="mono text-[length:var(--text-body)] font-bold text-[var(--t1)] tracking-[0.12em]">
               PERSPECTIVES
             </h2>
           </div>
@@ -74,7 +74,7 @@ export function PerspectivesContent() {
                 key={p.id}
                 variant="ghost"
                 onClick={() => handlePreset(p.id)}
-                className={`rounded-b-none rounded-t px-4 py-2 h-auto border border-b-0 text-[10px] mono font-bold tracking-wider transition-colors ${
+                className={`rounded-b-none rounded-t px-4 py-2 h-auto border border-b-0 text-[length:var(--text-label)] mono font-bold tracking-wider transition-colors ${
                   isActive
                     ? 'bg-[var(--bg-app)] text-white border-[var(--bd)]'
                     : 'bg-transparent text-[var(--t4)] border-transparent hover:text-[var(--t2)] hover:bg-[var(--bg-2)]'
@@ -85,7 +85,7 @@ export function PerspectivesContent() {
                   {p.label}
                 </div>
                 {isActive && (
-                  <div className="mt-0.5 hidden text-left text-[8px] font-normal text-[var(--t4)] md:block">
+                  <div className="mt-0.5 hidden text-left text-[length:var(--text-tiny)] font-normal text-[var(--t4)] md:block">
                     {p.description}
                   </div>
                 )}
@@ -97,15 +97,15 @@ export function PerspectivesContent() {
 
       <div className={`flex items-center justify-between border-b border-[var(--bd)] bg-[var(--bg-2)] py-2 shrink-0 ${isLandscapePhone ? 'safe-px' : 'px-5'}`}>
         <div className="flex items-center gap-3 min-w-0">
-          <span className="mono text-[9px] text-[var(--t4)]">ACTIVE PERSPECTIVE</span>
-          <span className="mono text-[10px] font-bold text-[var(--t1)] tracking-wider">{preset.label}</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">ACTIVE PERSPECTIVE</span>
+          <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t1)] tracking-wider">{preset.label}</span>
           <div className="w-px h-4 bg-[var(--bd)] shrink-0" />
-          <span className="mono text-[9px] text-[var(--t4)]">{activeChannels.length} channels</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{activeChannels.length} channels</span>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="dot dot-live" />
-          <span className="mono text-[9px] text-[var(--t4)]">autoplay · focus to interact</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">autoplay · focus to interact</span>
         </div>
       </div>
 

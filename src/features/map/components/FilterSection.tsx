@@ -42,7 +42,7 @@ export function FilterSection({ title, options, activeKeys, onToggle, isGrouped 
         <span className="label">{title}</span>
         <Button
           variant="ghost"
-          className="h-4 px-1 text-[9px] text-[var(--t4)] hover:text-[var(--t2)] rounded-sm"
+          className="h-4 px-1 text-[length:var(--text-caption)] text-[var(--t4)] hover:text-[var(--t2)] rounded-sm"
           onClick={handleToggleAll}
         >
           {allOn ? 'none' : 'all'}
@@ -54,7 +54,7 @@ export function FilterSection({ title, options, activeKeys, onToggle, isGrouped 
         groups.map(([group, opts]) => (
           <div key={group}>
             {group && (
-              <span className="label block px-2.5 mt-1 mb-0.5 text-[8px] text-[var(--t4)]">{group}</span>
+              <span className="label block px-2.5 mt-1 mb-0.5 text-[length:var(--text-tiny)] text-[var(--t4)]">{group}</span>
             )}
             {opts.map(o => (
               <FilterRow key={o.key} option={o} isOn={activeKeys.has(o.key)} onToggle={() => onToggle(o.key)} />

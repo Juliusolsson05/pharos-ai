@@ -75,7 +75,7 @@ export function StoryTimeline({ stories, activeId, onActivate }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <span className="label" style={{ color: 'var(--t4)' }}>TIMELINE</span>
-        <span className="mono text-[8px] text-[var(--t4)]">
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">
           {days[0]?.label} – {days[days.length - 1]?.label}
         </span>
       </div>
@@ -110,7 +110,7 @@ export function StoryTimeline({ stories, activeId, onActivate }: Props) {
               }}
             >
               {/* Day label */}
-              <div className="mono text-[8px] font-bold text-[var(--t4)] mb-1.5 tracking-wider">
+              <div className="mono text-[length:var(--text-tiny)] font-bold text-[var(--t4)] mb-1.5 tracking-wider">
                 {day.label}
               </div>
 

@@ -34,7 +34,7 @@ export function ChatInput({ value, isLoading, onChange, onSubmit, onStop }: Prop
         placeholder="Ask about events, actors, signals..."
         rows={1}
         disabled={isLoading}
-        className="flex-1 resize-none bg-transparent text-[16px] text-[var(--t1)] placeholder:text-[var(--t4)] outline-none disabled:opacity-50 md:text-[13px]"
+        className="flex-1 resize-none bg-transparent text-[16px] text-[var(--t1)] placeholder:text-[var(--t4)] outline-none disabled:opacity-50 md:text-[length:var(--text-body)]"
         style={{ maxHeight: 120, minHeight: 32 }}
       />
       {isLoading ? (

@@ -35,7 +35,7 @@ export function TimelineHeader({
 }: Props) {
   return (
     <div className={`${isLandscapePhone ? 'safe-px' : 'px-5'} py-2 bg-[var(--bg-2)] border-b border-[var(--bd)] flex items-center gap-3 shrink-0 z-10`}>
-      <span className="mono text-[11px] font-bold text-white tracking-wider">TIMELINE</span>
+      <span className="mono text-[length:var(--text-body-sm)] font-bold text-white tracking-wider">TIMELINE</span>
       <div className="w-px h-4 bg-white/20" />
 
       <div className="flex gap-1">
@@ -45,7 +45,7 @@ export function TimelineHeader({
             variant="ghost"
             size="sm"
             onClick={() => toggleTier(tier)}
-            className={`px-2 py-1 h-auto rounded text-[9px] mono font-bold tracking-wider
+            className={`px-2 py-1 h-auto rounded text-[length:var(--text-caption)] mono font-bold tracking-wider
               ${selectedTiers.has(tier)
                 ? 'bg-white/15 text-white border border-white/30'
                 : 'text-white/40 border border-transparent hover:text-white/70'
@@ -64,7 +64,7 @@ export function TimelineHeader({
             onClick={() => { zoomRef.current = Math.max(MIN_ZOOM, zoomRef.current - ZOOM_STEP * 2); commitTransform(); }}
             className="mono text-xs h-auto p-0 text-white/70 hover:text-white w-4 text-center"
           >−</Button>
-          <span className="mono text-[9px] text-white/70 w-10 text-center font-bold">{zoomPct}%</span>
+          <span className="mono text-[length:var(--text-caption)] text-white/70 w-10 text-center font-bold">{zoomPct}%</span>
           <Button
             variant="ghost"
             size="sm"
@@ -76,7 +76,7 @@ export function TimelineHeader({
           variant="outline"
           size="sm"
           onClick={centerOnNewest}
-          className="mono text-[9px] h-auto font-bold text-white/70 hover:text-white px-2 py-1 border-white/20"
+          className="mono text-[length:var(--text-caption)] h-auto font-bold text-white/70 hover:text-white px-2 py-1 border-white/20"
         >
           → LATEST
         </Button>
@@ -84,11 +84,11 @@ export function TimelineHeader({
           variant="ghost"
           size="sm"
           onClick={resetView}
-          className="mono text-[9px] h-auto p-0 text-white/50 hover:text-white"
+          className="mono text-[length:var(--text-caption)] h-auto p-0 text-white/50 hover:text-white"
         >
           RESET
         </Button>
-        <span className="mono text-[9px] font-bold text-white/60">{filteredCount} articles</span>
+        <span className="mono text-[length:var(--text-caption)] font-bold text-white/60">{filteredCount} articles</span>
       </div>
     </div>
   );

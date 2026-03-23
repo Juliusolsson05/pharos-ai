@@ -21,21 +21,21 @@ export function StoryCard(props: Props) {
       <article className="rounded-md border border-[var(--bd-s)] px-5 py-4 transition-colors hover:border-[var(--bd)] hover:bg-[var(--bg-3)]/20">
         <div className="flex items-center gap-2.5 mb-3">
           <CategoryBadge category={props.category} />
-          <span className="mono text-[10px] text-[var(--t4)]">
+          <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">
             {fmtDate(props.timestamp)}
           </span>
         </div>
 
-        <h2 className="text-[15px] font-bold text-[var(--t1)] leading-snug mb-1 group-hover:text-[var(--blue)] transition-colors">
+        <h2 className="text-[length:var(--text-subhead)] font-bold text-[var(--t1)] leading-snug mb-1 group-hover:text-[var(--blue)] transition-colors">
           {props.title}
         </h2>
         <p className="text-xs text-[var(--t3)] mb-3">{props.tagline}</p>
 
-        <p className="text-[13px] text-[var(--t2)] leading-relaxed line-clamp-3 mb-3">
+        <p className="text-[length:var(--text-body)] text-[var(--t2)] leading-relaxed line-clamp-3 mb-3">
           {props.narrative}
         </p>
 
-        <div className="flex items-center gap-3 text-[10px] mono text-[var(--t4)]">
+        <div className="flex items-center gap-3 text-[length:var(--text-label)] mono text-[var(--t4)]">
           <span>{props.keyFacts.length} key facts</span>
           <span>&middot;</span>
           <span>{props.eventCount} timeline events</span>

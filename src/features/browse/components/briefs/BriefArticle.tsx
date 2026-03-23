@@ -35,14 +35,14 @@ export function BriefArticle({ brief }: Props) {
       <header className="mt-6 mb-8">
         <p className="label mb-2">Daily brief</p>
         <h1 className="text-lg font-bold text-[var(--t1)] mb-1">{brief.dayLabel}</h1>
-        <p className="mono text-[10px] text-[var(--t4)] mb-4">{brief.day}</p>
+        <p className="mono text-[length:var(--text-label)] text-[var(--t4)] mb-4">{brief.day}</p>
         <div className="max-w-xs">
           <EscalationBar escalation={brief.escalation} />
         </div>
       </header>
 
       <section className="mb-8">
-        <p className="text-[15px] text-[var(--t1)] leading-[1.7]">{brief.summary}</p>
+        <p className="text-[length:var(--text-subhead)] text-[var(--t1)] leading-[1.7]">{brief.summary}</p>
       </section>
 
       {brief.keyFacts.length > 0 && (

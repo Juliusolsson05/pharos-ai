@@ -27,6 +27,13 @@ export type LayerVisibility = {
 
 export type TooltipObject = StrikeArc | MissileTrack | Target | Asset | ThreatZone | HeatPoint;
 
+function textToken(name: string, fallback: number): number {
+  if (typeof document === 'undefined') return fallback;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const n = parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 export function useMapLayers(visibility: LayerVisibility, mapData: MapDataResult | undefined) {
   return useMemo(() => {
     const strikes = mapData?.strikes ?? [];
@@ -160,7 +167,7 @@ export function useMapLayers(visibility: LayerVisibility, mapData: MapDataResult
         data: targets,
         getPosition: (d: Target): [number, number] => d.position,
         getText: (d: Target): string => d.name,
-        getSize: 11,
+        getSize: textToken('--text-body-sm', 11),
         getColor: (): [number, number, number, number] => [220, 220, 220, 200],
         getPixelOffset: (): [number, number] => [0, -20],
         fontFamily: 'SFMono-Regular, Menlo, monospace',
@@ -175,7 +182,7 @@ export function useMapLayers(visibility: LayerVisibility, mapData: MapDataResult
         data: assets,
         getPosition: (d: Asset): [number, number] => d.position,
         getText: (d: Asset): string => d.name,
-        getSize: 10,
+        getSize: textToken('--text-label', 10),
         getColor: (): [number, number, number, number] => [150, 200, 255, 200],
         getPixelOffset: (): [number, number] => [0, -22],
         fontFamily: 'SFMono-Regular, Menlo, monospace',

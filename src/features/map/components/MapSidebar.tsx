@@ -87,14 +87,14 @@ export function MapSidebar({ isOpen, stories, activeStory, onToggle, onActivateS
     }}>
       {/* Header */}
       <div className="panel-header">
-        <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 12 }}>◈ STORIES</span>
+        <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 'var(--text-body)' }}>◈ STORIES</span>
         <span className="label" style={{
           background: 'var(--bg-3)', color: 'var(--t4)',
           padding: '1px 6px', borderRadius: 2, marginLeft: 4,
         }}>AI CURATED</span>
         <span style={{
           background: 'var(--blue-dim)', color: 'var(--blue-l)',
-          fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 10, marginLeft: 2,
+          fontSize: 'var(--text-caption)', fontWeight: 700, padding: '2px 6px', borderRadius: 10, marginLeft: 2,
         }}>{stories.length}</span>
         {onToggleExpand && (
           <Button variant="ghost" size="xs" onClick={onToggleExpand}

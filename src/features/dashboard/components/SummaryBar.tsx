@@ -47,20 +47,20 @@ export function SummaryBar() {
     <div
       className={`flex items-center gap-1.5 shrink-0 overflow-x-auto touch-scroll hide-scrollbar bg-[var(--bg-app)] border-b border-[var(--bd)] ${isLandscapePhone ? 'h-8 safe-px' : 'h-9 px-4'}`}
     >
-      <span className="label shrink-0 text-[8px] text-[var(--t4)]">KEY FACTS</span>
+      <span className="label shrink-0 text-[length:var(--text-tiny)] text-[var(--t4)]">KEY FACTS</span>
       <div className="shrink-0 w-px h-3.5 bg-[var(--bd)]" />
       {chips.map(chip => (
         <div
           key={chip.label}
           className={`flex items-center shrink-0 px-2 py-0.5 border ${chip.danger ? 'bg-[var(--danger-dim)] border-[var(--danger-bd)]' : 'bg-[var(--bg-2)] border-[var(--bd)]'}`}
         >
-          <span className={`mono text-[9px] font-bold tracking-[0.06em] ${chip.danger ? 'text-[var(--danger)]' : 'text-[var(--t2)]'}`}>
+          <span className={`mono text-[length:var(--text-caption)] font-bold tracking-[0.06em] ${chip.danger ? 'text-[var(--danger)]' : 'text-[var(--t2)]'}`}>
             {chip.label}
           </span>
         </div>
       ))}
       <div className="shrink-0">
-        <span className="mono text-[9px] text-[var(--t4)]">
+        <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">
           {fmtDate(conflict.startDate)} – {endDateStr} · OPERATIONS {conflict.status}
         </span>
       </div>

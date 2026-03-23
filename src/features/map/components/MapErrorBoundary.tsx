@@ -27,7 +27,7 @@ export class MapErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-app)' }}>
-          <span className="mono text-[11px] text-[var(--t4)]">Reloading map…</span>
+          <span className="mono text-[length:var(--text-body-sm)] text-[var(--t4)]">Reloading map…</span>
         </div>
       );
     }

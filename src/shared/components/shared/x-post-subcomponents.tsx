@@ -21,7 +21,7 @@ export function EngStat({ icon, val }: EngStatProps) {
 export function EmbedSkeleton() {
   return (
     <div className="flex items-center justify-center py-8">
-      <div className="mono text-[10px] text-[var(--t4)]">Loading embed…</div>
+      <div className="mono text-[length:var(--text-label)] text-[var(--t4)]">Loading embed…</div>
     </div>
   );
 }
@@ -83,7 +83,7 @@ export function PharosNote({ note }: PharosNoteProps) {
         <Icon size={11} strokeWidth={2} className="shrink-0 mt-px" style={{ color }} />
         <div>
           <div className="label mb-0.5">Pharos Analyst Note</div>
-          <p className="text-[11.5px] text-[var(--t2)] leading-normal">{text}</p>
+          <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-normal">{text}</p>
         </div>
       </div>
     </div>
