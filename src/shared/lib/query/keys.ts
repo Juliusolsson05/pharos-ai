@@ -47,6 +47,8 @@ export const queryKeys = {
       ['events', id, filters] as const,
     detail: (id = CONFLICT_ID, eventId?: string) =>
       ['event', id, eventId] as const,
+    notifications: (id = CONFLICT_ID, createdAfter?: string, afterId?: string) =>
+      ['event-notifications', id, createdAfter, afterId] as const,
   },
   xPosts: {
     list: (id = CONFLICT_ID, filters?: object) =>

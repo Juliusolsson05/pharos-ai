@@ -1,4 +1,7 @@
+
 'use client';
+import { useSyncExternalStore } from 'react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -46,6 +49,11 @@ export function Header() {
   const { data: conflict } = useConflict();
   const isMobile = useIsMobile();
   const isLandscapePhone = useIsLandscapePhone();
+  const hasHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const isLandscapeNonMap = isLandscapePhone && !path.startsWith('/dashboard/map');
   const landscapeAutoHideEnabled = isLandscapeNonMap && path !== '/dashboard' && path !== '/dashboard/data';
   const showLandscapeHeader = useLandscapeHeaderVisibility(landscapeAutoHideEnabled, path);
@@ -70,6 +78,8 @@ export function Header() {
   const displayDate = latestDate ? fmtDate(latestDate) : (conflict ? fmtDate(conflict.startDate) : '');
   const layoutMode = getAnalyticsLayoutMode({ isLandscapePhone, isMobile });
 
+  const renderMobile = hasHydrated && isMobile;
+
   const trackHeaderNavigation = (destinationPath: string, component: string) => {
     if (destinationPath === path) return;
 
@@ -88,7 +98,7 @@ export function Header() {
       style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
     >
       {/* Mobile header */}
-      {isMobile && (
+      {renderMobile && (
         <div className="flex flex-col pt-[var(--safe-top)]">
           <div
             className={`${isLandscapeNonMap ? 'h-9 px-2.5' : 'h-11 px-2'} flex items-center justify-between gap-2 border-b border-[var(--bd)]`}
@@ -96,10 +106,10 @@ export function Header() {
           >
             <Link href="/dashboard" className="no-underline flex items-center gap-2 min-w-0">
               <span className="mono text-xs font-bold text-[var(--t1)] tracking-[0.14em]">PHAROS</span>
-              <span className="mono text-[8px] text-[var(--warning)] shrink-0">{latestLabel}</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--warning)] shrink-0">{latestLabel}</span>
             </Link>
             <div className="flex items-center gap-2 min-w-0 shrink-0">
-              <span className="mono text-[8px] text-[var(--t4)] truncate">{displayDate} · UTC</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] truncate">{displayDate} · UTC</span>
               <Button
                 variant="ghost"
                 asChild
@@ -116,7 +126,7 @@ export function Header() {
               >
                 <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="View Pharos on GitHub">
                   <Github size={12} fill="currentColor" strokeWidth={0} />
-                  <span className="mono text-[9px] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
+                  <span className="mono text-[length:var(--text-caption)] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
                 </a>
               </Button>
             </div>
@@ -144,7 +154,7 @@ export function Header() {
       )}
 
       {/* Desktop header */}
-      {!isMobile && (
+      {!renderMobile && (
         <div className="h-11 flex items-stretch">
           {/* ── Traffic light spacer (macOS hiddenInset — 80px) ── */}
           <div className="w-20 shrink-0" />
@@ -155,14 +165,14 @@ export function Header() {
             className="no-underline flex items-center gap-2 pr-4 pl-1 border-r border-[var(--bd)] shrink-0"
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           >
-            <span className="mono text-[13px] font-bold text-[var(--t1)] tracking-[0.18em]">
+            <span className="mono text-[length:var(--text-body)] font-bold text-[var(--t1)] tracking-[0.18em]">
               PHAROS
             </span>
 
             {/* Thin accent rule */}
             <div className="w-px h-4 bg-[var(--bd)]" />
 
-            <span className="mono text-[9px] font-bold text-[var(--t4)] tracking-[0.08em]">
+            <span className="mono text-[length:var(--text-caption)] font-bold text-[var(--t4)] tracking-[0.08em]">
               EPIC FURY
             </span>
 
@@ -170,17 +180,17 @@ export function Header() {
             <div
               className="px-[7px] py-0.5 bg-[var(--danger-dim)] border border-[var(--danger-bd)] rounded-sm"
             >
-              <span className="text-[8px] font-bold text-[var(--danger)] tracking-[0.08em] uppercase">
+              <span className="text-[length:var(--text-tiny)] font-bold text-[var(--danger)] tracking-[0.08em] uppercase">
                 {bootstrap?.status ?? 'ONGOING'}
               </span>
             </div>
 
             {/* Day indicator */}
             <div className="w-px h-4 bg-[var(--bd)]" />
-            <span className="mono text-[9px] font-bold text-[var(--warning)] tracking-[0.06em]">
+            <span className="mono text-[length:var(--text-caption)] font-bold text-[var(--warning)] tracking-[0.06em]">
               {latestLabel}
             </span>
-            <span className="mono text-[8px] text-[var(--t4)] tracking-[0.04em]">
+            <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-[0.04em]">
               {latestDay}
             </span>
           </Link>
@@ -215,13 +225,13 @@ export function Header() {
             {/* LIVE indicator */}
             <div className="flex items-center gap-[5px]">
               <div className="dot dot-live" />
-              <span className="mono text-[10px] font-bold text-[var(--danger)] tracking-[0.06em]">
+              <span className="mono text-[length:var(--text-label)] font-bold text-[var(--danger)] tracking-[0.06em]">
                 LIVE
               </span>
             </div>
 
             {/* UTC clock */}
-            <span className="mono text-[10px] text-[var(--t4)] tracking-[0.02em]">
+            <span className="mono text-[length:var(--text-label)] text-[var(--t4)] tracking-[0.02em]">
               {displayDate} · UTC
             </span>
 
@@ -237,7 +247,7 @@ export function Header() {
                 title="Help cover hosting and data infrastructure"
               >
                 <Heart size={12} fill="currentColor" strokeWidth={0} />
-                <span className="mono text-[10px] font-bold tracking-[0.04em]">SUPPORT SERVER COSTS</span>
+                <span className="mono text-[length:var(--text-label)] font-bold tracking-[0.04em]">SUPPORT SERVER COSTS</span>
               </a>
             </Button>
 
@@ -248,7 +258,7 @@ export function Header() {
             >
               <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
                 <Github size={13} fill="currentColor" strokeWidth={0} />
-                <span className="mono text-[10px] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
+                <span className="mono text-[length:var(--text-label)] font-bold tracking-[0.04em] text-[var(--bg-app)]">STAR</span>
               </a>
             </Button>
           </div>
@@ -294,6 +304,9 @@ function MoreDropdown({
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/browse/api/reference" className="no-underline" onClick={() => trackMoreNavigation('/browse/api/reference')}>API</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/settings" className="no-underline" onClick={() => trackMoreNavigation('/dashboard/settings')}>Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-[var(--bd)]" />
         <DropdownMenuItem asChild>
