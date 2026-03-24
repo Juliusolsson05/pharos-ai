@@ -362,9 +362,10 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<Node<GraphNodeData>, Edge> | null>(null);
   const isMobile = useIsMobile(1024);
   const graph = useMemo(() => (tree ? buildGraph(tree) : { nodes: [], edges: [], height: 980 }), [tree]);
-  const boardHeight = inline
-    ? Math.max(Math.min(graph.height, isMobile ? 680 : 760), isMobile ? 520 : 620)
-    : Math.max(graph.height, isMobile ? 780 : 980);
+  const boardHeight = Math.max(
+    Math.min(graph.height, isMobile ? 680 : 760),
+    isMobile ? 520 : 620,
+  );
 
   const onNodeClick: NodeMouseHandler<Node<GraphNodeData>> = (_, node) => {
     setHeaderCollapsed(true);
