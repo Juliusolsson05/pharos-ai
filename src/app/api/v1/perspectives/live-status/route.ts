@@ -5,6 +5,9 @@ import { err, ok } from '@/server/lib/api-utils';
 import { PERSPECTIVE_CHANNELS } from '@/data/perspective-channels';
 
 const CACHE_TTL = 600;
+const IS_LIVE_RE = /"isLive"\s*:\s*true/;
+const PAGE_VIDEO_ID_RE = /"videoId"\s*:\s*"([^"]+)"/;
+const CANONICAL_VIDEO_RE = /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([^"&]+)"/;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY ?? '';
 const VIDEO_ID_RE = /<yt:videoId>([^<]+)<\/yt:videoId>/g;
 
@@ -16,13 +19,17 @@ type CacheEntry = {
 
 const cache = new Map<string, CacheEntry>();
 
-/** Resolve a @handle to a YouTube channel ID using the static channel list. */
 function resolveChannelId(handle: string): string | null {
   const ch = PERSPECTIVE_CHANNELS.find(c => c.handle.toLowerCase() === handle.toLowerCase());
   return ch?.channelId ?? null;
 }
 
-/** Fetch the latest video IDs for a channel from YouTube's public RSS feed. */
+function extractVideoId(html: string): string | null {
+  return html.match(CANONICAL_VIDEO_RE)?.[1]
+    ?? html.match(PAGE_VIDEO_ID_RE)?.[1]
+    ?? null;
+}
+
 async function fetchRecentVideoIds(channelId: string, limit = 5): Promise<string[]> {
   const res = await fetch(
     `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
@@ -38,7 +45,6 @@ async function fetchRecentVideoIds(channelId: string, limit = 5): Promise<string
   return ids;
 }
 
-/** Check which videos are live using the YouTube Data API v3. */
 async function findLiveVideo(videoIds: string[]): Promise<{ videoId: string } | null> {
   if (!YOUTUBE_API_KEY || videoIds.length === 0) return null;
 
@@ -61,6 +67,24 @@ async function findLiveVideo(videoIds: string[]): Promise<{ videoId: string } | 
   return null;
 }
 
+async function checkLiveStatusViaPage(handle: string): Promise<{ isLive: boolean; videoId: string | null }> {
+  const res = await fetch(`https://www.youtube.com/${handle}/live`, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept-Language': 'en-US,en;q=0.9',
+      Cookie: 'CONSENT=YES+1',
+    },
+    signal: AbortSignal.timeout(8000),
+  });
+  const html = await res.text();
+  const isLive = IS_LIVE_RE.test(html);
+
+  return {
+    isLive,
+    videoId: isLive ? extractVideoId(html) : null,
+  };
+}
+
 async function checkLiveStatus(handle: string): Promise<{ isLive: boolean; videoId: string | null }> {
   const cached = cache.get(handle);
   if (cached && Date.now() - cached.checkedAt < CACHE_TTL * 1000) {
@@ -70,22 +94,30 @@ async function checkLiveStatus(handle: string): Promise<{ isLive: boolean; video
   const offline = { isLive: false, videoId: null };
 
   try {
+    if (!YOUTUBE_API_KEY) {
+      const fallback = await checkLiveStatusViaPage(handle);
+      cache.set(handle, { ...fallback, checkedAt: Date.now() });
+      return fallback;
+    }
+
     const channelId = resolveChannelId(handle);
     if (!channelId) {
-      cache.set(handle, { ...offline, checkedAt: Date.now() });
-      return offline;
+      const fallback = await checkLiveStatusViaPage(handle);
+      cache.set(handle, { ...fallback, checkedAt: Date.now() });
+      return fallback;
     }
 
     const videoIds = await fetchRecentVideoIds(channelId);
     if (videoIds.length === 0) {
-      cache.set(handle, { ...offline, checkedAt: Date.now() });
-      return offline;
+      const fallback = await checkLiveStatusViaPage(handle);
+      cache.set(handle, { ...fallback, checkedAt: Date.now() });
+      return fallback;
     }
 
     const live = await findLiveVideo(videoIds);
     const result = live
       ? { isLive: true, videoId: live.videoId }
-      : offline;
+      : await checkLiveStatusViaPage(handle);
 
     cache.set(handle, { ...result, checkedAt: Date.now() });
     return result;

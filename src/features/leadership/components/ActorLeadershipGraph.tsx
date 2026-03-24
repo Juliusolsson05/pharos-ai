@@ -33,7 +33,6 @@ import '@xyflow/react/dist/style.css';
 
 type Props = {
   actor: Actor;
-  inline?: boolean;
   pageScroll?: boolean;
 };
 
@@ -355,7 +354,7 @@ function LeadershipDetailPanel({ selectedNode, headerCollapsed, onHeaderCollapse
   );
 }
 
-function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['actor']; inline?: boolean }) {
+function LeadershipBoardWithActor({ actor }: { actor: Props['actor'] }) {
   const { data: tree, isLoading } = useActorLeadership(undefined, actor.id);
   const [selectedNode, setSelectedNode] = useState<GraphNodeData | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(true);
@@ -452,11 +451,11 @@ function LeadershipBoardWithActor({ actor, inline = false }: { actor: Props['act
   );
 }
 
-export function ActorLeadershipGraph({ actor, inline = false, pageScroll = false }: Props) {
+export function ActorLeadershipGraph({ actor, pageScroll = false }: Props) {
   return (
     <ReactFlowProvider>
       <div className={pageScroll ? '' : 'h-full'}>
-        <LeadershipBoardWithActor actor={actor} inline={inline} />
+        <LeadershipBoardWithActor actor={actor} />
       </div>
     </ReactFlowProvider>
   );

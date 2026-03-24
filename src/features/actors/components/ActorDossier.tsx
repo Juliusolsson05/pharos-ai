@@ -171,7 +171,7 @@ export function ActorDossier({ actor, tab, onTabChange, currentDay, compact = fa
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="border-t border-[var(--bd)] bg-[var(--bg-app)]">
-                      <ActorLeadershipGraph actor={actor} inline pageScroll />
+                      <ActorLeadershipGraph actor={actor} pageScroll />
                     </div>
                   </CollapsibleContent>
                 </div>
