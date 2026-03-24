@@ -18,8 +18,8 @@ export function KeyFactsWidget() {
           className="flex gap-3 items-start px-4 py-2 hover:bg-[var(--bg-3)] transition-colors"
           style={{ borderBottom: i < snap.keyFacts.length - 1 ? '1px solid var(--bd-s)' : 'none' }}
         >
-          <span className="mono text-[9px] text-[var(--blue)] shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
-          <p className="text-[11px] text-[var(--t2)] leading-snug">{fact}</p>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--blue)] shrink-0 mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+          <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-snug">{fact}</p>
         </div>
       ))}
     </div>

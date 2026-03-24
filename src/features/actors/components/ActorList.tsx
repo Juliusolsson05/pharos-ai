@@ -49,7 +49,7 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
     <div className={cn(pageScroll ? 'flex flex-col' : 'flex-1 flex flex-col overflow-hidden')}>
       <div className={cn('panel-header justify-between', compact && (pageScroll ? 'h-8 min-h-8 safe-px' : 'h-8 min-h-8 px-3'))}>
         <span className="section-title">Actors</span>
-        <Badge variant="outline" className="text-[9px] text-[var(--t4)] border-[var(--bd)]">{sorted.length}</Badge>
+        <Badge variant="outline" className="text-[length:var(--text-caption)] text-[var(--t4)] border-[var(--bd)]">{sorted.length}</Badge>
       </div>
 
       {/* Day selector */}
@@ -59,7 +59,7 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
 
       {/* Column headers */}
       <div className={cn('grid grid-cols-[1fr_60px_30px] py-1 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0', pageScroll ? 'safe-px' : 'px-3')}>
-        {['ACTOR', 'ACTIVITY', ''].map(h => <span key={h} className="label text-[8px]">{h}</span>)}
+        {['ACTOR', 'ACTIVITY', ''].map(h => <span key={h} className="label text-[length:var(--text-tiny)]">{h}</span>)}
       </div>
 
       {pageScroll ? (
@@ -90,19 +90,19 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
                 <div>
                   <div className="flex items-center gap-[5px] mb-[3px]">
                     <Flag actorId={actor.id} code={actor.countryCode} size={18} />
-                    <span className="text-[11px] font-bold text-[var(--t1)] text-left">
+                    <span className="text-[length:var(--text-body-sm)] font-bold text-[var(--t1)] text-left">
                       {actor.name}
                     </span>
                   </div>
                   <div className="flex gap-1.5 items-center">
                     <Badge
                       variant="outline"
-                      className="text-[7px] px-1 py-px tracking-[0.04em] rounded-sm"
+                      className="text-[length:var(--text-micro)] px-1 py-px tracking-[0.04em] rounded-sm"
                       style={{ color: staC, borderColor: staC, background: `${staC}15` }}
                     >
                       {snap.stance}
                     </Badge>
-                    {xCount > 0 && <span className="mono text-[8px] text-[var(--t3)]">𝕏{xCount}</span>}
+                    {xCount > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--t3)]">𝕏{xCount}</span>}
                   </div>
                 </div>
 
@@ -113,7 +113,7 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
                     className="h-[3px] rounded-[1px] bg-[var(--bd)]"
                     indicatorStyle={{ background: actC }}
                   />
-                  <span className="mono text-[8px]" style={{ color: actC }}>{snap.activityScore}</span>
+                  <span className="mono text-[length:var(--text-tiny)]" style={{ color: actC }}>{snap.activityScore}</span>
                 </div>
 
                 <ArrowRight size={9} className="text-[var(--t3)] self-center" strokeWidth={1.5} />
@@ -149,19 +149,19 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
                 <div>
                   <div className="flex items-center gap-[5px] mb-[3px]">
                     <Flag actorId={actor.id} code={actor.countryCode} size={18} />
-                    <span className="text-[11px] font-bold text-[var(--t1)] text-left">
+                    <span className="text-[length:var(--text-body-sm)] font-bold text-[var(--t1)] text-left">
                       {actor.name}
                     </span>
                   </div>
                   <div className="flex gap-1.5 items-center">
                     <Badge
                       variant="outline"
-                      className="text-[7px] px-1 py-px tracking-[0.04em] rounded-sm"
+                      className="text-[length:var(--text-micro)] px-1 py-px tracking-[0.04em] rounded-sm"
                       style={{ color: staC, borderColor: staC, background: `${staC}15` }}
                     >
                       {snap.stance}
                     </Badge>
-                    {xCount > 0 && <span className="mono text-[8px] text-[var(--t3)]">𝕏{xCount}</span>}
+                    {xCount > 0 && <span className="mono text-[length:var(--text-tiny)] text-[var(--t3)]">𝕏{xCount}</span>}
                   </div>
                 </div>
 
@@ -172,7 +172,7 @@ export function ActorList({ selectedId, onSelect, currentDay, onDayChange, compa
                     className="h-[3px] rounded-[1px] bg-[var(--bd)]"
                     indicatorStyle={{ background: actC }}
                   />
-                  <span className="mono text-[8px]" style={{ color: actC }}>{snap.activityScore}</span>
+                  <span className="mono text-[length:var(--text-tiny)]" style={{ color: actC }}>{snap.activityScore}</span>
                 </div>
 
                 <ArrowRight size={9} className="text-[var(--t3)] self-center" strokeWidth={1.5} />

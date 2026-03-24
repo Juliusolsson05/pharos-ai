@@ -92,8 +92,8 @@ export function ChatWidget() {
               <div className="p-3 safe-px">
                 {messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <p className="mb-1 text-[13px] text-[var(--t3)]">Pharos Intel Assistant</p>
-                    <p className="max-w-[260px] text-[11px] text-[var(--t4)]">
+                    <p className="mb-1 text-[length:var(--text-body)] text-[var(--t3)]">Pharos Intel Assistant</p>
+                    <p className="max-w-[260px] text-[length:var(--text-body-sm)] text-[var(--t4)]">
                       {isReady
                         ? 'Ask about events, actors, signals, or any intelligence in the conflict database.'
                         : 'Loading prior session...'}
@@ -103,7 +103,7 @@ export function ChatWidget() {
                 {messages.map(msg => (
                   <ChatMessage key={msg.id} message={msg} />
                 ))}
-                {error && <p className="px-1 pt-2 text-[11px] text-[var(--danger)]">{error}</p>}
+                {error && <p className="px-1 pt-2 text-[length:var(--text-body-sm)] text-[var(--danger)]">{error}</p>}
               </div>
             </ScrollArea>
 

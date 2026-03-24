@@ -135,7 +135,7 @@ export function PredictionsContent() {
           <div>
             <span className="label text-[var(--t4)]">MARKETS </span>
             <span className="mono font-bold text-[var(--t1)]">{markets.length}</span>
-            <span className="mono ml-1.5 text-[9px] text-[var(--success)]">({activeCount} LIVE)</span>
+            <span className="mono ml-1.5 text-[length:var(--text-caption)] text-[var(--success)]">({activeCount} LIVE)</span>
           </div>
           <div>
             <span className="label text-[var(--t4)]">TOTAL VOL </span>
@@ -149,7 +149,7 @@ export function PredictionsContent() {
 
         {/* Refresh + timestamp */}
         <div className="flex items-center gap-2.5 ml-auto">
-          <span className="mono text-[9px] text-[var(--t4)]">{lastUpdated}</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{lastUpdated}</span>
           <Button variant="outline" size="icon-sm" onClick={handleRefresh} disabled={loading} className="border-[var(--bd)] bg-transparent text-[var(--t3)]">
             <RefreshCw size={12} style={{ animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }} />
           </Button>
@@ -163,7 +163,7 @@ export function PredictionsContent() {
           style={{ gridTemplateColumns: COL }}
         >
           <div />
-          <div className="label pl-0.5 text-[8px]">MARKET</div>
+          <div className="label pl-0.5 text-[length:var(--text-tiny)]">MARKET</div>
 
           <ToggleGroup
             type="single"
@@ -185,17 +185,17 @@ export function PredictionsContent() {
               <ToggleGroupItem
                 key={col.key}
                 value={col.key}
-                className={`mono bg-transparent border-none h-[30px] rounded-none p-0 flex items-center text-[8px] tracking-[0.08em] ${col.key === 'probability' ? 'justify-start pr-0' : 'justify-end pr-3'} ${sortBy === col.key ? 'font-bold text-[var(--blue-l)]' : 'font-normal text-[var(--t4)]'}`}
+                className={`mono bg-transparent border-none h-[30px] rounded-none p-0 flex items-center text-[length:var(--text-tiny)] tracking-[0.08em] ${col.key === 'probability' ? 'justify-start pr-0' : 'justify-end pr-3'} ${sortBy === col.key ? 'font-bold text-[var(--blue-l)]' : 'font-normal text-[var(--t4)]'}`}
               >
                 {col.label}{sortBy === col.key ? ' ▼' : ''}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
 
-          <div className="label text-right pr-3 text-[8px]">ENDS</div>
+          <div className="label text-right pr-3 text-[length:var(--text-tiny)]">ENDS</div>
 
           <div className="flex justify-end items-center gap-1.5 pr-2">
-            <span className="label text-[7px] font-bold" style={{ color: showActiveOnly ? 'var(--success)' : 'var(--t4)' }}>LIVE</span>
+            <span className="label text-[length:var(--text-micro)] font-bold" style={{ color: showActiveOnly ? 'var(--success)' : 'var(--t4)' }}>LIVE</span>
             <Switch
               checked={showActiveOnly}
               onCheckedChange={value => {
@@ -235,14 +235,14 @@ export function PredictionsContent() {
               <ToggleGroupItem
                 key={col.key}
                 value={col.key}
-                className={`mono px-2 h-7 rounded text-[9px] border ${sortBy === col.key ? 'text-[var(--t1)] border-white/25 bg-white/10' : 'text-[var(--t4)] border-transparent bg-transparent'}`}
+                className={`mono px-2 h-7 rounded text-[length:var(--text-caption)] border ${sortBy === col.key ? 'text-[var(--t1)] border-white/25 bg-white/10' : 'text-[var(--t4)] border-transparent bg-transparent'}`}
               >
                 {col.label}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
           <div className="ml-auto flex items-center gap-2 pr-1">
-            <span className="label text-[8px]" style={{ color: showActiveOnly ? 'var(--success)' : 'var(--t4)' }}>LIVE</span>
+            <span className="label text-[length:var(--text-tiny)]" style={{ color: showActiveOnly ? 'var(--success)' : 'var(--t4)' }}>LIVE</span>
             <Switch
               checked={showActiveOnly}
               onCheckedChange={value => {
@@ -282,7 +282,7 @@ export function PredictionsContent() {
           <div className="p-6">
             <Alert variant="destructive" className="bg-[var(--danger-dim)] border-[var(--danger-bd)] text-[var(--danger)]">
               <AlertCircle size={14} />
-              <AlertDescription className="mono text-[11px] text-[var(--danger)]">
+              <AlertDescription className="mono text-[length:var(--text-body-sm)] text-[var(--danger)]">
                 {error}
               </AlertDescription>
             </Alert>

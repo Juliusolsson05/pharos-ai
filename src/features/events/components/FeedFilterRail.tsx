@@ -73,7 +73,7 @@ export function FeedFilterRail({
       </div>
       {pageScroll ? body : <ScrollArea className="flex-1">{body}</ScrollArea>}
       <div className={cn(pageScroll ? 'safe-px' : 'px-3', 'py-2 border-t border-[var(--bd)] shrink-0')}>
-        <span className="mono text-[9px] text-[var(--t3)]">{totalFiltered} EVENTS</span>
+        <span className="mono text-[length:var(--text-caption)] text-[var(--t3)]">{totalFiltered} EVENTS</span>
       </div>
     </div>
   );

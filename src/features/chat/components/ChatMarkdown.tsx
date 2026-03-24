@@ -31,7 +31,7 @@ export function ChatMarkdown({ content }: Props) {
             return (
               <code
                 {...props}
-                className="block overflow-x-auto rounded bg-[var(--bg-app)] px-3 py-2 font-mono text-[12px] text-[var(--t1)]"
+                className="block overflow-x-auto rounded bg-[var(--bg-app)] px-3 py-2 font-mono text-[length:var(--text-body)] text-[var(--t1)]"
               />
             );
           }
@@ -39,7 +39,7 @@ export function ChatMarkdown({ content }: Props) {
           return (
             <code
               {...props}
-              className="rounded bg-[var(--bg-app)] px-1.5 py-0.5 font-mono text-[12px] text-[var(--t1)]"
+              className="rounded bg-[var(--bg-app)] px-1.5 py-0.5 font-mono text-[length:var(--text-body)] text-[var(--t1)]"
             />
           );
         },

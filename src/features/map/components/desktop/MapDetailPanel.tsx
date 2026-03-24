@@ -83,7 +83,7 @@ export function DesktopDetailPanel({ item, onClose, onSelectItem, onActivateStor
 
           {/* Footer */}
           <div style={{ height: 36, borderTop: '1px solid var(--bd-s)', display: 'flex', alignItems: 'center', padding: '0 14px', flexShrink: 0 }}>
-            <span className="mono" style={{ fontSize: 9, color: 'var(--t4)' }}>PHAROS INTEL · UNCLASSIFIED</span>
+            <span className="mono" style={{ fontSize: 'var(--text-caption)', color: 'var(--t4)' }}>PHAROS INTEL · UNCLASSIFIED</span>
           </div>
         </>
       )}

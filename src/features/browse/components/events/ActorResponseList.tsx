@@ -30,10 +30,10 @@ export function ActorResponseList({ responses }: Props) {
               >
                 {r.actorName}
               </Link>
-              <span className={`mono text-[9px] font-bold ${STANCE_STYLE[r.stance] ?? STANCE_STYLE.UNKNOWN}`}>
+              <span className={`mono text-[length:var(--text-caption)] font-bold ${STANCE_STYLE[r.stance] ?? STANCE_STYLE.UNKNOWN}`}>
                 {r.stance}
               </span>
-              <span className="mono text-[10px] text-[var(--t4)] ml-auto">{r.type}</span>
+              <span className="mono text-[length:var(--text-label)] text-[var(--t4)] ml-auto">{r.type}</span>
             </div>
             <div className="card-body">
               <p className="text-xs text-[var(--t2)] leading-relaxed">{r.statement}</p>

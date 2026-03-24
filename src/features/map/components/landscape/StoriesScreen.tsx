@@ -59,14 +59,14 @@ export function StoriesScreen({ stories, activeStory, onBack, onSelectStory }: P
 
       {/* Story count */}
       <div className="shrink-0 flex items-center gap-2 safe-px py-1.5 border-b border-[var(--bd)] bg-[var(--bg-2)]">
-        <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 12 }}>◈ STORIES</span>
+        <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 'var(--text-body)' }}>◈ STORIES</span>
         <span className="label" style={{
           background: 'var(--bg-3)', color: 'var(--t4)',
           padding: '1px 6px', borderRadius: 2,
         }}>AI CURATED</span>
         <span style={{
           background: 'var(--blue-dim)', color: 'var(--blue-l)',
-          fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 10,
+          fontSize: 'var(--text-caption)', fontWeight: 700, padding: '2px 6px', borderRadius: 10,
         }}>{stories.length}</span>
       </div>
 

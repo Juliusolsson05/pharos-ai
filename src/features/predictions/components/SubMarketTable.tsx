@@ -27,7 +27,7 @@ export function SubMarketTable({ subMarkets, selectedId, onSelect }: Props) {
           {HEADERS.map(h => (
             <TableHead
               key={h}
-              className={`label h-6 text-[7px] py-0 pr-2 pl-1 ${h === 'DATE / QUESTION' ? 'text-left' : 'text-right'}`}
+              className={`label h-6 text-[length:var(--text-micro)] py-0 pr-2 pl-1 ${h === 'DATE / QUESTION' ? 'text-left' : 'text-right'}`}
             >
               {h}
             </TableHead>
@@ -54,7 +54,7 @@ export function SubMarketTable({ subMarkets, selectedId, onSelect }: Props) {
             >
               {/* Question */}
               <TableCell
-                className="mono truncate max-w-[140px] py-0 pr-2 pl-1 text-[10px]"
+                className="mono truncate max-w-[140px] py-0 pr-2 pl-1 text-[length:var(--text-label)]"
                 style={{ color: isSelected ? 'var(--blue-l)' : 'var(--t1)', fontWeight: isSelected ? 700 : 400 }}
               >
                 {label}
@@ -64,20 +64,20 @@ export function SubMarketTable({ subMarkets, selectedId, onSelect }: Props) {
                 {Math.round(sm.lastTradePrice * 100)}%
               </TableCell>
               {/* Bid */}
-              <TableCell className="mono text-right px-2 py-0 text-[var(--t3)] text-[10px]">
+              <TableCell className="mono text-right px-2 py-0 text-[var(--t3)] text-[length:var(--text-label)]">
                 {sm.bestBid > 0 ? Math.round(sm.bestBid * 100) : '—'}
               </TableCell>
               {/* Ask */}
-              <TableCell className="mono text-right px-2 py-0 text-[var(--t3)] text-[10px]">
+              <TableCell className="mono text-right px-2 py-0 text-[var(--t3)] text-[length:var(--text-label)]">
                 {sm.bestAsk > 0 ? Math.round(sm.bestAsk * 100) : '—'}
               </TableCell>
               {/* Spread */}
-              <TableCell className="mono text-right px-2 py-0 text-[10px]" style={{ color: sc }}>
+              <TableCell className="mono text-right px-2 py-0 text-[length:var(--text-label)]" style={{ color: sc }}>
                 {sm.spread > 0 ? (sm.spread * 100).toFixed(1) : '—'}
               </TableCell>
               {/* 24h volume */}
               <TableCell
-                className="mono text-right px-2 py-0 text-[10px]"
+                className="mono text-right px-2 py-0 text-[length:var(--text-label)]"
                 style={{ color: sm.volume24hr > 0 ? 'var(--success)' : 'var(--t4)' }}
               >
                 {sm.volume24hr > 0 ? `$${(sm.volume24hr / 1000).toFixed(0)}K` : '—'}
@@ -86,7 +86,7 @@ export function SubMarketTable({ subMarkets, selectedId, onSelect }: Props) {
               <TableCell className="text-right px-1 py-0">
                 <Badge
                   variant="outline"
-                  className="text-[7px] px-1 py-px tracking-[0.06em]"
+                  className="text-[length:var(--text-micro)] px-1 py-px tracking-[0.06em]"
                   style={{ color: st.color, borderColor: st.border, background: st.bg }}
                 >
                   {st.label}

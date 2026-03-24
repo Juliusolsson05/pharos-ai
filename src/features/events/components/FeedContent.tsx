@@ -88,7 +88,7 @@ export function FeedContent() {
                 variant="ghost"
                 size="xs"
                 onClick={() => handleSelect(null)}
-                className="mono h-7 px-2 text-[9px] font-bold tracking-[0.06em]"
+                className="mono h-7 px-2 text-[length:var(--text-caption)] font-bold tracking-[0.06em]"
               >
                 <ArrowLeft size={12} />
                 BACK TO FEED
@@ -113,7 +113,7 @@ export function FeedContent() {
                 variant="outline"
                 size="sm"
                 onClick={() => setFiltersOpen(p => !p)}
-                className={`text-[10px] h-auto px-2.5 py-1 font-semibold tracking-wide transition-colors mono ${
+                className={`text-[length:var(--text-label)] h-auto px-2.5 py-1 font-semibold tracking-wide transition-colors mono ${
                   filtersOpen
                     ? 'border-[var(--blue)] bg-[var(--blue-dim)] text-[var(--blue-l)]'
                     : 'border-[var(--bd)] bg-[var(--bg-3)] text-[var(--t3)]'
@@ -121,9 +121,9 @@ export function FeedContent() {
               >
                 FILTERS
               </Button>
-              <span className="mono text-[9px] text-[var(--t4)]">{filtered.length} events</span>
-              <span className="mono text-[9px] text-[var(--t4)]">·</span>
-              <span className="mono text-[9px] text-[var(--t3)]">{showAllDays ? 'ALL DAYS' : `DAY ${currentDay}`}</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{filtered.length} events</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">·</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--t3)]">{showAllDays ? 'ALL DAYS' : `DAY ${currentDay}`}</span>
             </div>
 
             {/* Collapsible filter rail */}

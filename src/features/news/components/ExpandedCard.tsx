@@ -66,13 +66,13 @@ export function ExpandedCard({ article, x, cardTop, color, defocus }: Props) {
           {/* Source row */}
           <div className="flex items-center gap-2 mb-3">
             <div
-              className="px-2 py-1 rounded text-[9px] mono font-bold"
+              className="px-2 py-1 rounded text-[length:var(--text-caption)] mono font-bold"
               style={{ backgroundColor: `${color}25`, color, border: `1px solid ${color}40` }}
             >
               {article.feed.name.toUpperCase()}
             </div>
             {article.feed.stateFunded && (
-              <span className="text-[9px] mono font-bold text-amber-400">STATE FUNDED</span>
+              <span className="text-[length:var(--text-caption)] mono font-bold text-amber-400">STATE FUNDED</span>
             )}
             <Button
               variant="ghost"
@@ -85,11 +85,11 @@ export function ExpandedCard({ article, x, cardTop, color, defocus }: Props) {
           </div>
           {/* Time */}
           <div className="flex items-baseline gap-2 mb-2">
-            <span className="mono text-[13px] font-bold text-white">
+            <span className="mono text-[length:var(--text-body)] font-bold text-white">
               {article.time.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
             </span>
-            <span className="mono text-[13px] font-bold text-white">{formatHour(article.time)}</span>
-            <span className="mono text-[11px] text-white/50">{formatTimeAgo(article.time)}</span>
+            <span className="mono text-[length:var(--text-body)] font-bold text-white">{formatHour(article.time)}</span>
+            <span className="mono text-[length:var(--text-body-sm)] text-white/50">{formatTimeAgo(article.time)}</span>
           </div>
           {/* Title */}
           <h3 className="text-base font-bold text-white leading-snug mb-2">
@@ -107,7 +107,7 @@ export function ExpandedCard({ article, x, cardTop, color, defocus }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg no-underline font-bold mono text-[10px] tracking-wider transition-opacity hover:opacity-80"
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg no-underline font-bold mono text-[length:var(--text-label)] tracking-wider transition-opacity hover:opacity-80"
             style={{ backgroundColor: color, color: '#000' }}
           >
             OPEN ARTICLE →

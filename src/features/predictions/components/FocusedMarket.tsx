@@ -96,21 +96,21 @@ export function FocusedMarket({ market, group, onClose }: Props) {
             {/* Badges row */}
             <div className="flex items-center gap-2 mb-2">
               <span
-                className="mono text-[7px] font-bold px-[5px] py-[2px] tracking-wider"
+                className="mono text-[length:var(--text-micro)] font-bold px-[5px] py-[2px] tracking-wider"
                 style={{ color: group.color, background: group.bg, border: `1px solid ${group.border}` }}
               >
                 {group.label}
               </span>
               <span
-                className="mono text-[7px] font-bold px-[5px] py-[2px] tracking-wider"
+                className="mono text-[length:var(--text-micro)] font-bold px-[5px] py-[2px] tracking-wider"
                 style={{ color: status.color, background: status.bg, border: `1px solid ${status.border}` }}
               >
                 {status.label}
               </span>
             </div>
-            <h2 className="text-[15px] font-bold text-[var(--t1)] leading-snug">{market.title}</h2>
+            <h2 className="text-[length:var(--text-subhead)] font-bold text-[var(--t1)] leading-snug">{market.title}</h2>
             {market.description && (
-              <p className="text-[10px] text-[var(--t3)] leading-relaxed mt-2 max-h-[72px] overflow-y-auto pr-2">
+              <p className="text-[length:var(--text-label)] text-[var(--t3)] leading-relaxed mt-2 max-h-[72px] overflow-y-auto pr-2">
                 {market.description}
               </p>
             )}
@@ -126,8 +126,8 @@ export function FocusedMarket({ market, group, onClose }: Props) {
                 {(prob * 100).toFixed(1)}%
               </div>
               <div className="flex items-center justify-end gap-2 mt-1">
-                <span className="mono text-[10px] font-bold" style={{ color: pColor }}>YES</span>
-                <span className="mono text-[10px] text-[var(--t4)]">/ {((1 - prob) * 100).toFixed(1)}% NO</span>
+                <span className="mono text-[length:var(--text-label)] font-bold" style={{ color: pColor }}>YES</span>
+                <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">/ {((1 - prob) * 100).toFixed(1)}% NO</span>
               </div>
             </div>
             <Button
@@ -153,15 +153,15 @@ export function FocusedMarket({ market, group, onClose }: Props) {
             { label: 'ENDS',        value: daysLeft !== null ? (daysLeft === 0 ? 'TODAY' : `${daysLeft}d`) : fmtMarketDate(market.endDate) },
           ].map((s) => (
             <div key={s.label} className="flex items-center gap-3 pr-4 mr-4 border-r border-[var(--bd)] last:border-r-0">
-              <span className="mono text-[7px] text-[var(--t4)] tracking-widest shrink-0">{s.label}</span>
-              <span className="mono text-[11px] font-bold shrink-0" style={{ color: s.color ?? 'var(--t1)' }}>{s.value}</span>
+              <span className="mono text-[length:var(--text-micro)] text-[var(--t4)] tracking-widest shrink-0">{s.label}</span>
+              <span className="mono text-[length:var(--text-body-sm)] font-bold shrink-0" style={{ color: s.color ?? 'var(--t1)' }}>{s.value}</span>
             </div>
           ))}
           <a
             href={market.polyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto mono text-[8px] font-bold px-2 py-1 border border-[var(--bd)] text-[var(--t4)] hover:text-[var(--t1)] hover:border-white/20 transition-colors shrink-0 no-underline"
+            className="ml-auto mono text-[length:var(--text-tiny)] font-bold px-2 py-1 border border-[var(--bd)] text-[var(--t4)] hover:text-[var(--t1)] hover:border-white/20 transition-colors shrink-0 no-underline"
           >
             ↗ POLYMARKET
           </a>
@@ -171,7 +171,7 @@ export function FocusedMarket({ market, group, onClose }: Props) {
         <div className="shrink-0 border-b border-[var(--bd)]">
           {/* Chart header: range selector + live crosshair value */}
           <div className="flex items-center gap-2 px-5 py-2 bg-[var(--bg-2)] border-b border-[var(--bd)]">
-            <span className="mono text-[8px] text-[var(--t4)] tracking-widest">PROBABILITY HISTORY</span>
+            <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest">PROBABILITY HISTORY</span>
             <div className="flex gap-1 ml-3">
               {RANGES.map((r, i) => (
                 <Button
@@ -180,7 +180,7 @@ export function FocusedMarket({ market, group, onClose }: Props) {
                   size="sm"
                   onClick={() => { setRangeIdx(i); setCrosshairPct(null); }}
                   disabled={chartLoading}
-                  className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider disabled:opacity-40 ${
+                  className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider disabled:opacity-40 ${
                     i === rangeIdx
                       ? 'bg-white/12 text-white border border-white/25'
                       : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent hover:bg-white/5'
@@ -195,7 +195,7 @@ export function FocusedMarket({ market, group, onClose }: Props) {
             </div>
             {crosshairPct !== null && (
               <span
-                className="ml-auto mono text-[11px] font-bold px-2 py-0.5 rounded"
+                className="ml-auto mono text-[length:var(--text-body-sm)] font-bold px-2 py-0.5 rounded"
                 style={{ color: probColor(crosshairPct), background: `${probColor(crosshairPct)}18` }}
               >
                 {(crosshairPct * 100).toFixed(2)}%
@@ -219,7 +219,7 @@ export function FocusedMarket({ market, group, onClose }: Props) {
               />
             ) : (
               <div className="h-full flex items-center justify-center">
-                <span className="mono text-[10px] text-[var(--t4)]">NO HISTORY AVAILABLE</span>
+                <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">NO HISTORY AVAILABLE</span>
               </div>
             )}
           </div>
@@ -230,7 +230,7 @@ export function FocusedMarket({ market, group, onClose }: Props) {
           {subs.length > 1 ? (
             <>
               <div className="flex items-center px-5 py-2 bg-[var(--bg-2)] border-b border-[var(--bd)] shrink-0">
-                <span className="mono text-[8px] text-[var(--t4)] tracking-widest">
+                <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest">
                   SUB-MARKETS ({subs.length})
                 </span>
               </div>
@@ -243,29 +243,29 @@ export function FocusedMarket({ market, group, onClose }: Props) {
                       key={sub.id}
                       className="flex items-center gap-4 px-5 py-3 border-b border-[var(--bd)] hover:bg-[var(--bg-2)] transition-colors"
                     >
-                      <span className="mono text-[9px] text-[var(--t4)] w-5 shrink-0">{i + 1}</span>
+                      <span className="mono text-[length:var(--text-caption)] text-[var(--t4)] w-5 shrink-0">{i + 1}</span>
 
                       {/* Title */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] text-[var(--t1)] leading-snug line-clamp-1">
+                        <p className="text-[length:var(--text-body-sm)] text-[var(--t1)] leading-snug line-clamp-1">
                           {sub.groupItemTitle || sub.question}
                         </p>
-                        <p className="text-[9px] text-[var(--t4)] mt-0.5 line-clamp-1">{sub.question}</p>
+                        <p className="text-[length:var(--text-caption)] text-[var(--t4)] mt-0.5 line-clamp-1">{sub.question}</p>
                       </div>
 
                       {/* Probability */}
-                      <span className="mono text-[13px] font-bold w-[52px] text-right shrink-0" style={{ color: subColor }}>
+                      <span className="mono text-[length:var(--text-body)] font-bold w-[52px] text-right shrink-0" style={{ color: subColor }}>
                         {(subProb * 100).toFixed(1)}%
                       </span>
 
                       {/* Vol */}
-                      <span className="mono text-[10px] text-[var(--t3)] w-[60px] text-right shrink-0">
+                      <span className="mono text-[length:var(--text-label)] text-[var(--t3)] w-[60px] text-right shrink-0">
                         {fmtVol(sub.volume)}
                       </span>
 
                       {/* Spread */}
                       <span
-                        className="mono text-[10px] font-bold w-[36px] text-right shrink-0"
+                        className="mono text-[length:var(--text-label)] font-bold w-[36px] text-right shrink-0"
                         style={{ color: spreadColor(sub.spread) }}
                       >
                         {(sub.spread * 100).toFixed(0)}¢
@@ -277,17 +277,17 @@ export function FocusedMarket({ market, group, onClose }: Props) {
             </>
           ) : (
             <div className="flex items-center justify-center py-8">
-              <span className="mono text-[10px] text-[var(--t4)]">SINGLE MARKET — NO SUB-MARKETS</span>
+              <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">SINGLE MARKET — NO SUB-MARKETS</span>
             </div>
           )}
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between px-5 py-2 border-t border-[var(--bd)] bg-[var(--bg-2)] shrink-0">
-          <span className="mono text-[8px] text-[var(--t4)]">
+          <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">
             {subs.length} sub-market{subs.length !== 1 ? 's' : ''} · via Polymarket · ESC to close
           </span>
-          <span className="mono text-[8px] text-[var(--t4)]">
+          <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">
             Started {fmtMarketDate(market.startDate)}
           </span>
         </div>

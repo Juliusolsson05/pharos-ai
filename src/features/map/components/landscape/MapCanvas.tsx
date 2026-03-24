@@ -100,7 +100,7 @@ export function MapCanvas({ ctx, onOpenStories, onSelectFeature }: Props) {
           }`}
           title={showAllLabels ? 'Use smart label filtering' : 'Show all labels'}
         >
-          <span className="mono text-[8px] font-bold">LBL</span>
+          <span className="mono text-[length:var(--text-tiny)] font-bold">LBL</span>
         </Button>
 
         {/* Visibility menu */}

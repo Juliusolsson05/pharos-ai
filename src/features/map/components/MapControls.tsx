@@ -38,7 +38,7 @@ export function MapControls({
         variant="ghost"
         size="xs"
         onClick={() => onShowAllLabelsChange(!showAllLabels)}
-        className={`mono absolute z-10 h-auto rounded-sm px-2.5 py-1 font-bold ${isMobile ? 'text-[9px]' : 'text-[8px]'}`}
+        className={`mono absolute z-10 h-auto rounded-sm px-2.5 py-1 font-bold ${isMobile ? 'text-[length:var(--text-caption)]' : 'text-[length:var(--text-tiny)]'}`}
         style={{
           background: showAllLabels ? 'var(--blue-dim)' : 'rgba(28,33,39,0.92)',
           border: '1px solid var(--bd)',
@@ -56,7 +56,7 @@ export function MapControls({
         style={{ bottom: switcherBottomStyle, right, border: '1px solid var(--bd)', transition: 'right 0.22s cubic-bezier(0.4,0,0.2,1), bottom 0.22s cubic-bezier(0.4,0,0.2,1)' }}>
         {(['dark', 'satellite'] as const).map((mode, i) => (
           <Button key={mode} variant="ghost" size="xs" onClick={() => onStyleChange(mode)}
-            className={`mono rounded-none px-2.5 py-1 h-auto font-bold ${isMobile ? 'text-[9px]' : 'text-[8px]'}`}
+            className={`mono rounded-none px-2.5 py-1 h-auto font-bold ${isMobile ? 'text-[length:var(--text-caption)]' : 'text-[length:var(--text-tiny)]'}`}
             style={{
               background:  mapStyle === mode ? 'var(--blue)' : 'rgba(28,33,39,0.92)',
               borderRight: i === 0 ? '1px solid var(--bd)' : 'none',
@@ -71,7 +71,7 @@ export function MapControls({
         style={{
           bottom: coordBottomStyle, right,
           background: 'rgba(28,33,39,0.85)', border: '1px solid var(--bd)',
-          padding: '4px 8px', fontSize: 9, color: 'var(--t4)',
+          padding: '4px 8px', fontSize: 'var(--text-caption)', color: 'var(--t4)',
           transition: 'right 0.22s cubic-bezier(0.4,0,0.2,1), bottom 0.22s cubic-bezier(0.4,0,0.2,1)',
         }}
       >

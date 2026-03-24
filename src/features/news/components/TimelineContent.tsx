@@ -70,16 +70,16 @@ export function TimelineContent() {
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/data/news"
-              className="mono text-[10px] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
+              className="mono text-[length:var(--text-label)] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
             >
               ← FEEDS
             </Link>
             <div className="w-px h-4 bg-[var(--bd)]" />
-            <span className="mono text-[10px] font-bold text-[var(--t1)] tracking-wider">
+            <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t1)] tracking-wider">
               {isMobile || view === 'feed' ? 'ALL ARTICLES' : 'TIMELINE VIEW'}
             </span>
             {(isMobile || view === 'feed') && (
-              <span className="mono text-[9px] text-[var(--t4)]">{totalArticles} articles</span>
+              <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{totalArticles} articles</span>
             )}
           </div>
 
@@ -90,7 +90,7 @@ export function TimelineContent() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setView('feed')}
-                className={`px-3 py-1 h-auto rounded-none mono text-[9px] font-bold tracking-wider ${
+                className={`px-3 py-1 h-auto rounded-none mono text-[length:var(--text-caption)] font-bold tracking-wider ${
                   activeView === 'feed' ? 'bg-white/10 text-white' : 'text-[var(--t4)] hover:text-[var(--t2)]'
                 }`}
               >
@@ -103,7 +103,7 @@ export function TimelineContent() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setView('timeline')}
-                    className={`px-3 py-1 h-auto rounded-none mono text-[9px] font-bold tracking-wider ${
+                    className={`px-3 py-1 h-auto rounded-none mono text-[length:var(--text-caption)] font-bold tracking-wider ${
                       activeView === 'timeline' ? 'bg-white/10 text-white' : 'text-[var(--t4)] hover:text-[var(--t2)]'
                     }`}
                   >
@@ -118,7 +118,7 @@ export function TimelineContent() {
             size="sm"
             onClick={handleRefresh}
             disabled={isFetching}
-            className="flex items-center gap-2 h-auto px-2 py-1 mono text-[9px] text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
+            className="flex items-center gap-2 h-auto px-2 py-1 mono text-[length:var(--text-caption)] text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" className={isFetching ? 'animate-spin' : ''}>
               <path d="M1 6a5 5 0 0 1 9-3M11 6a5 5 0 0 1-9 3" />
@@ -129,7 +129,7 @@ export function TimelineContent() {
 
           <div className="flex items-center gap-2">
             <div className={`dot ${isFetching ? 'dot-warn' : 'dot-live'}`} />
-            <span className="mono text-[9px] text-[var(--t4)]">
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">
               {isFetching ? 'loading…' : dataUpdatedAt ? `${Math.floor((now - dataUpdatedAt) / 1000)}s ago` : '…'}
             </span>
           </div>
@@ -176,21 +176,21 @@ export function TimelineContent() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="mono text-[9px] font-bold shrink-0" style={{ color }}>
+                      <span className="mono text-[length:var(--text-caption)] font-bold shrink-0" style={{ color }}>
                         {feed?.name ?? feedId}
                       </span>
-                      <span className="mono text-[8px] text-[var(--t4)]">
+                      <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">
                         {timeAgo(item.isoDate ?? item.pubDate)}
                       </span>
                       {feed?.stateFunded && (
-                        <span className="mono text-[7px] font-bold text-amber-400/70 tracking-wider">STATE</span>
+                        <span className="mono text-[length:var(--text-micro)] font-bold text-amber-400/70 tracking-wider">STATE</span>
                       )}
                     </div>
                     <p className="text-xs text-[var(--t1)] leading-snug group-hover:text-white transition-colors">
                       {item.title}
                     </p>
                     {item.contentSnippet && (
-                      <p className="text-[10px] text-[var(--t4)] mt-0.5 leading-relaxed line-clamp-2">
+                      <p className="text-[length:var(--text-label)] text-[var(--t4)] mt-0.5 leading-relaxed line-clamp-2">
                         {item.contentSnippet}
                       </p>
                     )}

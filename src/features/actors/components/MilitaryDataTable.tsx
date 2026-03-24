@@ -21,15 +21,15 @@ export function MilitaryDataTable({
 }: Props) {
   return (
     <div className="overflow-x-auto border border-[var(--bd)]">
-      <table className="w-full text-[11px] min-w-[720px]">
+      <table className="w-full text-[length:var(--text-body-sm)] min-w-[720px]">
         <thead>
           <tr className="border-b border-[var(--bd)] bg-[var(--bg-2)]">
-            <th className="label text-[8px] text-left py-1.5 px-3">YEAR</th>
-            <th className="label text-[8px] text-right py-1.5 px-3">SPENDING</th>
-            <th className="label text-[8px] text-right py-1.5 px-3">% GDP</th>
-            <th className="label text-[8px] text-right py-1.5 px-3">PERSONNEL</th>
-            <th className="label text-[8px] text-right py-1.5 px-3">INFLATION</th>
-            <th className="label text-[8px] text-right py-1.5 px-3">GDP GROWTH</th>
+            <th className="label text-[length:var(--text-tiny)] text-left py-1.5 px-3">YEAR</th>
+            <th className="label text-[length:var(--text-tiny)] text-right py-1.5 px-3">SPENDING</th>
+            <th className="label text-[length:var(--text-tiny)] text-right py-1.5 px-3">% GDP</th>
+            <th className="label text-[length:var(--text-tiny)] text-right py-1.5 px-3">PERSONNEL</th>
+            <th className="label text-[length:var(--text-tiny)] text-right py-1.5 px-3">INFLATION</th>
+            <th className="label text-[length:var(--text-tiny)] text-right py-1.5 px-3">GDP GROWTH</th>
           </tr>
         </thead>
         <tbody>

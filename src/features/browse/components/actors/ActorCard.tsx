@@ -32,10 +32,10 @@ export function ActorCard(props: Props) {
         <div className="flex items-center gap-2.5 mb-2.5">
           <Flag actorId={props.id} code={props.countryCode} size={22} />
           <div className="flex-1 min-w-0">
-            <h3 className="text-[13px] font-bold text-[var(--t1)] group-hover:text-[var(--blue)] transition-colors truncate">
+            <h3 className="text-[length:var(--text-body)] font-bold text-[var(--t1)] group-hover:text-[var(--blue)] transition-colors truncate">
               {props.name}
             </h3>
-            <span className="mono text-[9px] text-[var(--t4)]">{props.type.replace('_', ' ')}</span>
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{props.type.replace('_', ' ')}</span>
           </div>
           <span
             className="mono text-[18px] font-bold shrink-0 leading-none"
@@ -47,20 +47,20 @@ export function ActorCard(props: Props) {
 
         <div className="flex items-center gap-1.5 mb-3">
           <span
-            className="mono text-[8px] font-bold px-1.5 py-px rounded-sm"
+            className="mono text-[length:var(--text-tiny)] font-bold px-1.5 py-px rounded-sm"
             style={{ color: staC, background: `${staC}12` }}
           >
             {props.stance}
           </span>
           <span
-            className="mono text-[8px] font-bold px-1.5 py-px rounded-sm"
+            className="mono text-[length:var(--text-tiny)] font-bold px-1.5 py-px rounded-sm"
             style={{ color: actC, background: `${actC}12` }}
           >
             {props.activityLevel}
           </span>
         </div>
 
-        <p className="text-[11px] text-[var(--t2)] leading-[1.6] line-clamp-2">
+        <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-[1.6] line-clamp-2">
           {props.assessment}
         </p>
 

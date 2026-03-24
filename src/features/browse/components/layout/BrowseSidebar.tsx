@@ -53,7 +53,7 @@ function EventSidebarList({
   if (isLoading) {
     return (
       <div className="px-4 py-3">
-        <span className="mono text-[10px] text-[var(--t4)]">Loading...</span>
+        <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">Loading...</span>
       </div>
     );
   }
@@ -80,7 +80,7 @@ function EventSidebarList({
             }`}
           >
             <span className={`${SEV_DOT[e.severity] ?? 'dot dot-info'} mt-1.5 shrink-0`} />
-            <span className="text-[13px] md:text-[11px] text-[var(--t2)] line-clamp-2 leading-tight">
+            <span className="text-[length:var(--text-body)] md:text-[length:var(--text-body-sm)] text-[var(--t2)] line-clamp-2 leading-tight">
               {e.title}
             </span>
           </Link>
@@ -109,7 +109,7 @@ export function BrowseSidebar({ onNavigate, mobileSheet = false }: Props) {
               key={s.href}
               href={s.href}
               onClick={onNavigate}
-              className={`no-underline px-4 py-3 md:py-1.5 text-[13px] md:text-[11px] font-semibold tracking-[0.06em] transition-colors ${
+              className={`no-underline px-4 py-3 md:py-1.5 text-[length:var(--text-body)] md:text-[length:var(--text-body-sm)] font-semibold tracking-[0.06em] transition-colors ${
                 isActive
                   ? 'text-[var(--t1)] bg-[var(--bg-sel)]'
                   : 'text-[var(--t3)] hover:text-[var(--t1)] hover:bg-[var(--bg-3)]'
@@ -122,7 +122,7 @@ export function BrowseSidebar({ onNavigate, mobileSheet = false }: Props) {
         <Link
           href="/browse/api/reference"
           onClick={onNavigate}
-          className={`no-underline px-4 py-3 md:py-1.5 text-[13px] md:text-[11px] font-semibold tracking-[0.06em] transition-colors ${
+          className={`no-underline px-4 py-3 md:py-1.5 text-[length:var(--text-body)] md:text-[length:var(--text-body-sm)] font-semibold tracking-[0.06em] transition-colors ${
             path.startsWith('/browse/api/reference')
               ? 'text-[var(--t1)] bg-[var(--bg-sel)]'
               : 'text-[var(--t3)] hover:text-[var(--t1)] hover:bg-[var(--bg-3)]'

@@ -60,10 +60,10 @@ export function IntelMap() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-app)' }}>
       {/* Title Bar */}
       <div style={{ height: 36, background: 'var(--bg-app)', borderBottom: '1px solid var(--bd)', display: 'flex', alignItems: 'center', padding: '0 12px', gap: 8, flexShrink: 0 }}>
-        <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 11, fontFamily: 'monospace' }}>◈ INTEL MAP</span>
-        <span style={{ color: 'var(--t3)', fontSize: 9, fontFamily: 'monospace', marginLeft: 4 }}>OPERATION EPIC FURY</span>
+        <span style={{ color: 'var(--blue)', fontWeight: 700, fontSize: 'var(--text-body-sm)', fontFamily: 'monospace' }}>◈ INTEL MAP</span>
+        <span style={{ color: 'var(--t3)', fontSize: 'var(--text-caption)', fontFamily: 'monospace', marginLeft: 4 }}>OPERATION EPIC FURY</span>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block', marginLeft: 4 }} />
-        <span style={{ color: 'var(--success)', fontSize: 9, fontFamily: 'monospace' }}>LIVE</span>
+        <span style={{ color: 'var(--success)', fontSize: 'var(--text-caption)', fontFamily: 'monospace' }}>LIVE</span>
 
         {/* Toggle buttons */}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
@@ -75,7 +75,7 @@ export function IntelMap() {
                 variant="ghost"
                 size="sm"
                 onClick={() => toggleLayer(key)}
-                className="h-auto px-1.5 py-0.5 rounded-sm text-[8px] font-bold mono"
+                className="h-auto px-1.5 py-0.5 rounded-sm text-[length:var(--text-tiny)] font-bold mono"
                 style={{
                   border: `1px solid ${on ? active.border : 'var(--bd)'}`,
                   background: on ? active.bg : 'var(--bg-1)',
@@ -105,7 +105,7 @@ export function IntelMap() {
         <IntelMapLegend />
 
         {/* Coords */}
-        <div style={{ position: 'absolute', bottom: 52, right: 12, background: 'rgba(28,33,39,0.85)', border: '1px solid var(--bd)', padding: '4px 8px', fontSize: 9, fontFamily: 'monospace', color: 'var(--t4)', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', bottom: 52, right: 12, background: 'rgba(28,33,39,0.85)', border: '1px solid var(--bd)', padding: '4px 8px', fontSize: 'var(--text-caption)', fontFamily: 'monospace', color: 'var(--t4)', pointerEvents: 'none' }}>
           {viewState.latitude.toFixed(2)}°N {viewState.longitude.toFixed(2)}°E
         </div>
 
@@ -123,7 +123,7 @@ function OpenMapButton() {
       style={{
         position: 'absolute', bottom: 16, right: 12,
         background: hovered ? 'var(--blue)' : 'var(--blue)',
-        color: 'white', padding: '8px 16px', fontSize: 11, fontWeight: 700,
+        color: 'white', padding: '8px 16px', fontSize: 'var(--text-body-sm)', fontWeight: 700,
         fontFamily: 'monospace', border: 'none', borderRadius: 2,
         cursor: 'pointer', letterSpacing: '0.08em', textDecoration: 'none',
         display: 'inline-block', transition: 'background 0.15s ease', zIndex: 10,

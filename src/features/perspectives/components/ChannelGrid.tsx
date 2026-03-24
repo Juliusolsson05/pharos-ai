@@ -108,8 +108,8 @@ function ChannelTile({ channel, isDesktop, isFocused, onFocus }: TileProps) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          <span className="mono truncate text-[10px] font-bold text-[var(--t1)]">{channel.name}</span>
-          <span className="mono shrink-0 text-[8px] text-[var(--t4)]">{channel.country}</span>
+          <span className="mono truncate text-[length:var(--text-label)] font-bold text-[var(--t1)]">{channel.name}</span>
+          <span className="mono shrink-0 text-[length:var(--text-tiny)] text-[var(--t4)]">{channel.country}</span>
         </div>
 
         <ChannelTileActions

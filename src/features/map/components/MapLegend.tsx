@@ -50,7 +50,7 @@ export function MapLegend({ hasPanel, timelineVisible = true, isMobile = false }
         className="label w-full justify-start h-auto text-[var(--t4)]"
         style={{
           padding:     isCollapsed ? '6px 10px' : '0 0 6px 0',
-          fontSize:    9,
+          fontSize: 'var(--text-caption)',
           fontWeight:  700,
           letterSpacing: '0.06em',
         }}
@@ -59,7 +59,7 @@ export function MapLegend({ hasPanel, timelineVisible = true, isMobile = false }
       </Button>
 
       {!isCollapsed && ITEMS.map(({ shape, color, label }) => (
-        <div key={label} className="flex items-center gap-1.5" style={{ marginBottom: 3, fontSize: 9, color: 'var(--t3)' }}>
+        <div key={label} className="flex items-center gap-1.5" style={{ marginBottom: 3, fontSize: 'var(--text-caption)', color: 'var(--t3)' }}>
           {shape === 'rect'   && <div style={{ width: 12, height: 3,  background: color, flexShrink: 0 }} />}
           {shape === 'circle' && <div style={{ width: 8,  height: 8,  borderRadius: '50%', background: color, flexShrink: 0 }} />}
           {shape === 'zone'   && <div style={{ width: 10, height: 8,  background: `color-mix(in srgb, ${color} 30%, transparent)`, border: `1px solid ${color}`, flexShrink: 0 }} />}

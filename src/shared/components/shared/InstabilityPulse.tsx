@@ -37,7 +37,7 @@ export function InstabilityPulse({ conflictId }: InstabilityPulseProps) {
   if (isError) {
     return (
       <div className="flex h-7 items-center justify-between gap-3">
-        <span className="mono text-[9px] text-[var(--t4)]">INSTABILITY PULSE - UNAVAILABLE</span>
+        <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">INSTABILITY PULSE - UNAVAILABLE</span>
         <Button className="h-6 px-2" size="sm" variant="outline" onClick={() => refetch()}>
           Retry
         </Button>
@@ -56,12 +56,12 @@ export function InstabilityPulse({ conflictId }: InstabilityPulseProps) {
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
-          <span className="label text-[8px] text-[var(--t4)] tracking-[0.10em]">INSTABILITY PULSE</span>
-          <span className="mono text-[9px] text-[var(--t4)]">7D</span>
+          <span className="label text-[length:var(--text-tiny)] text-[var(--t4)] tracking-[0.10em]">INSTABILITY PULSE</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">7D</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span
-            className="mono text-[9px] font-bold"
+            className="mono text-[length:var(--text-caption)] font-bold"
             style={{ color: TREND_COLOR[trend] }}
           >
             {TREND_ARROW[trend]}

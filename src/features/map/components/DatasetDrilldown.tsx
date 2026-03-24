@@ -30,8 +30,8 @@ export function DatasetDrilldown({ dataset, facets, state, onToggleType, onToggl
       {/* Header */}
       <div className="px-2.5 py-1.5" style={{ borderBottom: '1px solid var(--bd-s)' }}>
         <div className="flex items-center justify-between">
-          <span className="mono text-[10px] font-bold text-[var(--t1)]">{label}</span>
-          <span className="mono text-[9px] text-[var(--t4)]">
+          <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t1)]">{label}</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">
             {facets.totalVisible}/{facets.totalAll}
           </span>
         </div>

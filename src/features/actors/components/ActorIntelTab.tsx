@@ -40,7 +40,7 @@ export function ActorIntelTab({
         <div className="mb-5">
           <SectionDivider label="SAYING — OFFICIAL POSITION" />
           <div className="pl-3" style={{ borderLeft: `3px solid ${staC}` }}>
-            <p className="text-[12.5px] text-[var(--t1)] leading-relaxed italic">
+            <p className="text-[length:var(--text-body)] text-[var(--t1)] leading-relaxed italic">
               {snap.saying}
             </p>
           </div>
@@ -61,7 +61,7 @@ export function ActorIntelTab({
         <div className="mb-5">
           <SectionDivider label="PHAROS ASSESSMENT" />
           <div className="border-l-[3px] border-[var(--blue)] pl-3">
-            <p className="text-[12.5px] text-[var(--t1)] leading-relaxed">{snap.assessment}</p>
+            <p className="text-[length:var(--text-body)] text-[var(--t1)] leading-relaxed">{snap.assessment}</p>
           </div>
         </div>
 
@@ -72,10 +72,10 @@ export function ActorIntelTab({
               const ac = TYPE_C[action.type] ?? 'var(--t2)';
               return (
                 <div key={i} className="grid grid-cols-[86px_64px_1fr] py-1.5 border-b border-[var(--bd-s)]">
-                  <span className="mono text-[10px] text-[var(--t3)] self-start pt-px">{action.date}</span>
+                  <span className="mono text-[length:var(--text-label)] text-[var(--t3)] self-start pt-px">{action.date}</span>
                   <div className="flex flex-col gap-[3px]">
                     <span
-                      className="text-[8px] font-bold px-[5px] py-px tracking-[0.04em]"
+                      className="text-[length:var(--text-tiny)] font-bold px-[5px] py-px tracking-[0.04em]"
                       style={{ background: ac + '18', color: ac }}
                     >
                       {action.type}
@@ -83,15 +83,15 @@ export function ActorIntelTab({
                     <div className="flex gap-1 items-center">
                       {action.verified
                         ? <CheckCircle size={8} className="text-[var(--success)]" strokeWidth={2} />
-                        : <span className="mono text-[8px] text-[var(--t4)]">UNCFMD</span>}
+                        : <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">UNCFMD</span>}
                     </div>
                   </div>
-                  <p className="text-[11.5px] text-[var(--t1)] leading-snug pl-1">{action.description}</p>
+                  <p className="text-[length:var(--text-body-sm)] text-[var(--t1)] leading-snug pl-1">{action.description}</p>
                 </div>
               );
             })}
             {dayActions.length === 0 && (
-              <p className="text-[10px] text-[var(--t4)] py-2">No recorded actions for this day</p>
+              <p className="text-[length:var(--text-label)] text-[var(--t4)] py-2">No recorded actions for this day</p>
             )}
           </div>
         </div>
@@ -102,7 +102,7 @@ export function ActorIntelTab({
             <div className="flex gap-1.5 flex-wrap">
               {actor.keyFigures.map((fig, i) => (
                 <div key={i} className="px-2.5 py-[3px] border border-[var(--bd)] bg-[var(--bg-2)]">
-                  <span className="text-[10px] text-[var(--t2)]">{fig}</span>
+                  <span className="text-[length:var(--text-label)] text-[var(--t2)]">{fig}</span>
                 </div>
               ))}
             </div>
@@ -111,9 +111,9 @@ export function ActorIntelTab({
 
         {leadershipStatus === 'loading' && (
           <div className="mb-5 border border-[var(--bd)] bg-[var(--bg-1)] px-4 py-3">
-            <div className="label mb-1 text-[8px] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
-            <div className="section-title mb-2 text-[11px] text-[var(--t1)]">Loading leadership tree...</div>
-            <p className="text-[11px] leading-relaxed text-[var(--t3)]">
+            <div className="label mb-1 text-[length:var(--text-tiny)] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
+            <div className="section-title mb-2 text-[length:var(--text-body-sm)] text-[var(--t1)]">Loading leadership tree...</div>
+            <p className="text-[length:var(--text-body-sm)] leading-relaxed text-[var(--t3)]">
               Pharos is resolving the command structure for this actor.
             </p>
           </div>
@@ -121,9 +121,9 @@ export function ActorIntelTab({
 
         {leadershipStatus === 'unavailable' && !showKeyFigures && (
           <div className="mb-5 border border-dashed border-[var(--bd)] bg-[var(--bg-1)] px-4 py-3">
-            <div className="label mb-1 text-[8px] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
-            <div className="section-title mb-2 text-[11px] text-[var(--t1)]">Not available</div>
-            <p className="text-[11px] leading-relaxed text-[var(--t3)]">
+            <div className="label mb-1 text-[length:var(--text-tiny)] text-[var(--t4)]">LEADERSHIP STRUCTURE</div>
+            <div className="section-title mb-2 text-[length:var(--text-body-sm)] text-[var(--t1)]">Not available</div>
+            <p className="text-[length:var(--text-body-sm)] leading-relaxed text-[var(--t3)]">
               No leadership tree is currently available for this actor.
             </p>
           </div>

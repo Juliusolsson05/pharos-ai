@@ -44,7 +44,7 @@ export function DaySelector({ currentDay, onDayChange, showAll, allSelected, onA
           variant="outline"
           size="xs"
           onClick={onAllClick}
-          className="mono text-[9px] font-bold tracking-[0.06em] rounded-none shrink-0"
+          className="mono text-[length:var(--text-caption)] font-bold tracking-[0.06em] rounded-none shrink-0"
           style={{
             borderColor: allSelected ? 'var(--blue)' : 'var(--bd)',
             background: allSelected ? 'var(--blue-dim)' : undefined,
@@ -78,19 +78,19 @@ export function DaySelector({ currentDay, onDayChange, showAll, allSelected, onA
             }}
           >
             <span
-              className="mono text-[9px] font-bold tracking-[0.08em]"
+              className="mono text-[length:var(--text-caption)] font-bold tracking-[0.08em]"
               style={{ color: allSelected ? 'var(--t3)' : 'var(--danger)' }}
             >
               {dayLabel(currentDay, allDays)}
             </span>
             <span
-              className="mono text-[8px]"
+              className="mono text-[length:var(--text-tiny)]"
               style={{ color: allSelected ? 'var(--t4)' : 'var(--danger)' }}
             >
               {dayShort(currentDay)}
             </span>
             <span
-              className="mono text-[7px]"
+              className="mono text-[length:var(--text-micro)]"
               style={{ color: allSelected ? 'var(--t4)' : 'var(--danger)' }}
             >
               {evtCount}E

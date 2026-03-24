@@ -29,13 +29,13 @@ export function ChannelView({ channel, showImages, feedData }: ChannelViewProps)
       <div className={`${isLandscapePhone ? 'safe-px' : 'px-5'} py-2 bg-[var(--bg-2)] border-b border-[var(--bd)] flex items-center gap-3 shrink-0`}>
         <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: channel.color }} />
         <div className="min-w-0">
-          <span className="mono text-[10px] font-bold text-[var(--t2)] tracking-wider">
+          <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t2)] tracking-wider">
             {channel.label}
           </span>
-          <span className="text-[9px] text-[var(--t4)] ml-3">{channel.description}</span>
+          <span className="text-[length:var(--text-caption)] text-[var(--t4)] ml-3">{channel.description}</span>
         </div>
         <div className="ml-auto flex items-center gap-2 shrink-0">
-          <span className="text-[8px] mono text-[var(--t4)] uppercase tracking-wider">
+          <span className="text-[length:var(--text-tiny)] mono text-[var(--t4)] uppercase tracking-wider">
             {channel.perspective}
           </span>
         </div>

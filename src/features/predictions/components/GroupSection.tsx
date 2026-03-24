@@ -48,18 +48,18 @@ export function GroupSection({ group, markets, expandedId, onToggle, globalRankO
             ? <ChevronDown  size={11} className="shrink-0" style={{ color: group.color }} />
             : <ChevronRight size={11} className="shrink-0" style={{ color: group.color }} />}
 
-          <span className="mono font-bold tracking-[0.10em] text-[9px]" style={{ color: group.color }}>
+          <span className="mono font-bold tracking-[0.10em] text-[length:var(--text-caption)]" style={{ color: group.color }}>
             {group.label}
           </span>
-          <span className="mono text-[var(--t4)] tracking-[0.04em] text-[9px]">
+          <span className="mono text-[var(--t4)] tracking-[0.04em] text-[length:var(--text-caption)]">
             {group.description}
           </span>
 
           <div className="flex items-center gap-3 ml-auto">
-            <span className="mono text-[var(--t4)] text-[9px]">
+            <span className="mono text-[var(--t4)] text-[length:var(--text-caption)]">
               {markets.length} {markets.length === 1 ? 'MARKET' : 'MARKETS'}
             </span>
-            <span className="mono text-[var(--t3)] font-bold text-[9px]">
+            <span className="mono text-[var(--t3)] font-bold text-[length:var(--text-caption)]">
               {fmtVol(groupVol)} VOL
             </span>
           </div>

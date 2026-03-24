@@ -33,8 +33,8 @@ export function BriefList({ briefs }: Props) {
               <h2 className="text-sm font-semibold text-[var(--t1)] group-hover:text-[var(--blue)] transition-colors">
                 {brief.dayLabel}
               </h2>
-              <span className="mono text-[10px] text-[var(--t4)]">{brief.day}</span>
-              <span className="mono text-[10px] text-[var(--t4)]">
+              <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">{brief.day}</span>
+              <span className="mono text-[length:var(--text-label)] text-[var(--t4)]">
                 {brief.keyFacts.length} key facts
               </span>
             </div>
@@ -43,7 +43,7 @@ export function BriefList({ briefs }: Props) {
               <EscalationBar escalation={brief.escalation} />
             </div>
 
-            <p className="text-[13px] text-[var(--t2)] leading-relaxed line-clamp-2">
+            <p className="text-[length:var(--text-body)] text-[var(--t2)] leading-relaxed line-clamp-2">
               {brief.summary}
             </p>
           </article>

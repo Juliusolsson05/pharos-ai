@@ -11,6 +11,18 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
 
+  /* ── Typography scale ──
+     Semantic text size tokens consumed by components via text-[var(--text-*)].
+     Scale variants (compact / default / large) override these below.
+  */
+  --text-micro:     7px;
+  --text-tiny:      8px;
+  --text-caption:   9px;
+  --text-label:     10px;
+  --text-body-sm:   11px;
+  --text-body:      13px;
+  --text-subhead:   15px;
+
   /* ── Background layers ── */
   --bg-app:    #1C2127;
   --bg-1:      #252A31;
@@ -62,10 +74,14 @@
 :root {
   --background:            var(--bg-1);
   --foreground:            var(--t1);
+  --card:                  var(--bg-1);
+  --card-foreground:       var(--t1);
   --muted:                 var(--bg-3);
   --muted-foreground:      var(--t3);
   --border:                var(--bd);
   --input:                 var(--bg-3);
+  --popover:               var(--bg-1);
+  --popover-foreground:    var(--t1);
   --ring:                  var(--blue);
   --primary:               var(--blue);
   --primary-foreground:    var(--t1);
@@ -75,6 +91,29 @@
   --accent-foreground:     var(--t1);
   --destructive:           var(--danger);
   --radius:                2px;
+}
+
+/* ── UI scale overrides ──
+   Applied on <html> by SettingsRuntime — affects dashboard and browse.
+*/
+html[data-ui-scale="compact"] {
+  --text-micro:     6px;
+  --text-tiny:      7px;
+  --text-caption:   8px;
+  --text-label:     9px;
+  --text-body-sm:   10px;
+  --text-body:      12px;
+  --text-subhead:   14px;
+}
+
+html[data-ui-scale="large"] {
+  --text-micro:     8px;
+  --text-tiny:      9px;
+  --text-caption:   10px;
+  --text-label:     11px;
+  --text-body-sm:   12px;
+  --text-body:      14px;
+  --text-subhead:   16px;
 }
 
 /* ── Browse light theme (follows OS preference) ───────────────────────────
@@ -117,10 +156,14 @@
 
     --background:            #FFFFFF;
     --foreground:            #111111;
+    --card:                  #FFFFFF;
+    --card-foreground:       #111111;
     --muted:                 #F4F4F4;
     --muted-foreground:      #666666;
     --border:                #D5D5D5;
     --input:                 #EAEAEA;
+    --popover:               #FFFFFF;
+    --popover-foreground:    #111111;
     --primary:               #0066CC;
     --primary-foreground:    #FFFFFF;
     --secondary:             #F4F4F4;
@@ -151,7 +194,7 @@
     font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
     background: var(--bg-app);
     color: var(--t1);
-    font-size: 13px;
+    font-size: var(--text-body);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -254,9 +297,9 @@
     overflow-y: auto;
   }
 
-  /* Typography helpers */
+  /* Typography helpers — use semantic scale tokens */
   .label {
-    font-size: 10px;
+    font-size: var(--text-label);
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -266,13 +309,13 @@
 
   .mono {
     font-family: 'SFMono-Regular', 'Menlo', 'Cascadia Code', monospace;
-    font-size: 11px;
+    font-size: var(--text-body-sm);
     color: var(--t2);
     letter-spacing: -0.01em;
   }
 
   .section-title {
-    font-size: 11px;
+    font-size: var(--text-body-sm);
     font-weight: 700;
     color: var(--t1);
     letter-spacing: 0.03em;
@@ -310,7 +353,7 @@
     display: inline-flex;
     align-items: center;
     padding: 1px 6px;
-    font-size: 9px;
+    font-size: var(--text-caption);
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -354,7 +397,7 @@
     align-items: center;
     height: 100%;
     padding: 0 18px;
-    font-size: 12px;
+    font-size: var(--text-body);
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--t3);
@@ -468,7 +511,7 @@
   @media (max-width: 1024px) {
     .nav-item {
       padding: 0 12px;
-      font-size: 11px;
+      font-size: var(--text-body-sm);
       letter-spacing: 0.03em;
     }
     .panel-header {

@@ -58,7 +58,7 @@ export function BrowseArticleBanner() {
 
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-2 bg-black border-b border-[var(--bd)]">
-      <p className="text-[11px] text-white/70 leading-snug">
+      <p className="text-[length:var(--text-body-sm)] text-white/70 leading-snug">
         You are viewing public article pages.{' '}
         <Link
           href="/dashboard"

@@ -43,8 +43,8 @@ export function EventDetailScreen({ item, onBack, onSelectItem, onActivateStory 
 
       {/* Type header */}
       <div className="shrink-0 safe-px py-2 border-b border-[var(--bd)] bg-[var(--bg-2)]" style={{ borderTop: `2px solid ${accent}` }}>
-        <p className="label text-[8px] mb-0.5" style={{ color: accent }}>{PANEL_LABEL[item.type]}</p>
-        <p className="mono text-[13px] font-bold text-[var(--t1)]">{getTitle(item)}</p>
+        <p className="label text-[length:var(--text-tiny)] mb-0.5" style={{ color: accent }}>{PANEL_LABEL[item.type]}</p>
+        <p className="mono text-[length:var(--text-body)] font-bold text-[var(--t1)]">{getTitle(item)}</p>
       </div>
 
       {/* Content */}
@@ -58,7 +58,7 @@ export function EventDetailScreen({ item, onBack, onSelectItem, onActivateStory 
 
       {/* Footer */}
       <div className="shrink-0 h-8 flex items-center safe-px border-t border-[var(--bd-s)] bg-[var(--bg-app)]">
-        <span className="mono text-[8px] text-[var(--t4)]">PHAROS INTEL · UNCLASSIFIED</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)]">PHAROS INTEL · UNCLASSIFIED</span>
       </div>
     </div>
   );

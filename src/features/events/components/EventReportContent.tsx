@@ -21,8 +21,8 @@ const STANCE_C: Record<string, string> = {
 export function MetaChip({ label, val }: { label: string; val: string }) {
   return (
     <div>
-      <div className="label text-[8px] mb-px">{label}</div>
-      <span className="mono text-[10px] text-[var(--t1)]">{val}</span>
+      <div className="label text-[length:var(--text-tiny)] mb-px">{label}</div>
+      <span className="mono text-[length:var(--text-label)] text-[var(--t1)]">{val}</span>
     </div>
   );
 }
@@ -43,13 +43,13 @@ export function EventReportContent({ event, compact = false, pageScroll = false 
       <div className="mb-[22px]">
         <SectionDivider label="EXECUTIVE SUMMARY" />
         <div className="pl-[14px]" style={{ borderLeft: `3px solid ${sc}` }}>
-          <p className="text-[13px] text-[var(--t1)] leading-relaxed">{event.summary}</p>
+          <p className="text-[length:var(--text-body)] text-[var(--t1)] leading-relaxed">{event.summary}</p>
         </div>
       </div>
 
       <div className="mb-[22px]">
         <SectionDivider label="INTELLIGENCE REPORT" />
-        <div className="text-[12.5px] text-[var(--t1)] leading-relaxed">
+        <div className="text-[length:var(--text-body)] text-[var(--t1)] leading-relaxed">
           {event.fullContent.split('\n\n').map((p, i) => (
             <p key={i} className={`mb-3 ${i === 0 ? 'text-[var(--t1)]' : 'text-[var(--t2)]'}`}>{p}</p>
           ))}
@@ -63,7 +63,7 @@ export function EventReportContent({ event, compact = false, pageScroll = false 
             {event.sources.map((src, i) => (
               <div key={i} className="flex items-center gap-2.5 px-2.5 py-1.5 border border-[var(--bd)]" style={src.url ? { borderColor: 'color-mix(in srgb, var(--blue) 30%, var(--bd))' } : undefined}>
                 <span
-                  className="text-[8px] font-bold px-[5px] py-px shrink-0"
+                  className="text-[length:var(--text-tiny)] font-bold px-[5px] py-px shrink-0"
                   style={{ background: TIER_C[src.tier] + '22', color: TIER_C[src.tier] }}
                 >
                   {TIER_L[src.tier]}
@@ -73,13 +73,13 @@ export function EventReportContent({ event, compact = false, pageScroll = false 
                     href={src.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] flex-1 font-medium hover:underline"
+                    className="text-[length:var(--text-body-sm)] flex-1 font-medium hover:underline"
                     style={{ color: 'var(--blue-l)', textDecoration: 'none' }}
                   >
                     {src.name} ↗
                   </a>
                 ) : (
-                  <span className="text-[11px] text-[var(--t1)] flex-1">{src.name}</span>
+                  <span className="text-[length:var(--text-body-sm)] text-[var(--t1)] flex-1">{src.name}</span>
                 )}
                 <div className="flex items-center gap-1.5">
                   <div className="w-[50px] h-[3px] bg-[var(--bd)]">
@@ -92,7 +92,7 @@ export function EventReportContent({ event, compact = false, pageScroll = false 
                       }}
                     />
                   </div>
-                  <span className="mono text-[9px] text-[var(--t3)] min-w-[26px]">
+                  <span className="mono text-[length:var(--text-caption)] text-[var(--t3)] min-w-[26px]">
                     {src.reliability}%
                   </span>
                 </div>
@@ -118,15 +118,15 @@ export function EventReportContent({ event, compact = false, pageScroll = false 
                     style={{ borderLeft: `3px solid ${stC}` }}
                   >
                     <div className="flex gap-2 mb-1">
-                      <span className="text-[11px] font-bold text-[var(--t1)]">{r.actorName}</span>
+                      <span className="text-[length:var(--text-body-sm)] font-bold text-[var(--t1)]">{r.actorName}</span>
                       <span
-                        className="text-[8px] px-[5px] py-px font-bold tracking-[0.05em]"
+                        className="text-[length:var(--text-tiny)] px-[5px] py-px font-bold tracking-[0.05em]"
                         style={{ background: stC + '18', color: stC }}
                       >{r.stance}</span>
-                      <span className="label text-[8px] ml-auto text-[var(--t3)]">{r.type}</span>
+                      <span className="label text-[length:var(--text-tiny)] ml-auto text-[var(--t3)]">{r.type}</span>
                       <ArrowRight size={9} className="text-[var(--t3)]" strokeWidth={1.5} />
                     </div>
-                    <p className="text-[11.5px] text-[var(--t2)] leading-[1.5] italic">
+                    <p className="text-[length:var(--text-body-sm)] text-[var(--t2)] leading-[1.5] italic">
                       &quot;{r.statement}&quot;
                     </p>
                   </div>

@@ -56,51 +56,51 @@ export function ActorProfile({ actor }: Props) {
           <Flag actorId={actor.id} code={actor.countryCode} size={32} />
           <div>
             <h1 className="text-lg font-bold text-[var(--t1)]">{actor.name}</h1>
-            <p className="mono text-[11px] text-[var(--t3)]">{actor.fullName}</p>
+            <p className="mono text-[length:var(--text-body-sm)] text-[var(--t3)]">{actor.fullName}</p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mt-3">
           <span
-            className="mono text-[9px] font-bold px-2 py-0.5 rounded-sm"
+            className="mono text-[length:var(--text-caption)] font-bold px-2 py-0.5 rounded-sm"
             style={{ color: actC, border: `1px solid ${actC}`, background: `${actC}15` }}
           >
             {actor.activityLevel}
           </span>
           <span
-            className="mono text-[9px] font-bold px-2 py-0.5 rounded-sm"
+            className="mono text-[length:var(--text-caption)] font-bold px-2 py-0.5 rounded-sm"
             style={{ color: staC, border: `1px solid ${staC}`, background: `${staC}15` }}
           >
             {actor.stance}
           </span>
           {aff && (
             <span
-              className="mono text-[9px] px-2 py-0.5 rounded-sm"
+              className="mono text-[length:var(--text-caption)] px-2 py-0.5 rounded-sm"
               style={{ color: aff.color, border: `1px solid ${aff.color}`, background: `${aff.color}15` }}
             >
               {aff.label}
             </span>
           )}
-          <span className="mono text-[9px] text-[var(--t4)]">{actor.type}</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{actor.type}</span>
         </div>
 
         <div className="flex items-center gap-3 mt-4">
           <div className="h-[3px] flex-1 max-w-xs rounded-full bg-[var(--bg-3)]">
             <div className="h-full rounded-full" style={{ width: `${actor.activityScore}%`, background: actC }} />
           </div>
-          <span className="mono text-[10px] font-bold" style={{ color: actC }}>{actor.activityScore}%</span>
+          <span className="mono text-[length:var(--text-label)] font-bold" style={{ color: actC }}>{actor.activityScore}%</span>
         </div>
       </header>
 
       <section className="mb-8">
         <h2 className="label mb-3">Assessment</h2>
-        <p className="text-[15px] text-[var(--t1)] leading-[1.7]">{actor.assessment}</p>
+        <p className="text-[length:var(--text-subhead)] text-[var(--t1)] leading-[1.7]">{actor.assessment}</p>
       </section>
 
       <section className="mb-8">
         <h2 className="label mb-3">Current posture</h2>
         <blockquote className="border-l-2 border-[var(--bd)] pl-4 mb-4">
-          <p className="text-[13px] text-[var(--t2)] italic leading-relaxed">
+          <p className="text-[length:var(--text-body)] text-[var(--t2)] italic leading-relaxed">
             &ldquo;{actor.saying}&rdquo;
           </p>
         </blockquote>
@@ -121,7 +121,7 @@ export function ActorProfile({ actor }: Props) {
           <h2 className="label mb-3">Key figures</h2>
           <div className="flex flex-wrap gap-2">
             {actor.keyFigures.map((fig) => (
-              <span key={fig} className="mono text-[10px] text-[var(--t2)] px-2 py-1 rounded border border-[var(--bd-s)]">
+              <span key={fig} className="mono text-[length:var(--text-label)] text-[var(--t2)] px-2 py-1 rounded border border-[var(--bd-s)]">
                 {fig}
               </span>
             ))}

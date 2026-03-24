@@ -15,7 +15,7 @@ export function CategoryBadge({ category }: Props) {
 
   return (
     <span
-      className="mono text-[9px] font-bold px-2 py-0.5 rounded-sm tracking-wider"
+      className="mono text-[length:var(--text-caption)] font-bold px-2 py-0.5 rounded-sm tracking-wider"
       style={{ color: style.color, background: style.bg }}
     >
       {category}

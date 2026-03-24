@@ -89,30 +89,30 @@ export function PredictionsDataContent() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/data"
-            className="mono text-[10px] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
+            className="mono text-[length:var(--text-label)] text-[var(--t4)] hover:text-[var(--t2)] no-underline transition-colors"
           >
             ← DATA
           </Link>
           <div className="w-px h-4 bg-[var(--bd)]" />
-          <span className="mono text-[10px] font-bold text-[var(--t1)] tracking-wider">PREDICTION MARKETS</span>
-          <span className="mono text-[9px] text-[var(--t4)]">via Polymarket</span>
+          <span className="mono text-[length:var(--text-label)] font-bold text-[var(--t1)] tracking-wider">PREDICTION MARKETS</span>
+          <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">via Polymarket</span>
         </div>
 
         <div className="flex items-center gap-5">
           {/* Stats */}
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-2">
-              <span className="mono text-[8px] text-[var(--t4)] tracking-widest">MARKETS</span>
-              <span className="mono text-[11px] font-bold text-[var(--t1)]">{markets.length}</span>
-              <span className="mono text-[9px]" style={{ color: 'var(--success)' }}>({liveCount} LIVE)</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest">MARKETS</span>
+              <span className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--t1)]">{markets.length}</span>
+              <span className="mono text-[length:var(--text-caption)]" style={{ color: 'var(--success)' }}>({liveCount} LIVE)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="mono text-[8px] text-[var(--t4)] tracking-widest">TOTAL VOL</span>
-              <span className="mono text-[11px] font-bold text-[var(--t1)]">{fmtVol(totalVol)}</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest">TOTAL VOL</span>
+              <span className="mono text-[length:var(--text-body-sm)] font-bold text-[var(--t1)]">{fmtVol(totalVol)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="mono text-[8px] text-[var(--t4)] tracking-widest">24H VOL</span>
-              <span className="mono text-[11px] font-bold" style={{ color: 'var(--success)' }}>{fmtVol(totalVol24)}</span>
+              <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] tracking-widest">24H VOL</span>
+              <span className="mono text-[length:var(--text-body-sm)] font-bold" style={{ color: 'var(--success)' }}>{fmtVol(totalVol24)}</span>
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export function PredictionsDataContent() {
             size="sm"
             onClick={() => refetch()}
             disabled={refreshing}
-            className="flex items-center gap-2 h-auto px-2 py-1 text-[9px] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
+            className="flex items-center gap-2 h-auto px-2 py-1 text-[length:var(--text-caption)] mono text-[var(--t4)] hover:text-[var(--t2)] disabled:opacity-40"
           >
             <svg
               width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"
@@ -138,7 +138,7 @@ export function PredictionsDataContent() {
 
           <div className="flex items-center gap-2">
             <div className={`dot ${refreshing ? 'dot-warn' : 'dot-live'}`} />
-            <span className="mono text-[9px] text-[var(--t4)]">{refreshing ? 'refreshing…' : timeSince}</span>
+            <span className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{refreshing ? 'refreshing…' : timeSince}</span>
           </div>
         </div>
       </div>
@@ -147,13 +147,13 @@ export function PredictionsDataContent() {
       <div className={`flex items-center gap-3 py-2 border-b border-[var(--bd)] bg-[var(--bg-2)] shrink-0 overflow-x-auto ${isLandscapePhone ? 'safe-px' : 'px-5'}`}>
 
         {/* Group filter tabs */}
-        <span className="mono text-[8px] text-[var(--t4)] shrink-0">GROUP:</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] shrink-0">GROUP:</span>
         <div className="flex gap-1">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setGroupFilter('ALL')}
-            className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+            className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
               groupFilter === 'ALL'
                 ? 'bg-white/10 text-white border border-white/20'
                 : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -167,7 +167,7 @@ export function PredictionsDataContent() {
               variant="ghost"
               size="sm"
               onClick={() => setGroupFilter(g.id)}
-              className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+              className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
                 groupFilter === g.id
                   ? 'border'
                   : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -187,7 +187,7 @@ export function PredictionsDataContent() {
         <div className="w-px h-4 bg-[var(--bd)]" />
 
         {/* Sort */}
-        <span className="mono text-[8px] text-[var(--t4)] shrink-0">SORT:</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] shrink-0">SORT:</span>
         <div className="flex gap-1">
           {SORT_OPTS.map(s => (
             <Button
@@ -195,7 +195,7 @@ export function PredictionsDataContent() {
               variant="ghost"
               size="sm"
               onClick={() => setSortBy(s.key)}
-              className={`px-2 py-1 h-auto rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+              className={`px-2 py-1 h-auto rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
                 sortBy === s.key
                   ? 'bg-white/10 text-white border border-white/20'
                   : 'text-[var(--t4)] hover:text-[var(--t2)] border border-transparent'
@@ -213,7 +213,7 @@ export function PredictionsDataContent() {
           variant="outline"
           size="sm"
           onClick={() => setLiveOnly(v => !v)}
-          className={`flex items-center gap-1.5 h-auto px-2 py-1 rounded text-[8px] mono font-bold tracking-wider shrink-0 ${
+          className={`flex items-center gap-1.5 h-auto px-2 py-1 rounded text-[length:var(--text-tiny)] mono font-bold tracking-wider shrink-0 ${
             liveOnly
               ? 'text-[var(--success)] bg-[var(--success-dim)] border-[rgba(35,162,109,0.3)]'
               : 'text-[var(--t4)] border-transparent hover:text-[var(--t2)]'
@@ -224,7 +224,7 @@ export function PredictionsDataContent() {
           LIVE ONLY
         </Button>
 
-        <span className="mono text-[8px] text-[var(--t4)] ml-auto shrink-0">{processed.length} shown</span>
+        <span className="mono text-[length:var(--text-tiny)] text-[var(--t4)] ml-auto shrink-0">{processed.length} shown</span>
       </div>
 
       {/* ── Grid ── */}
@@ -238,13 +238,13 @@ export function PredictionsDataContent() {
         ) : error ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="mono text-[11px] text-[var(--danger)] mb-2">FETCH ERROR</div>
-              <div className="mono text-[9px] text-[var(--t4)]">{error}</div>
+              <div className="mono text-[length:var(--text-body-sm)] text-[var(--danger)] mb-2">FETCH ERROR</div>
+              <div className="mono text-[length:var(--text-caption)] text-[var(--t4)]">{error}</div>
               <Button
                 variant="outline"
                 size="sm"
             onClick={() => refetch()}
-                className="mt-4 mono text-[9px] h-auto px-3 py-1.5 border-[var(--bd)] text-[var(--t3)] hover:text-[var(--t1)] hover:border-white/20"
+                className="mt-4 mono text-[length:var(--text-caption)] h-auto px-3 py-1.5 border-[var(--bd)] text-[var(--t3)] hover:text-[var(--t1)] hover:border-white/20"
               >
                 RETRY
               </Button>
@@ -252,7 +252,7 @@ export function PredictionsDataContent() {
           </div>
         ) : processed.length === 0 ? (
           <div className="flex items-center justify-center py-20">
-            <span className="mono text-[11px] text-[var(--t4)]">No markets match current filters</span>
+            <span className="mono text-[length:var(--text-body-sm)] text-[var(--t4)]">No markets match current filters</span>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">

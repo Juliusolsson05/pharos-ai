@@ -36,7 +36,7 @@ export function PharosView({ post, acct, postUrl, compact }: Props) {
           style={{ background: avatarBg }}
         >
           <AvatarFallback
-            className="text-[10px] font-bold text-white rounded-full"
+            className="text-[length:var(--text-label)] font-bold text-white rounded-full"
             style={{ background: avatarBg }}
           >
             {avatarText}
@@ -56,7 +56,7 @@ export function PharosView({ post, acct, postUrl, compact }: Props) {
 
         <Badge
           variant="outline"
-          className="text-[9px] px-[6px] py-0.5 rounded-sm shrink-0 border-transparent tracking-[0.05em]"
+          className="text-[length:var(--text-caption)] px-[6px] py-0.5 rounded-sm shrink-0 border-transparent tracking-[0.05em]"
           style={{ background: acct.bg, color: acct.text }}
         >
           {acct.label}
@@ -68,8 +68,7 @@ export function PharosView({ post, acct, postUrl, compact }: Props) {
       {/* ── BODY ── */}
       <div className="card-body">
         <p
-          className={`leading-snug whitespace-pre-wrap text-[var(--t1)]${compact ? ' line-clamp-3' : ''}`}
-          style={{ fontSize: compact ? 11.5 : 12.5 }}
+          className={`leading-snug whitespace-pre-wrap text-[var(--t1)]${compact ? ' text-[length:var(--text-body-sm)] line-clamp-3' : ' text-[length:var(--text-body)]'}`}
         >
           {post.content}
         </p>

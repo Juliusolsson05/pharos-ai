@@ -40,20 +40,20 @@ export function BriefContent() {
         {/* Classification header */}
         <div className="text-center mb-8 pb-5 border-b-2 border-[var(--bd)]">
           <div className="mb-2">
-            <span className="mono text-[9px] font-bold tracking-[0.16em] text-[var(--t4)] uppercase">
+            <span className="mono text-[length:var(--text-caption)] font-bold tracking-[0.16em] text-[var(--t4)] uppercase">
               UNCLASSIFIED // PHAROS ANALYTICAL
             </span>
           </div>
           <h1 className="mono text-[22px] font-bold text-[var(--t1)] tracking-[0.04em] mb-[6px]">
             DAILY INTELLIGENCE BRIEF
           </h1>
-          <h2 className="mono text-[15px] font-bold text-[var(--danger)] tracking-[0.08em] mb-2.5">
+          <h2 className="mono text-[length:var(--text-subhead)] font-bold text-[var(--danger)] tracking-[0.08em] mb-2.5">
             OPERATION EPIC FURY / ROARING LION
           </h2>
           <div className="flex justify-center gap-5 mb-4">
-            <span className="mono text-[10px] text-[var(--t3)]">DATE: {currentDay}</span>
-            <span className="mono text-[10px] text-[var(--t3)]">AS OF: 12:00 UTC</span>
-            <span className="mono text-[10px] text-[var(--t3)]">DAY {dayIndex + 1} OF OPERATIONS</span>
+            <span className="mono text-[length:var(--text-label)] text-[var(--t3)]">DATE: {currentDay}</span>
+            <span className="mono text-[length:var(--text-label)] text-[var(--t3)]">AS OF: 12:00 UTC</span>
+            <span className="mono text-[length:var(--text-label)] text-[var(--t3)]">DAY {dayIndex + 1} OF OPERATIONS</span>
           </div>
           <div className="flex justify-center">
             <DaySelector
@@ -83,10 +83,10 @@ export function BriefContent() {
           <div className="flex flex-col gap-[6px]">
             {snapshot.keyFacts.map((fact, i) => (
               <div key={i} className="flex gap-3 px-3 py-2 bg-[var(--bg-2)] border border-[var(--bd)] [border-left:3px_solid_var(--danger)]">
-                <span className="mono text-[10px] font-bold text-[var(--danger)] shrink-0 pt-[1px]">
+                <span className="mono text-[length:var(--text-label)] font-bold text-[var(--danger)] shrink-0 pt-[1px]">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <p className="text-[12.5px] text-[var(--t1)] leading-normal">{fact}</p>
+                <p className="text-[length:var(--text-body)] text-[var(--t1)] leading-normal">{fact}</p>
               </div>
             ))}
           </div>
@@ -101,17 +101,17 @@ export function BriefContent() {
                 <div key={actor.id} className="px-4 py-3 bg-[var(--bg-2)] border border-[var(--bd)]">
                   <div className="flex items-center gap-2 mb-2">
                     <Flag actorId={actor.id} code={actor.countryCode} size={18} />
-                    <span className="text-[13px] font-bold text-[var(--t1)]">{actor.fullName}</span>
-                    <span className="text-[8px] font-bold px-[6px] py-[2px] ml-auto"
+                    <span className="text-[length:var(--text-body)] font-bold text-[var(--t1)]">{actor.fullName}</span>
+                    <span className="text-[length:var(--text-tiny)] font-bold px-[6px] py-[2px] ml-auto"
                       style={{ background: actC + '18', color: actC }}>
                       {actor.activityLevel}
                     </span>
-                    <span className="text-[8px] font-bold px-[6px] py-[2px]"
+                    <span className="text-[length:var(--text-tiny)] font-bold px-[6px] py-[2px]"
                       style={{ background: staC + '18', color: staC }}>
                       {actor.stance}
                     </span>
                   </div>
-                  <p className="text-[12.5px] text-[var(--t2)] leading-relaxed">{actor.assessment}</p>
+                  <p className="text-[length:var(--text-body)] text-[var(--t2)] leading-relaxed">{actor.assessment}</p>
                 </div>
               );
             })}
@@ -142,7 +142,7 @@ export function BriefContent() {
             {BRIEF_SOURCES.map((src, i) => (
               <div key={i} className="flex items-center gap-[10px] px-[10px] py-[6px] border border-[var(--bd)]">
                 <span
-                  className="text-[8px] font-bold px-[5px] py-[1px] shrink-0"
+                  className="text-[length:var(--text-tiny)] font-bold px-[5px] py-[1px] shrink-0"
                   style={{ background: TIER_C[src.tier] + '22', color: TIER_C[src.tier] }}
                 >
                   T{src.tier}
@@ -152,15 +152,15 @@ export function BriefContent() {
                     href={(src as { url: string }).url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] font-semibold min-w-[180px] hover:underline"
+                    className="text-[length:var(--text-body-sm)] font-semibold min-w-[180px] hover:underline"
                     style={{ color: 'var(--blue-l)', textDecoration: 'none' }}
                   >
                     {src.name} ↗
                   </a>
                 ) : (
-                  <span className="text-[11px] font-semibold text-[var(--t1)] min-w-[180px]">{src.name}</span>
+                  <span className="text-[length:var(--text-body-sm)] font-semibold text-[var(--t1)] min-w-[180px]">{src.name}</span>
                 )}
-                <span className="text-[10px] text-[var(--t3)] flex-1">{src.note}</span>
+                <span className="text-[length:var(--text-label)] text-[var(--t3)] flex-1">{src.note}</span>
               </div>
             ))}
           </div>

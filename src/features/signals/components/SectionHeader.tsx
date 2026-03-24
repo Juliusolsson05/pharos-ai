@@ -12,14 +12,14 @@ export function SectionHeader({ label, count, color }: Props) {
         style={{ background: color }}
       />
       <span
-        className="text-[10px] font-bold uppercase tracking-[0.08em] shrink-0"
+        className="text-[length:var(--text-label)] font-bold uppercase tracking-[0.08em] shrink-0"
         style={{ color }}
       >
         {label}
       </span>
       <Badge
         variant="outline"
-        className="text-[8px] px-[5px] py-px rounded-sm shrink-0"
+        className="text-[length:var(--text-tiny)] px-[5px] py-px rounded-sm shrink-0"
         style={{
           color,
           borderColor: `${color}60`,

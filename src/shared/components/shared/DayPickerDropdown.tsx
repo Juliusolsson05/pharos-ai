@@ -24,7 +24,7 @@ export function DayPickerDropdown({ currentDay, allSelected, onSelect, allDays, 
       className="w-[220px] p-0 border-[var(--bd)] bg-[var(--bg-1)] shadow-lg"
     >
       <div className="px-3 py-2 border-b border-[var(--bd)] bg-[var(--bg-2)]">
-        <span className="mono text-[8px] font-bold text-[var(--t4)] tracking-[0.10em]">
+        <span className="mono text-[length:var(--text-tiny)] font-bold text-[var(--t4)] tracking-[0.10em]">
           CONFLICT TIMELINE — {allDays.length} DAYS
         </span>
       </div>
@@ -47,7 +47,7 @@ export function DayPickerDropdown({ currentDay, allSelected, onSelect, allDays, 
               }}
             >
               <span
-                className="mono text-[10px] font-bold w-9 shrink-0"
+                className="mono text-[length:var(--text-label)] font-bold w-9 shrink-0"
                 style={{ color: isActive ? 'var(--danger)' : 'var(--t2)' }}
               >
                 {dayLabel(day, allDays)}
@@ -55,13 +55,13 @@ export function DayPickerDropdown({ currentDay, allSelected, onSelect, allDays, 
 
               <div className="flex-1 min-w-0">
                 <span
-                  className="mono text-[9px] block"
+                  className="mono text-[length:var(--text-caption)] block"
                   style={{ color: isActive ? 'var(--danger)' : 'var(--t3)' }}
                 >
                   {day}
                 </span>
                 <span
-                  className="mono text-[7px]"
+                  className="mono text-[length:var(--text-micro)]"
                   style={{ color: isActive ? 'var(--danger)' : 'var(--t4)' }}
                 >
                   {ec} events
@@ -71,7 +71,7 @@ export function DayPickerDropdown({ currentDay, allSelected, onSelect, allDays, 
               {snap && (
                 <div className="shrink-0 flex flex-col items-end gap-px">
                   <span
-                    className="mono text-[9px] font-bold"
+                    className="mono text-[length:var(--text-caption)] font-bold"
                     style={{
                       color: snap.escalation >= 90 ? 'var(--danger)'
                         : snap.escalation >= 80 ? 'var(--warning)' : 'var(--t3)',
