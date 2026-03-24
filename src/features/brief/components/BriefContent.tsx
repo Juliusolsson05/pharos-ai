@@ -166,11 +166,6 @@ export function BriefContent() {
           </div>
         </BriefSection>
 
-        <div className="mt-10 pt-4 border-t border-[var(--bd)] text-center">
-          <span className="label text-[length:var(--text-tiny)] text-[var(--t4)]">
-            UNCLASSIFIED // PHAROS ANALYTICAL // OPERATION EPIC FURY // {currentDay}
-          </span>
-        </div>
     </div>
   );
 

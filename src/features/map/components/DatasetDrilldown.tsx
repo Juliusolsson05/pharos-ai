@@ -23,7 +23,7 @@ export function DatasetDrilldown({ dataset, facets, state, onToggleType, onToggl
       style={{
         background: 'rgba(28,33,39,0.97)',
         border: '1px solid var(--bd)',
-        width: 240,
+        width: 'min(240px, 100%)',
         maxHeight: 'calc(100vh - 120px)',
       }}
     >
