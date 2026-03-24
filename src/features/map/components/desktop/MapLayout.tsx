@@ -66,8 +66,8 @@ export function DesktopMapLayout({ ctx, embedded = false }: Props) {
       )}
 
       {/* ── Map canvas ── */}
-      <ResizablePanel id="canvas" defaultSize="75%" minSize="40%" className="relative overflow-hidden">
-        <div className="relative overflow-hidden w-full h-full">
+      <ResizablePanel id="canvas" defaultSize="75%" minSize="40%" className="relative overflow-hidden min-w-0">
+        <div className="relative overflow-hidden w-full h-full min-w-0">
           <DeckGL
             viewState={{
               ...viewState,
@@ -109,11 +109,18 @@ export function DesktopMapLayout({ ctx, embedded = false }: Props) {
           <div style={{
             position: 'absolute',
             bottom: showTimeline ? 118 : 74,
+            left: 12,
             right: selectedItem ? 332 : 12,
             zIndex: 10,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            minWidth: 0,
+            pointerEvents: 'none',
             transition: 'right 0.22s cubic-bezier(0.4,0,0.2,1)',
           }}>
-            <MapVisibilityMenu visibility={overlayVisibility} onToggle={toggleOverlay} />
+            <div style={{ pointerEvents: 'auto' }}>
+              <MapVisibilityMenu visibility={overlayVisibility} onToggle={toggleOverlay} />
+            </div>
           </div>
 
           {/* Filter panel */}
@@ -121,23 +128,30 @@ export function DesktopMapLayout({ ctx, embedded = false }: Props) {
             <div style={{
               position: 'absolute',
               top: 12,
+              left: 12,
               right: selectedItem ? 332 : 12,
               zIndex: 10,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              minWidth: 0,
+              pointerEvents: 'none',
               transition: 'right 0.22s cubic-bezier(0.4,0,0.2,1)',
             }}>
-              <MapFilterPanel
-                defaultExpanded
-                state={f.state}
-                facets={f.facets}
-                isFiltered={f.isFiltered}
-                onToggleDataset={f.toggleDataset}
-                onToggleType={f.toggleType}
-                onToggleActor={f.toggleActor}
-                onTogglePriority={f.togglePriority}
-                onToggleStatus={f.toggleStatus}
-                onToggleHeat={f.toggleHeat}
-                onReset={f.resetFilters}
-              />
+              <div style={{ minWidth: 0, maxWidth: '100%', pointerEvents: 'auto' }}>
+                <MapFilterPanel
+                  defaultExpanded
+                  state={f.state}
+                  facets={f.facets}
+                  isFiltered={f.isFiltered}
+                  onToggleDataset={f.toggleDataset}
+                  onToggleType={f.toggleType}
+                  onToggleActor={f.toggleActor}
+                  onTogglePriority={f.togglePriority}
+                  onToggleStatus={f.toggleStatus}
+                  onToggleHeat={f.toggleHeat}
+                  onReset={f.resetFilters}
+                />
+              </div>
             </div>
           )}
 

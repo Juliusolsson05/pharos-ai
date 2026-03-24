@@ -105,15 +105,15 @@ export function MapTimeline({ rawData, dataExtent, viewExtent, onViewExtent, tim
   const toPct = (ms: number) => ((ms - vMin) / span) * 100;
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-10 select-none"
+    <div className="absolute bottom-0 left-0 right-0 z-10 select-none min-w-0"
       style={{
         background: 'rgba(28,33,39,0.92)',
         borderTop: '1px solid var(--bd)',
         padding: isMobile ? '6px 10px calc(12px + var(--safe-bottom))' : '4px 16px 6px',
         touchAction: 'none',
       }}>
-      <div className="flex items-center justify-between mb-0.5">
-        <div className="flex items-center gap-0.5 overflow-x-auto touch-scroll hide-scrollbar pr-2">
+      <div className="flex items-center gap-2 mb-0.5 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto touch-scroll hide-scrollbar pr-2">
           {ZOOM_LEVELS.map(z => (
             <Button key={z.label} variant="ghost" size="xs" onClick={() => handleZoom(z.ms)}
               className={`mono rounded-sm px-1.5 py-0 text-[8px] font-bold tracking-wider ${isMobile ? 'h-5' : 'h-4'}`}
@@ -126,8 +126,8 @@ export function MapTimeline({ rawData, dataExtent, viewExtent, onViewExtent, tim
           ))}
         </div>
         {isActive && (
-          <div className="flex items-center gap-2">
-            <span className="mono text-[9px] text-[var(--t2)]">{fmt(rng[0])} — {fmt(rng[1])}</span>
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="mono min-w-0 truncate text-[9px] text-[var(--t2)]">{fmt(rng[0])} — {fmt(rng[1])}</span>
             <Button variant="ghost" size="xs" onClick={() => onTimeRange(null)}
               className="mono rounded-sm px-1 py-0 h-4 text-[8px]"
               style={{ color: 'var(--danger)', background: 'var(--danger-dim)', border: '1px solid var(--danger)' }}

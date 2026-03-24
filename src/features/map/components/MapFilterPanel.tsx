@@ -64,7 +64,7 @@ export function MapFilterPanel(props: Props) {
   const drill = drillDataset ? facets.perDataset[drillDataset] : null;
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-1 min-w-0" style={{ maxWidth: '100%' }}>
 
       {/* Collapsed: single icon button */}
       {!expanded && (
@@ -92,7 +92,8 @@ export function MapFilterPanel(props: Props) {
               background: 'rgba(28,33,39,0.95)',
               border: '1px solid var(--bd)',
               padding: '4px 6px',
-              maxWidth: 'min(100vw - 24px, 520px)',
+              maxWidth: 'min(100%, 520px)',
+              minWidth: 0,
             }}
           >
             {ALL_DATASETS.map(d => (
