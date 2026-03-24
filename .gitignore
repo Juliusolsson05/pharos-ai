@@ -34,6 +34,7 @@ yarn-error.log*
 .env*
 !.env.local.example
 !.env.vps.example
+!osint/.env.example
 
 # prisma generated client
 /src/generated/prisma

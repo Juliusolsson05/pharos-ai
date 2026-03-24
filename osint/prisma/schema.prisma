@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/osint-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["osint"]
+}
+
+model RawIngest {
+  id        String   @id @default(cuid())
+  source    String
+  fetchedAt DateTime @default(now())
+  fileKey   String?
+  rowCount  Int
+  meta      Json?
+
+  @@schema("osint")
+  @@map("raw_ingests")
+}
+
+model OsintEvent {
+  id            String   @id @default(cuid())
+  source        String
+  sourceEventId String
+  eventCode     String
+  eventDate     DateTime
+  actor1        String?
+  actor2        String?
+  lat           Float
+  lon           Float
+  countryCode   String?
+  numMentions   Int      @default(1)
+  avgTone       Float    @default(0)
+  sourceUrl     String?
+  rawPayload    Json?
+  ingestedAt    DateTime @default(now())
+  ingestId      String?
+
+  @@unique([source, sourceEventId])
+  @@index([eventDate])
+  @@index([eventCode])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("events")
+}
+
+model MapFeature {
+  id            String   @id @default(cuid())
+  featureType   String
+  sourceEventId String?
+  actor         String?
+  priority      String
+  category      String
+  type          String
+  status        String?
+  timestamp     DateTime?
+  geometry      Json
+  properties    Json
+  source        String
+  createdAt     DateTime @default(now())
+
+  @@index([featureType])
+  @@index([timestamp])
+  @@schema("osint")
+  @@map("map_features")
+}
+
+model SourceSync {
+  id            String    @id @default(cuid())
+  source        String    @unique
+  lastCursor    String?
+  lastRunAt     DateTime?
+  lastRunStatus String?
+  lastError     String?
+  lastRunCount  Int       @default(0)
+  totalEvents   Int       @default(0)
+
+  @@schema("osint")
+  @@map("source_syncs")
+}
