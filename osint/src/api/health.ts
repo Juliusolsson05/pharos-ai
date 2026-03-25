@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { prisma } from '../db.js';
 import { redis } from '../queue.js';
 import { ok } from '../lib/api-utils.js';
+import { getStreamStatuses } from '../streams/index.js';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get('/api/health', async (_req, res) => {
     uptime: process.uptime(),
     db: dbOk,
     redis: redisOk,
+    streams: getStreamStatuses(),
     sources: syncs.map((s) => ({
       source: s.source,
       lastRunAt: s.lastRunAt,

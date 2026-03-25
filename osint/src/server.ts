@@ -23,6 +23,7 @@ import { processSafecastIngest } from './jobs/ingest-safecast.js';
 import { processSubmarineCablesIngest } from './jobs/ingest-submarine-cables.js';
 import { processCloudflareRadarIngest } from './jobs/ingest-cloudflare-radar.js';
 import { processReferenceIngest } from './jobs/ingest-reference.js';
+import { startStreams, stopStreams } from './streams/index.js';
 
 import healthRouter from './api/health.js';
 import mapDataRouter from './api/map-data.js';
@@ -95,6 +96,9 @@ async function start() {
   await prisma.$executeRawUnsafe('CREATE SCHEMA IF NOT EXISTS osint');
   await registerJobs();
 
+  // Start persistent streams (WebSocket connections, etc.)
+  startStreams();
+
   app.listen(config.port, () => {
     console.log(`OSINT service listening on :${config.port}`);
     console.log(`Job dashboard: http://localhost:${config.port}/admin/queues`);
@@ -110,6 +114,7 @@ start().catch((e) => {
 for (const sig of ['SIGTERM', 'SIGINT'] as const) {
   process.on(sig, async () => {
     console.log(`${sig} received, shutting down...`);
+    stopStreams();
     await worker.close();
     await prisma.$disconnect();
     process.exit(0);

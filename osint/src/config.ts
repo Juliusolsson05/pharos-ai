@@ -55,6 +55,11 @@ export const config = {
     pollInterval: 2 * 60 * 1000, // 2 min (alerts are time-critical)
   },
 
+  aisstream: {
+    apiKey: process.env.AISSTREAM_API_KEY || '',
+    flushInterval: 60_000, // 60s
+  },
+
   cloudflareRadar: {
     token: process.env.CLOUDFLARE_API_TOKEN || '',
     pollInterval: 30 * 60 * 1000, // 30 min

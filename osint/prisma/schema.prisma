@@ -347,6 +347,28 @@ model MirtaSite {
   @@map("mirta_sites")
 }
 
+// ─── AIS vessel positions (live stream) ─────────────────────
+
+model AisPosition {
+  id          String   @id @default(cuid())
+  mmsi        String   @unique
+  shipName    String?
+  lat         Float
+  lon         Float
+  speed       Float?
+  heading     Float?
+  shipType    Int?
+  destination String?
+  lastSeen    DateTime @default(now())
+  raw         Json
+
+  @@index([lat, lon])
+  @@index([lastSeen])
+  @@index([shipType])
+  @@schema("osint")
+  @@map("ais_positions")
+}
+
 // ─── Reference: military installations ──────────────────────
 
 model ReferenceInstallation {
