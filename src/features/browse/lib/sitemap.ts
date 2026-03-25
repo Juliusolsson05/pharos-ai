@@ -23,12 +23,29 @@ export const DASHBOARD_ROUTES = [
   '/dashboard',
   '/dashboard/map',
   '/dashboard/signals',
+  '/dashboard/feed',
+  '/dashboard/actors',
+  '/dashboard/brief',
+  '/dashboard/predictions',
+  '/dashboard/data',
+  '/dashboard/data/news',
+  '/dashboard/data/news/timeline',
+  '/dashboard/data/perspectives',
+  '/dashboard/data/predictions',
+  '/dashboard/data/economics',
+] as const;
+
+export const LEGAL_ROUTES = [
+  '/privacy',
+  '/cookies',
+  '/terms',
 ] as const;
 
 export const SITEMAP_PATHS = {
   index: '/sitemap.xml',
   browse: '/sitemaps/browse.xml',
   dashboard: '/sitemaps/dashboard.xml',
+  legal: '/sitemaps/legal.xml',
   events: '/sitemaps/events.xml',
   actors: '/sitemaps/actors.xml',
   briefs: '/sitemaps/briefs.xml',

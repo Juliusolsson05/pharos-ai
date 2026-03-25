@@ -1,5 +1,14 @@
+import type { Metadata } from 'next';
+
+import { buildBrowseMetadata } from '@/features/browse/lib/seo';
 import { LegalPage } from '@/features/legal/components/LegalPage';
 import { OpenCookiePreferencesButton } from '@/shared/components/privacy/OpenCookiePreferencesButton';
+
+export const metadata: Metadata = buildBrowseMetadata({
+  title: 'Cookie Policy',
+  description: 'What storage Conflicts.app uses, which categories are necessary, and how to manage consent.',
+  path: '/cookies',
+});
 
 export default function CookiesPage() {
   return (
