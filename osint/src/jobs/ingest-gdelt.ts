@@ -11,17 +11,7 @@ import {
 
 const SOURCE = 'gdelt';
 
-type IngestResult = {
-  status: 'ok' | 'skipped';
-  exportUrl: string;
-  rowsParsed: number;
-  eventsUpserted: number;
-  featuresCreated: number;
-  archivedFileKey: string | null;
-  durationMs: number;
-};
-
-export async function processGdeltIngest(job: Job): Promise<IngestResult> {
+export async function processGdeltIngest(job: Job) {
   const start = Date.now();
 
   await job.log('Resolving latest GDELT export URL');
@@ -29,191 +19,153 @@ export async function processGdeltIngest(job: Job): Promise<IngestResult> {
   await job.log(`Export URL: ${exportUrl}`);
   await job.updateProgress(10);
 
-  // Dedupe — skip if we already ingested this exact file
   const sync = await prisma.sourceSync.findUnique({ where: { source: SOURCE } });
   if (sync?.lastCursor === exportUrl) {
     await job.log('Already ingested this export, skipping');
-    return {
-      status: 'skipped',
-      exportUrl,
-      rowsParsed: 0,
-      eventsUpserted: 0,
-      featuresCreated: 0,
-      archivedFileKey: null,
-      durationMs: Date.now() - start,
-    };
+    return { status: 'skipped', exportUrl, durationMs: Date.now() - start };
   }
 
-  await job.log('Downloading and parsing CSV');
   const { rows, rawZip } = await downloadAndParse(exportUrl);
-  await job.log(`Parsed ${rows.length} conflict events from CSV`);
+  await job.log(`Parsed ${rows.length} conflict events`);
   await job.updateProgress(30);
 
   if (rows.length === 0) {
     await upsertSync(exportUrl, 'ok', null, 0, 0);
-    return {
-      status: 'ok',
-      exportUrl,
-      rowsParsed: 0,
-      eventsUpserted: 0,
-      featuresCreated: 0,
-      archivedFileKey: null,
-      durationMs: Date.now() - start,
-    };
+    return { status: 'ok', exportUrl, rows: 0, durationMs: Date.now() - start };
   }
 
-  // Archive raw ZIP to object storage
+  // Archive raw ZIP
   const ts = exportUrl.match(/(\d{14})/)?.[1] || Date.now().toString();
   const fileKey = `gdelt/${ts}.export.CSV.zip`;
-  let archivedFileKey: string | null = fileKey;
-  try {
-    await uploadRaw(fileKey, rawZip);
-    await job.log(`Archived raw ZIP to ${fileKey}`);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    await job.log(`Archive upload failed (non-fatal): ${msg}`);
-    archivedFileKey = null;
-  }
+  try { await uploadRaw(fileKey, rawZip); } catch { /* non-fatal */ }
   await job.updateProgress(40);
 
-  // Record the ingest run
   const ingest = await prisma.rawIngest.create({
-    data: { source: SOURCE, fileKey: archivedFileKey, rowCount: rows.length, meta: { exportUrl } },
+    data: { source: SOURCE, fileKey, rowCount: rows.length, meta: { exportUrl } },
   });
 
-  // Upsert events with progress
+  // Write to typed gdelt_events table
   let upserted = 0;
-  let rowErrors = 0;
+  let errors = 0;
   for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+    const r = rows[i];
+    const c = r.raw; // all 61 columns
     try {
-      await prisma.osintEvent.upsert({
-        where: {
-          source_sourceEventId: { source: SOURCE, sourceEventId: row.globalEventId },
-        },
+      await prisma.gdeltEvent.upsert({
+        where: { globalEventId: r.globalEventId },
         create: {
-          source: SOURCE,
-          sourceEventId: row.globalEventId,
-          eventCode: row.eventCode,
-          eventDate: new Date(`${row.day.slice(0, 4)}-${row.day.slice(4, 6)}-${row.day.slice(6, 8)}`),
-          actor1: row.actor1Name,
-          actor2: row.actor2Name || null,
-          lat: row.lat,
-          lon: row.lon,
-          countryCode: row.countryCode || null,
-          numMentions: row.numMentions,
-          avgTone: row.avgTone,
-          sourceUrl: row.sourceUrl || null,
+          globalEventId: c[0],
+          day: parseInt(c[1]) || 0,
+          monthYear: parseInt(c[2]) || 0,
+          year: parseInt(c[3]) || 0,
+          fractionDate: parseFloat(c[4]) || 0,
+          actor1Code: c[5] || null,
+          actor1Name: c[6] || null,
+          actor1CountryCode: c[7] || null,
+          actor1KnownGroupCode: c[8] || null,
+          actor1EthnicCode: c[9] || null,
+          actor1Religion1Code: c[10] || null,
+          actor1Religion2Code: c[11] || null,
+          actor1Type1Code: c[12] || null,
+          actor1Type2Code: c[13] || null,
+          actor1Type3Code: c[14] || null,
+          actor2Code: c[15] || null,
+          actor2Name: c[16] || null,
+          actor2CountryCode: c[17] || null,
+          actor2KnownGroupCode: c[18] || null,
+          actor2EthnicCode: c[19] || null,
+          actor2Religion1Code: c[20] || null,
+          actor2Religion2Code: c[21] || null,
+          actor2Type1Code: c[22] || null,
+          actor2Type2Code: c[23] || null,
+          actor2Type3Code: c[24] || null,
+          isRootEvent: c[25] === '1',
+          eventCode: c[26] || '',
+          eventBaseCode: c[27] || null,
+          eventRootCode: c[28] || null,
+          quadClass: parseInt(c[29]) || null,
+          goldsteinScale: parseFloat(c[30]) || null,
+          numMentions: parseInt(c[31]) || 1,
+          numSources: parseInt(c[32]) || 1,
+          numArticles: parseInt(c[33]) || 1,
+          avgTone: parseFloat(c[34]) || 0,
+          actor1GeoType: parseInt(c[35]) || null,
+          actor1GeoFullName: c[36] || null,
+          actor1GeoCountryCode: c[37] || null,
+          actor1GeoAdm1Code: c[38] || null,
+          actor1GeoAdm2Code: c[39] || null,
+          actor1GeoLat: parseFloat(c[40]) || null,
+          actor1GeoLon: parseFloat(c[41]) || null,
+          actor1GeoFeatureId: c[42] || null,
+          actor2GeoType: parseInt(c[43]) || null,
+          actor2GeoFullName: c[44] || null,
+          actor2GeoCountryCode: c[45] || null,
+          actor2GeoAdm1Code: c[46] || null,
+          actor2GeoAdm2Code: c[47] || null,
+          actor2GeoLat: parseFloat(c[48]) || null,
+          actor2GeoLon: parseFloat(c[49]) || null,
+          actor2GeoFeatureId: c[50] || null,
+          actionGeoType: parseInt(c[51]) || null,
+          actionGeoFullName: c[52] || null,
+          actionGeoCountryCode: c[53] || null,
+          actionGeoAdm1Code: c[54] || null,
+          actionGeoAdm2Code: c[55] || null,
+          actionGeoLat: r.lat,
+          actionGeoLon: r.lon,
+          actionGeoFeatureId: c[58] || null,
+          dateAdded: c[59] || null,
+          sourceUrl: c[60] || null,
+          raw: c,
           ingestId: ingest.id,
         },
         update: {
-          numMentions: row.numMentions,
-          avgTone: row.avgTone,
+          numMentions: parseInt(c[31]) || 1,
+          avgTone: parseFloat(c[34]) || 0,
+          raw: c,
         },
       });
       upserted++;
-    } catch (e) {
-      rowErrors++;
-      if (rowErrors <= 5) {
-        const msg = e instanceof Error ? e.message : String(e);
-        await job.log(`Row ${i} (${row.globalEventId}) failed: ${msg}`);
-      }
+    } catch {
+      errors++;
+      if (errors <= 3) await job.log(`Row ${i} failed (${r.globalEventId})`);
     }
-
-    if (i % 50 === 0) {
-      await job.updateProgress(40 + Math.round((i / rows.length) * 40));
-    }
+    if (i % 50 === 0) await job.updateProgress(40 + Math.round((i / rows.length) * 40));
   }
-
-  if (rowErrors > 5) {
-    await job.log(`... and ${rowErrors - 5} more row errors suppressed`);
-  }
-  await job.log(`Upserted ${upserted}/${rows.length} events (${rowErrors} errors)`);
+  await job.log(`Upserted ${upserted}/${rows.length} events (${errors} errors)`);
   await job.updateProgress(80);
 
-  // Derive map features — store position-only geometry (honest about GDELT data)
+  // Derive map features
   const strikes = buildStrikes(rows);
   const heatPoints = buildHeatPoints(rows);
+  const eventIds = rows.map((r) => r.globalEventId);
+  await prisma.mapFeature.deleteMany({ where: { source: SOURCE, sourceEventId: { in: eventIds } } });
 
-  const sourceEventIds = rows.map((r) => r.globalEventId);
-  await prisma.mapFeature.deleteMany({
-    where: { source: SOURCE, sourceEventId: { in: sourceEventIds } },
-  });
-
-  const featureRecords = [
+  const records = [
     ...strikes.map((s) => ({
-      featureType: 'STRIKE_ARC',
-      sourceEventId: s.sourceEventId,
-      actor: s.actor,
-      priority: s.priority,
-      category: 'KINETIC',
-      type: s.type,
-      status: 'COMPLETE',
-      timestamp: new Date(s.timestamp),
-      geometry: { position: s.position },
-      properties: { label: s.label, severity: s.severity },
-      source: SOURCE,
+      featureType: 'STRIKE_ARC', sourceEventId: s.sourceEventId, actor: s.actor,
+      priority: s.priority, category: 'KINETIC', type: s.type, status: 'COMPLETE',
+      timestamp: new Date(s.timestamp), geometry: { position: s.position },
+      properties: { label: s.label, severity: s.severity }, source: SOURCE,
     })),
     ...heatPoints.map((h) => ({
-      featureType: 'HEAT_POINT',
-      sourceEventId: h.sourceEventId,
-      actor: h.actor,
-      priority: h.priority,
-      category: 'KINETIC',
-      type: 'HEAT',
-      status: null as string | null,
-      timestamp: null as Date | null,
-      geometry: { position: h.position },
-      properties: { weight: h.weight },
-      source: SOURCE,
+      featureType: 'HEAT_POINT', sourceEventId: h.sourceEventId, actor: h.actor,
+      priority: h.priority, category: 'KINETIC', type: 'HEAT',
+      status: null as string | null, timestamp: null as Date | null,
+      geometry: { position: h.position }, properties: { weight: h.weight }, source: SOURCE,
     })),
   ];
-
-  if (featureRecords.length > 0) {
-    await prisma.mapFeature.createMany({ data: featureRecords });
-  }
-  await job.updateProgress(95);
+  if (records.length > 0) await prisma.mapFeature.createMany({ data: records });
 
   await upsertSync(exportUrl, 'ok', null, upserted, upserted);
   await job.updateProgress(100);
-  await job.log(`Done: ${upserted} events, ${featureRecords.length} map features in ${Date.now() - start}ms`);
-
-  return {
-    status: 'ok',
-    exportUrl,
-    rowsParsed: rows.length,
-    eventsUpserted: upserted,
-    featuresCreated: featureRecords.length,
-    archivedFileKey,
-    durationMs: Date.now() - start,
-  };
+  await job.log(`Done: ${upserted} events, ${records.length} features in ${Date.now() - start}ms`);
+  return { status: 'ok', exportUrl, upserted, features: records.length, durationMs: Date.now() - start };
 }
 
-async function upsertSync(
-  cursor: string,
-  status: string,
-  error: string | null,
-  lastRunCount: number,
-  totalDelta: number,
-) {
+async function upsertSync(cursor: string, status: string, error: string | null, last: number, delta: number) {
   await prisma.sourceSync.upsert({
     where: { source: SOURCE },
-    create: {
-      source: SOURCE,
-      lastCursor: cursor,
-      lastRunAt: new Date(),
-      lastRunStatus: status,
-      lastError: error,
-      lastRunCount,
-      totalEvents: totalDelta,
-    },
-    update: {
-      lastCursor: cursor,
-      lastRunAt: new Date(),
-      lastRunStatus: status,
-      lastError: error,
-      lastRunCount,
-      totalEvents: { increment: totalDelta },
-    },
+    create: { source: SOURCE, lastCursor: cursor, lastRunAt: new Date(), lastRunStatus: status, lastError: error, lastRunCount: last, totalEvents: delta },
+    update: { lastCursor: cursor, lastRunAt: new Date(), lastRunStatus: status, lastError: error, lastRunCount: last, totalEvents: { increment: delta } },
   });
 }

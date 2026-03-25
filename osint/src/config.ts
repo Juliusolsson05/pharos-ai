@@ -33,4 +33,25 @@ export const config = {
   nga: {
     pollInterval: 6 * 60 * 60 * 1000, // 6h
   },
+
+  usgs: {
+    pollInterval: 60 * 60 * 1000, // 1h
+  },
+
+  ucdp: {
+    pollInterval: 6 * 60 * 60 * 1000, // 6h
+  },
+
+  opensky: {
+    pollInterval: 5 * 60 * 1000, // 5 min
+  },
+
+  gpsjam: {
+    apiKey: process.env.WINGBITS_API_KEY || '',
+    pollInterval: 30 * 60 * 1000, // 30 min
+  },
+
+  oref: {
+    pollInterval: 2 * 60 * 1000, // 2 min (alerts are time-critical)
+  },
 } as const;

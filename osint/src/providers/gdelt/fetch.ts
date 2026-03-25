@@ -90,6 +90,7 @@ export async function downloadAndParse(zipUrl: string): Promise<{
       lat,
       lon,
       sourceUrl: cols[60] || '',
+      raw: cols,
     });
   }
 

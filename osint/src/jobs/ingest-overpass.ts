@@ -5,60 +5,65 @@ import { fetchOverpass, buildInstallations } from '../providers/overpass/index.j
 
 const SOURCE = 'overpass';
 
-type IngestResult = {
-  status: 'ok';
-  elementsFetched: number;
-  installationsStored: number;
-  durationMs: number;
-};
-
-export async function processOverpassIngest(job: Job): Promise<IngestResult> {
+export async function processOverpassIngest(job: Job) {
   const start = Date.now();
-
   await job.log('Fetching military installations from OSM Overpass (Middle East)');
-  await job.updateProgress(10);
 
   const elements = await fetchOverpass();
   await job.log(`Fetched ${elements.length} raw OSM elements`);
-  await job.updateProgress(40);
-
-  const installations = buildInstallations(elements);
-  await job.log(`Filtered to ${installations.length} named installations`);
-  await job.updateProgress(60);
+  await job.updateProgress(30);
 
   // Full replace — installations are a static snapshot
-  await prisma.mapFeature.deleteMany({ where: { source: SOURCE } });
-
-  const records = installations.map((inst) => ({
-    featureType: 'ASSET',
-    sourceEventId: inst.id,
-    actor: inst.operator || inst.country || 'Unknown',
-    priority: 'P3',
-    category: 'INSTALLATION',
-    type: inst.type,
-    status: 'ACTIVE',
-    timestamp: null as Date | null,
-    geometry: { position: [inst.lon, inst.lat] },
-    properties: { name: inst.name, country: inst.country },
-    source: SOURCE,
-  }));
-
-  if (records.length > 0) {
-    await prisma.mapFeature.createMany({ data: records });
+  await prisma.overpassInstallation.deleteMany({});
+  let stored = 0;
+  for (const el of elements) {
+    try {
+      await prisma.overpassInstallation.create({
+        data: {
+          osmType: el.type,
+          osmId: BigInt(el.id),
+          lat: el.lat,
+          lon: el.lon,
+          name: el.tags.name || null,
+          nameEn: el.tags['name:en'] || null,
+          nameAr: el.tags['name:ar'] || null,
+          military: el.tags.military || null,
+          militaryService: el.tags.military_service || null,
+          aeroway: el.tags.aeroway || null,
+          landuse: el.tags.landuse || null,
+          operator: el.tags.operator || null,
+          country: el.tags['addr:country'] || el.tags['is_in:country'] || null,
+          wikidata: el.tags.wikidata || null,
+          wikipedia: el.tags.wikipedia || null,
+          raw: { type: el.type, id: el.id, tags: el.tags },
+        },
+      });
+      stored++;
+    } catch { /* skip */ }
   }
-  await job.updateProgress(90);
+  await job.log(`Stored ${stored} installations`);
+  await job.updateProgress(60);
 
-  await upsertSync('ok', null, installations.length, installations.length);
+  // Derive map features
+  const installations = buildInstallations(elements);
+  await prisma.mapFeature.deleteMany({ where: { source: SOURCE } });
+  if (installations.length > 0) {
+    await prisma.mapFeature.createMany({
+      data: installations.map((inst) => ({
+        featureType: 'ASSET', sourceEventId: inst.id, actor: inst.operator || inst.country || 'Unknown',
+        priority: 'P3', category: 'INSTALLATION', type: inst.type, status: 'ACTIVE',
+        timestamp: null as Date | null, geometry: { position: [inst.lon, inst.lat] },
+        properties: { name: inst.name, country: inst.country }, source: SOURCE,
+      })),
+    });
+  }
   await job.updateProgress(100);
-  await job.log(`Done: ${installations.length} installations in ${Date.now() - start}ms`);
+  await job.log(`Done: ${stored} raw, ${installations.length} named in ${Date.now() - start}ms`);
 
-  return { status: 'ok', elementsFetched: elements.length, installationsStored: installations.length, durationMs: Date.now() - start };
-}
-
-async function upsertSync(status: string, error: string | null, lastCount: number, total: number) {
   await prisma.sourceSync.upsert({
     where: { source: SOURCE },
-    create: { source: SOURCE, lastRunAt: new Date(), lastRunStatus: status, lastError: error, lastRunCount: lastCount, totalEvents: total },
-    update: { lastRunAt: new Date(), lastRunStatus: status, lastError: error, lastRunCount: lastCount, totalEvents: total },
+    create: { source: SOURCE, lastRunAt: new Date(), lastRunStatus: 'ok', lastRunCount: stored, totalEvents: stored },
+    update: { lastRunAt: new Date(), lastRunStatus: 'ok', lastRunCount: stored, totalEvents: stored },
   });
+  return { status: 'ok', raw: stored, named: installations.length, durationMs: Date.now() - start };
 }

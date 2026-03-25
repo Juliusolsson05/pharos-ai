@@ -9,6 +9,8 @@ datasource db {
   schemas  = ["osint"]
 }
 
+// ─── Cross-provider tables ──────────────────────────────────
+
 model RawIngest {
   id        String   @id @default(cuid())
   source    String
@@ -21,34 +23,8 @@ model RawIngest {
   @@map("raw_ingests")
 }
 
-model OsintEvent {
-  id            String   @id @default(cuid())
-  source        String
-  sourceEventId String
-  eventCode     String
-  eventDate     DateTime
-  actor1        String?
-  actor2        String?
-  lat           Float
-  lon           Float
-  countryCode   String?
-  numMentions   Int      @default(1)
-  avgTone       Float    @default(0)
-  sourceUrl     String?
-  rawPayload    Json?
-  ingestedAt    DateTime @default(now())
-  ingestId      String?
-
-  @@unique([source, sourceEventId])
-  @@index([eventDate])
-  @@index([eventCode])
-  @@index([lat, lon])
-  @@schema("osint")
-  @@map("events")
-}
-
 model MapFeature {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   featureType   String
   sourceEventId String?
   actor         String?
@@ -60,10 +36,11 @@ model MapFeature {
   geometry      Json
   properties    Json
   source        String
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
   @@index([featureType])
   @@index([timestamp])
+  @@index([source])
   @@schema("osint")
   @@map("map_features")
 }
@@ -80,4 +57,267 @@ model SourceSync {
 
   @@schema("osint")
   @@map("source_syncs")
+}
+
+// ─── GDELT 2.0 — all 61 CSV columns ────────────────────────
+
+model GdeltEvent {
+  id                    String   @id @default(cuid())
+  globalEventId         String   @unique
+  day                   Int
+  monthYear             Int
+  year                  Int
+  fractionDate          Float
+  actor1Code            String?
+  actor1Name            String?
+  actor1CountryCode     String?
+  actor1KnownGroupCode  String?
+  actor1EthnicCode      String?
+  actor1Religion1Code   String?
+  actor1Religion2Code   String?
+  actor1Type1Code       String?
+  actor1Type2Code       String?
+  actor1Type3Code       String?
+  actor2Code            String?
+  actor2Name            String?
+  actor2CountryCode     String?
+  actor2KnownGroupCode  String?
+  actor2EthnicCode      String?
+  actor2Religion1Code   String?
+  actor2Religion2Code   String?
+  actor2Type1Code       String?
+  actor2Type2Code       String?
+  actor2Type3Code       String?
+  isRootEvent           Boolean  @default(false)
+  eventCode             String
+  eventBaseCode         String?
+  eventRootCode         String?
+  quadClass             Int?
+  goldsteinScale        Float?
+  numMentions           Int      @default(1)
+  numSources            Int      @default(1)
+  numArticles           Int      @default(1)
+  avgTone               Float    @default(0)
+  actor1GeoType         Int?
+  actor1GeoFullName     String?
+  actor1GeoCountryCode  String?
+  actor1GeoAdm1Code     String?
+  actor1GeoAdm2Code     String?
+  actor1GeoLat          Float?
+  actor1GeoLon          Float?
+  actor1GeoFeatureId    String?
+  actor2GeoType         Int?
+  actor2GeoFullName     String?
+  actor2GeoCountryCode  String?
+  actor2GeoAdm1Code     String?
+  actor2GeoAdm2Code     String?
+  actor2GeoLat          Float?
+  actor2GeoLon          Float?
+  actor2GeoFeatureId    String?
+  actionGeoType         Int?
+  actionGeoFullName     String?
+  actionGeoCountryCode  String?
+  actionGeoAdm1Code     String?
+  actionGeoAdm2Code     String?
+  actionGeoLat          Float
+  actionGeoLon          Float
+  actionGeoFeatureId    String?
+  dateAdded             String?
+  sourceUrl             String?
+  raw                   Json
+  ingestId              String?
+  ingestedAt            DateTime @default(now())
+
+  @@index([day])
+  @@index([eventCode])
+  @@index([actionGeoLat, actionGeoLon])
+  @@index([actor1CountryCode])
+  @@index([quadClass])
+  @@schema("osint")
+  @@map("gdelt_events")
+}
+
+// ─── NASA FIRMS — all 13 CSV columns ────────────────────────
+
+model FirmsDetection {
+  id         String   @id @default(cuid())
+  latitude   Float
+  longitude  Float
+  brightTi4  Float
+  scan       Float
+  track      Float
+  acqDate    String
+  acqTime    String
+  satellite  String
+  confidence String
+  version    String?
+  brightTi5  Float?
+  frp        Float
+  daynight   String
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@unique([latitude, longitude, acqDate, acqTime])
+  @@index([acqDate])
+  @@index([confidence])
+  @@index([frp])
+  @@schema("osint")
+  @@map("firms_detections")
+}
+
+// ─── OSM Overpass — military installations ───────────────────
+
+model OverpassInstallation {
+  id              String   @id @default(cuid())
+  osmType         String
+  osmId           BigInt
+  lat             Float
+  lon             Float
+  name            String?
+  nameEn          String?
+  nameAr          String?
+  military        String?
+  militaryService String?
+  aeroway         String?
+  landuse         String?
+  operator        String?
+  country         String?
+  wikidata        String?
+  wikipedia       String?
+  raw             Json
+  ingestedAt      DateTime @default(now())
+
+  @@unique([osmType, osmId])
+  @@index([military])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("overpass_installations")
+}
+
+// ─── NGA navigational warnings ──────────────────────────────
+
+model NgaWarning {
+  id              String   @id @default(cuid())
+  navArea         String
+  msgYear         Int
+  msgNumber       Int
+  subregion       String?
+  text            String
+  status          String?
+  issueDate       String?
+  authority       String?
+  cancelDate      String?
+  cancelNavArea   String?
+  cancelMsgYear   Int?
+  cancelMsgNumber Int?
+  raw             Json
+  ingestedAt      DateTime @default(now())
+
+  @@unique([navArea, msgYear, msgNumber])
+  @@index([navArea])
+  @@schema("osint")
+  @@map("nga_warnings")
+}
+
+// ─── OpenSky — military flight sightings ────────────────────
+
+model OpenskySighting {
+  id             String   @id @default(cuid())
+  icao24         String   @unique
+  callsign       String?
+  originCountry  String?
+  lat            Float
+  lon            Float
+  baroAltitude   Float?
+  geoAltitude    Float?
+  onGround       Boolean  @default(false)
+  velocity       Float?
+  heading        Float?
+  verticalRate   Float?
+  squawk         String?
+  positionSource Int?
+  category       Int?
+  milOperator    String?
+  milCountry     String?
+  raw            Json
+  seenAt         DateTime @default(now())
+
+  @@index([milOperator])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("opensky_sightings")
+}
+
+// ─── USGS earthquakes ───────────────────────────────────────
+
+model UsgsQuake {
+  id           String   @id @default(cuid())
+  eventId      String   @unique
+  place        String?
+  magnitude    Float
+  magType      String?
+  depthKm      Float
+  lat          Float
+  lon          Float
+  occurredAt   DateTime
+  felt         Int?
+  cdi          Float?
+  mmi          Float?
+  alert        String?
+  tsunami      Int?
+  significance Int?
+  status       String?
+  net          String?
+  sourceUrl    String?
+  raw          Json
+  ingestedAt   DateTime @default(now())
+
+  @@index([occurredAt])
+  @@index([magnitude])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("usgs_quakes")
+}
+
+// ─── OREF alerts (Israel Home Front Command) ────────────────
+
+model OrefAlert {
+  id         String    @id @default(cuid())
+  alertId    String    @unique
+  cat        String
+  title      String?
+  desc       String?
+  areas      String[]
+  alertDate  DateTime?
+  raw        Json
+  ingestedAt DateTime  @default(now())
+
+  @@index([cat])
+  @@index([alertDate])
+  @@schema("osint")
+  @@map("oref_alerts")
+}
+
+// ─── GPSJam / Wingbits interference ─────────────────────────
+
+model GpsjamHex {
+  id            String   @id @default(cuid())
+  h3            String   @unique
+  lat           Float
+  lon           Float
+  level         String
+  region        String?
+  npAvg         Float?
+  pct           Float?
+  bad           Int?
+  total         Int?
+  sampleCount   Int?
+  aircraftCount Int?
+  raw           Json
+  seenAt        DateTime @default(now())
+
+  @@index([level])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("gpsjam_hexes")
 }

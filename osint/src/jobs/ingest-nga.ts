@@ -5,60 +5,53 @@ import { fetchNgaWarnings, buildWarnings } from '../providers/nga/index.js';
 
 const SOURCE = 'nga';
 
-type IngestResult = {
-  status: 'ok';
-  warningsFetched: number;
-  zonesCreated: number;
-  durationMs: number;
-};
-
-export async function processNgaIngest(job: Job): Promise<IngestResult> {
+export async function processNgaIngest(job: Job) {
   const start = Date.now();
-
-  await job.log('Fetching NGA navigational warnings (NAVAREA 8+9)');
-  await job.updateProgress(10);
+  await job.log('Fetching NGA navigational warnings (NAVAREA A+P)');
 
   const warnings = await fetchNgaWarnings();
-  await job.log(`Fetched ${warnings.length} active warnings for our region`);
-  await job.updateProgress(40);
+  await job.log(`Fetched ${warnings.length} active warnings`);
+  await job.updateProgress(30);
 
-  const zones = buildWarnings(warnings);
-  await job.log(`Extracted ${zones.length} warnings with parseable coordinates`);
+  // Write to typed nga_warnings table
+  let stored = 0;
+  for (const w of warnings) {
+    try {
+      await prisma.ngaWarning.upsert({
+        where: { navArea_msgYear_msgNumber: { navArea: w.navArea, msgYear: w.msgYear, msgNumber: w.msgNumber } },
+        create: {
+          navArea: w.navArea, msgYear: w.msgYear, msgNumber: w.msgNumber,
+          subregion: w.subregion || null, text: w.text, status: 'A',
+          issueDate: w.issueDate || null, authority: w.authority || null,
+          raw: w as unknown as Record<string, unknown>,
+        },
+        update: { text: w.text, raw: w as unknown as Record<string, unknown> },
+      });
+      stored++;
+    } catch { /* dedupe */ }
+  }
+  await job.log(`Stored ${stored} warnings`);
   await job.updateProgress(60);
 
-  // Full replace
+  const zones = buildWarnings(warnings);
   await prisma.mapFeature.deleteMany({ where: { source: SOURCE } });
-
-  const records = zones.map((z) => ({
-    featureType: 'THREAT_ZONE',
-    sourceEventId: z.id,
-    actor: 'NGA',
-    priority: 'P2',
-    category: 'ZONE',
-    type: 'CLOSURE',
-    status: 'ACTIVE',
-    timestamp: null as Date | null,
-    geometry: { coordinates: z.coordinates },
-    properties: { name: z.name, text: z.text },
-    source: SOURCE,
-  }));
-
-  if (records.length > 0) {
-    await prisma.mapFeature.createMany({ data: records });
+  if (zones.length > 0) {
+    await prisma.mapFeature.createMany({
+      data: zones.map((z) => ({
+        featureType: 'THREAT_ZONE', sourceEventId: z.id, actor: 'NGA',
+        priority: 'P2', category: 'ZONE', type: 'CLOSURE', status: 'ACTIVE',
+        timestamp: null as Date | null, geometry: { coordinates: z.coordinates },
+        properties: { name: z.name, text: z.text }, source: SOURCE,
+      })),
+    });
   }
-  await job.updateProgress(90);
-
-  await upsertSync('ok', null, zones.length, zones.length);
   await job.updateProgress(100);
-  await job.log(`Done: ${zones.length} threat zones in ${Date.now() - start}ms`);
+  await job.log(`Done: ${stored} raw, ${zones.length} zones in ${Date.now() - start}ms`);
 
-  return { status: 'ok', warningsFetched: warnings.length, zonesCreated: zones.length, durationMs: Date.now() - start };
-}
-
-async function upsertSync(status: string, error: string | null, lastCount: number, total: number) {
   await prisma.sourceSync.upsert({
     where: { source: SOURCE },
-    create: { source: SOURCE, lastRunAt: new Date(), lastRunStatus: status, lastError: error, lastRunCount: lastCount, totalEvents: total },
-    update: { lastRunAt: new Date(), lastRunStatus: status, lastError: error, lastRunCount: lastCount, totalEvents: total },
+    create: { source: SOURCE, lastRunAt: new Date(), lastRunStatus: 'ok', lastRunCount: stored, totalEvents: stored },
+    update: { lastRunAt: new Date(), lastRunStatus: 'ok', lastRunCount: stored, totalEvents: stored },
   });
+  return { status: 'ok', raw: stored, zones: zones.length, durationMs: Date.now() - start };
 }

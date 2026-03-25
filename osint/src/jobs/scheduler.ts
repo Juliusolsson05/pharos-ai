@@ -11,17 +11,24 @@ const JOB_OPTS = {
 type JobDef = { name: string; interval: number; enabled: boolean };
 
 const JOBS: JobDef[] = [
-  { name: 'gdelt', interval: config.gdelt.pollInterval, enabled: true },
-  { name: 'firms', interval: config.firms.pollInterval, enabled: !!config.firms.mapKey },
+  { name: 'gdelt',   interval: config.gdelt.pollInterval,   enabled: true },
+  { name: 'firms',   interval: config.firms.pollInterval,   enabled: !!config.firms.mapKey },
   { name: 'overpass', interval: config.overpass.pollInterval, enabled: true },
-  { name: 'nga', interval: config.nga.pollInterval, enabled: true },
+  { name: 'nga',     interval: config.nga.pollInterval,     enabled: true },
+  { name: 'usgs',    interval: config.usgs.pollInterval,    enabled: true },
+  { name: 'ucdp',    interval: config.ucdp.pollInterval,    enabled: true },
+  { name: 'opensky', interval: config.opensky.pollInterval, enabled: true },
+  { name: 'gpsjam',  interval: config.gpsjam.pollInterval,  enabled: !!config.gpsjam.apiKey },
+  { name: 'oref',    interval: config.oref.pollInterval,    enabled: true },
 ];
 
 export async function registerJobs() {
+  const jobNames = new Set(JOBS.map((j) => j.name));
+
   // Remove stale repeatable jobs we own
   const existing = await ingestQueue.getRepeatableJobs();
   for (const job of existing) {
-    if (JOBS.some((j) => j.name === job.name)) {
+    if (jobNames.has(job.name)) {
       await ingestQueue.removeRepeatableByKey(job.key);
     }
   }

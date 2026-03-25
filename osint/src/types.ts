@@ -11,6 +11,7 @@ export type GdeltRow = {
   lat: number;
   lon: number;
   sourceUrl: string;
+  raw: string[]; // all 61 columns preserved
 };
 
 // Map data response — matches main app's MapDataResponse shape

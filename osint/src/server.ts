@@ -12,6 +12,11 @@ import { processGdeltIngest } from './jobs/ingest-gdelt.js';
 import { processFirmsIngest } from './jobs/ingest-firms.js';
 import { processOverpassIngest } from './jobs/ingest-overpass.js';
 import { processNgaIngest } from './jobs/ingest-nga.js';
+import { processUsgsIngest } from './jobs/ingest-usgs.js';
+import { processUcdpIngest } from './jobs/ingest-ucdp.js';
+import { processOpenskyIngest } from './jobs/ingest-opensky.js';
+import { processGpsjamIngest } from './jobs/ingest-gpsjam.js';
+import { processOrefIngest } from './jobs/ingest-oref.js';
 
 import healthRouter from './api/health.js';
 import mapDataRouter from './api/map-data.js';
@@ -19,6 +24,14 @@ import sourcesRouter from './api/sources.js';
 
 const app = express();
 app.use(express.json());
+
+// CORS for local playground dev
+app.use((_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 // Bull Board — job dashboard
 const serverAdapter = new ExpressAdapter();
@@ -40,6 +53,11 @@ const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>
   firms: processFirmsIngest,
   overpass: processOverpassIngest,
   nga: processNgaIngest,
+  usgs: processUsgsIngest,
+  ucdp: processUcdpIngest,
+  opensky: processOpenskyIngest,
+  gpsjam: processGpsjamIngest,
+  oref: processOrefIngest,
 };
 
 const worker = createWorker(async (job) => {
