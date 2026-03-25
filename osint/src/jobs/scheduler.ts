@@ -22,6 +22,7 @@ const JOBS: JobDef[] = [
   { name: 'oref',    interval: config.oref.pollInterval,    enabled: true },
   { name: 'mirta',     interval: 7 * 24 * 60 * 60 * 1000,   enabled: true },
   { name: 'eonet',     interval: 2 * 60 * 60 * 1000,       enabled: true },
+  { name: 'safecast',  interval: 2 * 60 * 60 * 1000,       enabled: true },
   { name: 'submarine-cables', interval: 7 * 24 * 60 * 60 * 1000, enabled: true },
   { name: 'cloudflare-radar', interval: config.cloudflareRadar.pollInterval, enabled: !!config.cloudflareRadar.token },
   { name: 'reference', interval: 24 * 60 * 60 * 1000,      enabled: true },
