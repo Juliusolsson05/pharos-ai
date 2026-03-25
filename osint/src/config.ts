@@ -54,4 +54,9 @@ export const config = {
   oref: {
     pollInterval: 2 * 60 * 1000, // 2 min (alerts are time-critical)
   },
+
+  cloudflareRadar: {
+    token: process.env.CLOUDFLARE_API_TOKEN || '',
+    pollInterval: 30 * 60 * 1000, // 30 min
+  },
 } as const;
