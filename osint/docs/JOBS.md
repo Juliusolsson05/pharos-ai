@@ -195,14 +195,27 @@ Available at `http://localhost:4000/admin/queues`. Shows:
 1. **Write the spec first**: Create `docs/providers/{name}.md` documenting every field the API returns, the endpoint URL, auth, rate limits, and what we map to. This is mandatory — no provider without a spec.
 2. Create `src/providers/{name}/` with `fetch.ts`, `transform.ts`, `index.ts`
 3. Create `src/jobs/ingest-{name}.ts` following the patterns above
-4. **Always store raw JSON**: Every event must be written to `osint.events` with `rawPayload` containing the full unmodified response from the source. We parse/transform for `map_features`, but the raw data is preserved for future re-processing.
+4. **Always store raw JSON**: Every record must include a `raw Json` column containing the full unmodified source payload. Each provider has its own typed Prisma table — use typed columns for the fields you need, and `raw` as the safety net.
 5. Register in `src/jobs/scheduler.ts`
-6. Add the job name to the worker router in `server.ts`
+6. Add the job name to the processor map in `server.ts`
 7. Add env vars (if any) to `.env.example` and `config.ts`
 
 ### Raw data rule
 
-The `rawPayload` column in `osint.events` must contain **everything** the source gives us, even fields we don't currently use. The transform layer picks what it needs for `map_features`, but the raw data is our archive. This lets us:
+Each provider's typed table must contain a `raw Json` column with **everything** the source gives us, even fields we don't currently use. The transform layer picks what it needs for `map_features`, but the raw data is preserved. This lets us:
 - Re-process historical data when we add new map feature types
 - Debug data quality issues by comparing raw vs transformed
 - Build new analytics without re-fetching from the source
+
+## Adding a new stream
+
+For sources that push data continuously (WebSocket, SSE, etc.) instead of responding to polls:
+
+1. **Write the spec** in `docs/providers/{name}.md`
+2. Create `src/streams/{name}/stream.ts` exporting a `StreamHandle`
+3. Add it to the `ALL_STREAMS` array in `src/streams/index.ts`
+4. Add env vars to `.env.example` and `config.ts`
+
+A `StreamHandle` has: `name`, `enabled()`, `start()`, `stop()`, `status()`.
+
+Streams run alongside the Express server. They accumulate data in memory and flush to the DB in batches (e.g. every 60 seconds). They are NOT BullMQ jobs — they manage their own lifecycle, reconnection, and error handling.

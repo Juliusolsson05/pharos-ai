@@ -19,8 +19,9 @@ Because OSINT mode aggregates many sources with different formats, update freque
 - **Redis** backs the job queue and provides caching
 - **Prisma** manages the `osint` schema in the shared PostgreSQL database
 - **S3-compatible storage** (MinIO locally, Cloudflare R2 in production) archives raw source files for traceability
+- **Persistent streams** (WebSocket connections) handle real-time data sources like AIS vessel tracking
 
-The goal is to continuously add more OSINT sources over time. Each source gets its own provider folder, its own BullMQ job, and its own poll interval.
+The goal is to continuously add more OSINT sources over time. Each source gets its own provider folder, its own ingest mechanism (BullMQ job or persistent stream), and its own typed database table.
 
 ## How it relates to the main app
 
@@ -56,7 +57,7 @@ npm run dev
 | URL | What |
 |-----|------|
 | `localhost:4000/admin/queues` | Bull Board — job dashboard (logs, progress, results) |
-| `localhost:4000/api/health` | Service health |
+| `localhost:4000/api/health` | Service health (DB, Redis, streams, all sources) |
 | `localhost:4000/api/map-data` | Map-ready data (same shape as main app) |
 | `localhost:4000/api/sources` | Per-source sync metadata |
 | `localhost:9001` | MinIO console — browse raw archived files |
@@ -70,40 +71,79 @@ npm run dev
 | Redis | BullMQ backend + cache |
 | Prisma | ORM — `osint` schema in shared PostgreSQL |
 | MinIO (local) / R2 (prod) | S3-compatible object storage for raw files |
-| adm-zip | GDELT ZIP extraction |
+| ws | WebSocket client for persistent streams |
 
 ## Directory structure
 
 ```
 osint/
-├── docker-compose.yml      # Redis + MinIO (separate from main app)
-├── prisma/schema.prisma    # osint.* tables
-├── docs/JOBS.md            # Job system practices
+├── docker-compose.yml          # Redis + MinIO (separate from main app)
+├── prisma/schema.prisma        # osint.* tables (per-provider typed models)
+├── data/reference/             # Curated JSON datasets (Iranian/Israeli sites, vessels)
+│   ├── installations/
+│   └── vessels/
+├── docs/
+│   ├── JOBS.md                 # Job system practices
+│   └── providers/              # Spec doc per data source
 └── src/
-    ├── server.ts           # Express + BullMQ worker entry
-    ├── config.ts           # Env-driven config
-    ├── db.ts               # Prisma client (osint schema)
-    ├── queue.ts            # BullMQ queue + worker factory
-    ├── types.ts            # Shared types (MapDataResponse, etc.)
+    ├── server.ts               # Express + BullMQ worker + stream startup
+    ├── config.ts               # Env-driven config
+    ├── db.ts                   # Prisma client (osint schema)
+    ├── queue.ts                # BullMQ queue + worker factory
+    ├── types.ts                # Shared types (MapDataResponse, etc.)
     ├── api/
     │   ├── health.ts
     │   ├── map-data.ts
     │   └── sources.ts
-    ├── providers/
-    │   ├── gdelt/          # GDELT 2.0 conflict events (CSV exports)
-    │   ├── firms/          # NASA FIRMS thermal hotspots
-    │   ├── overpass/       # OSM military installations
-    │   └── nga/            # NGA navigational warnings
-    ├── jobs/
+    ├── providers/              # One folder per polling data source
+    │   ├── gdelt/              # GDELT 2.0 conflict events (CSV exports)
+    │   ├── firms/              # NASA FIRMS thermal hotspots
+    │   ├── overpass/           # OSM military installations
+    │   ├── nga/                # NGA navigational warnings
+    │   ├── usgs/               # USGS earthquakes
+    │   ├── ucdp/               # UCDP conflict data
+    │   ├── opensky/            # OpenSky military flights (ICAO hex)
+    │   ├── gpsjam/             # Wingbits GPS interference
+    │   ├── oref/               # Israel Home Front Command alerts
+    │   ├── mirta/              # US DoD installations (ArcGIS)
+    │   ├── eonet/              # NASA EONET + GDACS natural disasters
+    │   ├── safecast/           # Radiation monitoring
+    │   ├── submarine-cables/   # TeleGeography cable routes
+    │   ├── cloudflare-radar/   # Internet outage detection
+    │   └── reference/          # Curated JSON reference data
+    ├── streams/                # Persistent connections (WebSocket, etc.)
+    │   ├── types.ts            # StreamHandle interface
+    │   ├── index.ts            # Stream registry (startAll/stopAll)
+    │   └── aisstream/          # AIS vessel tracking WebSocket
+    ├── jobs/                   # BullMQ job processors
     │   ├── ingest-gdelt.ts
     │   ├── ingest-firms.ts
     │   ├── ingest-overpass.ts
     │   ├── ingest-nga.ts
+    │   ├── ingest-usgs.ts
+    │   ├── ingest-ucdp.ts
+    │   ├── ingest-opensky.ts
+    │   ├── ingest-gpsjam.ts
+    │   ├── ingest-oref.ts
+    │   ├── ingest-mirta.ts
+    │   ├── ingest-eonet.ts
+    │   ├── ingest-safecast.ts
+    │   ├── ingest-submarine-cables.ts
+    │   ├── ingest-cloudflare-radar.ts
+    │   ├── ingest-reference.ts
     │   └── scheduler.ts
     └── lib/
-        ├── api-utils.ts    # ok()/err() response envelope
-        └── storage.ts      # S3/MinIO upload
+        ├── api-utils.ts        # ok()/err() response envelope
+        └── storage.ts          # S3/MinIO upload
 ```
+
+## Data ingestion patterns
+
+The service has two ingestion patterns:
+
+**Jobs** (BullMQ) — for sources that expose a REST API or downloadable file. Each job runs on a schedule, fetches data, writes to a typed provider table, and derives map features. Jobs have retries, exponential backoff, progress tracking, and structured results visible in Bull Board.
+
+**Streams** (persistent connections) — for sources that push data continuously via WebSocket or similar protocols. Streams run alongside the Express server, accumulate data in memory, and flush to the DB in batches. They reconnect automatically on disconnect.
 
 ## API envelope
 
@@ -111,12 +151,37 @@ All responses use `{ ok, data }` / `{ ok: false, error: { code, message } }` —
 
 ## Current sources
 
-| Source | Layer | Interval | Auth |
-|--------|-------|----------|------|
-| GDELT 2.0 CSV | Strikes + heat points | 15 min | None |
-| NASA FIRMS | Heat points (thermal) | 30 min | Free MAP_KEY |
-| OSM Overpass | Assets (bases, airfields) | 24h | None |
-| NGA Nav Warnings | Threat zones (maritime) | 6h | None |
+### Polling providers (BullMQ jobs)
+
+| Source | Layer | Interval | Auth | Status |
+|--------|-------|----------|------|--------|
+| GDELT 2.0 CSV | Strikes + heat points | 15 min | None | Active |
+| NASA FIRMS | Heat points (thermal) | 30 min | Free MAP_KEY | Active |
+| OSM Overpass | Military installations (4,500+) | 24h | None | Active |
+| NGA Nav Warnings | Maritime threat zones (245) | 6h | None | Active |
+| USGS Earthquakes | Seismic events | 1h | None | Active |
+| UCDP GED | Conflict events | 6h | Needs token | Blocked |
+| OpenSky Network | Military flights (ICAO hex) | 5 min | None | Active |
+| GPSJam / Wingbits | GPS interference zones | 30 min | Free API key | Needs key |
+| OREF | Israel siren alerts | 2 min | None | Active |
+| MIRTA (US Army Corps) | US DoD installations (737) | 7 days | None | Active |
+| EONET + GDACS | Natural disasters (400+) | 2h | None | Active |
+| Safecast | Radiation monitoring | 2h | None | Active |
+| Submarine cables | Cable routes + landing points | 7 days | None | Active |
+| Cloudflare Radar | Internet outages (ME) | 30 min | Free CF token | Needs token |
+| Reference data | Curated Iranian/Israeli/vessel data | 24h | None | Active |
+
+### Persistent streams
+
+| Source | What | Protocol |
+|--------|------|----------|
+| AISStream | Vessel positions (100+ ME vessels) | WebSocket |
+
+## Database
+
+Each provider has its own typed Prisma table (e.g. `gdelt_events`, `firms_detections`, `mirta_sites`, `ais_positions`). Every table includes a `raw Json` column preserving the full unmodified source payload. The shared `map_features` table holds derived features for the API.
+
+See `prisma/schema.prisma` for the full schema.
 
 ## Environment variables
 
@@ -124,4 +189,5 @@ See `.env.example`. All have sensible local defaults in `config.ts`.
 
 ## Docs
 
-- [Job system practices](docs/JOBS.md) — how to write job processors correctly
+- [Job system practices](docs/JOBS.md) — how to write job processors, use `job.log()`, progress tracking, retries
+- [Provider specs](docs/providers/) — per-source documentation of every field, endpoint, and mapping
