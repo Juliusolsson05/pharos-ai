@@ -17,6 +17,7 @@ import { processUcdpIngest } from './jobs/ingest-ucdp.js';
 import { processOpenskyIngest } from './jobs/ingest-opensky.js';
 import { processGpsjamIngest } from './jobs/ingest-gpsjam.js';
 import { processOrefIngest } from './jobs/ingest-oref.js';
+import { processReferenceIngest } from './jobs/ingest-reference.js';
 
 import healthRouter from './api/health.js';
 import mapDataRouter from './api/map-data.js';
@@ -58,6 +59,7 @@ const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>
   opensky: processOpenskyIngest,
   gpsjam: processGpsjamIngest,
   oref: processOrefIngest,
+  reference: processReferenceIngest,
 };
 
 const worker = createWorker(async (job) => {

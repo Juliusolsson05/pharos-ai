@@ -321,3 +321,68 @@ model GpsjamHex {
   @@schema("osint")
   @@map("gpsjam_hexes")
 }
+
+// ─── Reference: military installations ──────────────────────
+
+model ReferenceInstallation {
+  id            String   @id @default(cuid())
+  name          String
+  nameLocal     String?
+  lat           Float
+  lon           Float
+  country       String
+  affiliation   String
+  type          String
+  operators     String[]
+  units         String[]
+  equipment     String[]
+  personnel     Int?
+  runwayLengthM Int?
+  role          String[]
+  status        String
+  hardening     String?
+  description   String
+  sourceUrl     String?
+  raw           Json
+  seededAt      DateTime @default(now())
+
+  @@unique([name, country])
+  @@index([country])
+  @@index([affiliation])
+  @@index([type])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("reference_installations")
+}
+
+// ─── Reference: naval vessels ───────────────────────────────
+
+model ReferenceVessel {
+  id               String   @id @default(cuid())
+  name             String
+  hullNumber       String?
+  vesselClass      String?
+  type             String
+  country          String
+  affiliation      String
+  operator         String
+  strikeGroup      String?
+  airWing          String?
+  displacement     Int?
+  personnel        Int?
+  homePort         String?
+  typicalPatrolLat Float?
+  typicalPatrolLon Float?
+  role             String[]
+  status           String
+  description      String
+  sourceUrl        String?
+  raw              Json
+  seededAt         DateTime @default(now())
+
+  @@unique([name, country])
+  @@index([country])
+  @@index([type])
+  @@schema("osint")
+  @@map("reference_vessels")
+}
