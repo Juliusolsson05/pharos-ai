@@ -20,4 +20,17 @@ export const config = {
     lastUpdateUrl: 'http://data.gdeltproject.org/gdeltv2/lastupdate.txt',
     pollInterval: 15 * 60 * 1000, // 15 min
   },
+
+  firms: {
+    mapKey: process.env.NASA_FIRMS_MAP_KEY || '',
+    pollInterval: 30 * 60 * 1000, // 30 min
+  },
+
+  overpass: {
+    pollInterval: 24 * 60 * 60 * 1000, // 24h
+  },
+
+  nga: {
+    pollInterval: 6 * 60 * 60 * 1000, // 6h
+  },
 } as const;

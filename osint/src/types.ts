@@ -18,8 +18,8 @@ export type MapDataResponse = {
   strikes: StrikeArc[];
   missiles: never[];
   targets: never[];
-  assets: never[];
-  threatZones: never[];
+  assets: Asset[];
+  threatZones: ThreatZone[];
   heatPoints: HeatPoint[];
   actorMeta: Record<string, ActorMeta>;
 };
@@ -37,6 +37,31 @@ export type StrikeArc = {
   to: [number, number];
   label: string;
   severity: 'CRITICAL' | 'HIGH';
+};
+
+export type Asset = {
+  id: string;
+  sourceEventId: string | null;
+  actor: string;
+  priority: 'P1' | 'P2' | 'P3';
+  category: 'INSTALLATION';
+  type: 'AIR_BASE' | 'NAVAL_BASE' | 'ARMY_BASE' | 'CARRIER';
+  status: 'ACTIVE' | 'DEGRADED' | 'STRUCK' | 'DAMAGED' | 'DESTROYED';
+  name: string;
+  position: [number, number];
+  description?: string;
+};
+
+export type ThreatZone = {
+  id: string;
+  sourceEventId: string | null;
+  actor: string;
+  priority: 'P1' | 'P2' | 'P3';
+  category: 'ZONE';
+  type: 'CLOSURE' | 'PATROL' | 'NFZ' | 'THREAT_CORRIDOR';
+  name: string;
+  coordinates: [number, number][];
+  color: [number, number, number, number];
 };
 
 export type HeatPoint = {

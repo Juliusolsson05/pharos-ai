@@ -9,6 +9,9 @@ import { prisma } from './db.js';
 import { ingestQueue, createWorker } from './queue.js';
 import { registerJobs } from './jobs/scheduler.js';
 import { processGdeltIngest } from './jobs/ingest-gdelt.js';
+import { processFirmsIngest } from './jobs/ingest-firms.js';
+import { processOverpassIngest } from './jobs/ingest-overpass.js';
+import { processNgaIngest } from './jobs/ingest-nga.js';
 
 import healthRouter from './api/health.js';
 import mapDataRouter from './api/map-data.js';
@@ -32,11 +35,17 @@ app.use(mapDataRouter);
 app.use(sourcesRouter);
 
 // BullMQ worker
+const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>> = {
+  gdelt: processGdeltIngest,
+  firms: processFirmsIngest,
+  overpass: processOverpassIngest,
+  nga: processNgaIngest,
+};
+
 const worker = createWorker(async (job) => {
-  if (job.name === 'gdelt') {
-    return processGdeltIngest(job);
-  }
-  throw new Error(`Unknown job name: ${job.name}`);
+  const fn = processors[job.name];
+  if (!fn) throw new Error(`Unknown job name: ${job.name}`);
+  return fn(job);
 });
 
 worker.on('completed', (job, result) => {

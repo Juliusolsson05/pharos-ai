@@ -8,24 +8,42 @@ const JOB_OPTS = {
   removeOnFail: 50,
 };
 
+type JobDef = { name: string; interval: number; enabled: boolean };
+
+const JOBS: JobDef[] = [
+  { name: 'gdelt', interval: config.gdelt.pollInterval, enabled: true },
+  { name: 'firms', interval: config.firms.pollInterval, enabled: !!config.firms.mapKey },
+  { name: 'overpass', interval: config.overpass.pollInterval, enabled: true },
+  { name: 'nga', interval: config.nga.pollInterval, enabled: true },
+];
+
 export async function registerJobs() {
-  // Only remove repeatable jobs we own (by name), not everything
+  // Remove stale repeatable jobs we own
   const existing = await ingestQueue.getRepeatableJobs();
   for (const job of existing) {
-    if (job.name === 'gdelt') {
+    if (JOBS.some((j) => j.name === job.name)) {
       await ingestQueue.removeRepeatableByKey(job.key);
     }
   }
 
-  // GDELT ingest — every 15 minutes
-  await ingestQueue.add(
-    'gdelt',
-    { source: 'gdelt' },
-    { repeat: { every: config.gdelt.pollInterval }, ...JOB_OPTS },
-  );
+  for (const def of JOBS) {
+    if (!def.enabled) {
+      console.log(`[scheduler] ${def.name} skipped (not configured)`);
+      continue;
+    }
 
-  // Immediate first run
-  await ingestQueue.add('gdelt', { source: 'gdelt' }, JOB_OPTS);
+    await ingestQueue.add(
+      def.name,
+      { source: def.name },
+      { repeat: { every: def.interval }, ...JOB_OPTS },
+    );
 
-  console.log('[scheduler] Registered gdelt ingest (every 15min, 3 attempts, exponential backoff)');
+    // Immediate first run
+    await ingestQueue.add(def.name, { source: def.name }, JOB_OPTS);
+
+    const label = def.interval >= 3_600_000
+      ? `${def.interval / 3_600_000}h`
+      : `${def.interval / 60_000}min`;
+    console.log(`[scheduler] Registered ${def.name} (every ${label})`);
+  }
 }
