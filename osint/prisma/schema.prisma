@@ -322,6 +322,31 @@ model GpsjamHex {
   @@map("gpsjam_hexes")
 }
 
+// ─── MIRTA — US DoD installations (ArcGIS) ──────────────────
+
+model MirtaSite {
+  id                  String   @id @default(cuid())
+  objectId            Int      @unique
+  siteName            String
+  featureName         String?
+  featureDescription  String?
+  countryName         String?
+  stateCode           String?
+  reportingComponent  String?
+  operationalStatus   String?
+  isJointBase         Boolean  @default(false)
+  lat                 Float
+  lon                 Float
+  raw                 Json
+  ingestedAt          DateTime @default(now())
+
+  @@index([reportingComponent])
+  @@index([operationalStatus])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("mirta_sites")
+}
+
 // ─── Reference: military installations ──────────────────────
 
 model ReferenceInstallation {

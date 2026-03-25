@@ -20,6 +20,8 @@ const JOBS: JobDef[] = [
   { name: 'opensky', interval: config.opensky.pollInterval, enabled: true },
   { name: 'gpsjam',  interval: config.gpsjam.pollInterval,  enabled: !!config.gpsjam.apiKey },
   { name: 'oref',    interval: config.oref.pollInterval,    enabled: true },
+  { name: 'mirta',     interval: 7 * 24 * 60 * 60 * 1000,   enabled: true },
+  { name: 'eonet',     interval: 2 * 60 * 60 * 1000,       enabled: true },
   { name: 'reference', interval: 24 * 60 * 60 * 1000,      enabled: true },
 ];
 
