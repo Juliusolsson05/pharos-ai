@@ -1,4 +1,13 @@
+import type { Metadata } from 'next';
+
+import { buildBrowseMetadata } from '@/features/browse/lib/seo';
 import { LegalPage } from '@/features/legal/components/LegalPage';
+
+export const metadata: Metadata = buildBrowseMetadata({
+  title: 'Terms of Use',
+  description: 'Baseline terms for using Conflicts.app, its public intelligence views, and the open-source product.',
+  path: '/terms',
+});
 
 export default function TermsPage() {
   return (

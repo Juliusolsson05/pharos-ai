@@ -5,6 +5,7 @@ export function GET() {
     renderSitemapIndex([
       { url: toAbsoluteUrl(SITEMAP_PATHS.browse) },
       { url: toAbsoluteUrl(SITEMAP_PATHS.dashboard) },
+      { url: toAbsoluteUrl(SITEMAP_PATHS.legal) },
       { url: toAbsoluteUrl(SITEMAP_PATHS.events) },
       { url: toAbsoluteUrl(SITEMAP_PATHS.actors) },
       { url: toAbsoluteUrl(SITEMAP_PATHS.briefs) },

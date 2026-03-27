@@ -1,4 +1,13 @@
+import type { Metadata } from 'next';
+
+import { buildBrowseMetadata } from '@/features/browse/lib/seo';
 import { LegalPage } from '@/features/legal/components/LegalPage';
+
+export const metadata: Metadata = buildBrowseMetadata({
+  title: 'Privacy Policy',
+  description: 'How Conflicts.app handles analytics, chat continuity, and local device storage.',
+  path: '/privacy',
+});
 
 export default function PrivacyPage() {
   return (

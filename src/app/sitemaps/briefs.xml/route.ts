@@ -1,7 +1,6 @@
 import { createXmlResponse, renderSitemap, toAbsoluteUrl } from '@/features/browse/lib/sitemap';
 
 import { publicConflictId } from '@/shared/lib/env';
-import { fmtDate } from '@/shared/lib/format';
 import { prisma } from '@/server/lib/db';
 
 const CONFLICT_ID = publicConflictId;
@@ -16,7 +15,7 @@ export async function GET() {
   return createXmlResponse(
     renderSitemap(
       briefs.map((brief) => ({
-        url: toAbsoluteUrl(`/browse/brief/${fmtDate(brief.day.toISOString())}`),
+        url: toAbsoluteUrl(`/browse/brief/${brief.day.toISOString().slice(0, 10)}`),
         lastModified: brief.updatedAt,
       })),
     ),
