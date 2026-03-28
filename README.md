@@ -8,6 +8,15 @@
   <a href="https://conflicts.app"><strong>conflicts.app</strong></a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/Juliusolsson05/pharos-ai/stargazers"><img src="https://img.shields.io/github/stars/Juliusolsson05/pharos-ai?style=flat" alt="Stars"></a>
+  <a href="https://github.com/Juliusolsson05/pharos-ai/network/members"><img src="https://img.shields.io/github/forks/Juliusolsson05/pharos-ai?style=flat" alt="Forks"></a>
+  <a href="https://github.com/Juliusolsson05/pharos-ai/issues"><img src="https://img.shields.io/github/issues/Juliusolsson05/pharos-ai?style=flat" alt="Issues"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Juliusolsson05/pharos-ai?style=flat" alt="License"></a>
+  <a href="https://github.com/Juliusolsson05/pharos-ai/commits/main"><img src="https://img.shields.io/github/last-commit/Juliusolsson05/pharos-ai?style=flat" alt="Last commit"></a>
+  <a href="https://conflicts.app"><img src="https://img.shields.io/badge/live-conflicts.app-2D72D2?style=flat" alt="Live"></a>
+</p>
+
 ---
 
 <!-- TODO: Replace with GIF of the map dashboard -->
@@ -120,3 +129,9 @@ Useful commands:
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full setup walkthrough, branch workflow, and PR guidelines.
 
 Code conventions are documented in [`CODEX.md`](CODEX.md). The key rules: 150-line file limit, `type` not `interface`, CSS variables for all colours, shadcn primitives for interactive elements, and enforced import ordering.
+
+## Contributors
+
+<a href="https://github.com/Juliusolsson05/pharos-ai/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Juliusolsson05/pharos-ai" />
+</a>
