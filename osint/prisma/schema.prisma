@@ -59,6 +59,31 @@ model SourceSync {
   @@map("source_syncs")
 }
 
+// ─── GDELT GKG — articles with themes, entities, locations ──
+
+model GkgRecord {
+  id            String   @id @default(cuid())
+  recordId      String   @unique
+  date          String
+  domain        String
+  url           String
+  themes        String[]
+  locations     Json
+  persons       String[]
+  organizations String[]
+  tone          Float    @default(0)
+  imageUrl      String?
+  pageTitle     String
+  raw           Json
+  ingestedAt    DateTime @default(now())
+
+  @@index([date])
+  @@index([domain])
+  @@index([tone])
+  @@schema("osint")
+  @@map("gkg_records")
+}
+
 // ─── GDELT 2.0 — all 61 CSV columns ────────────────────────
 
 model GdeltEvent {

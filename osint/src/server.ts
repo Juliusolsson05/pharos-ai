@@ -9,6 +9,7 @@ import { prisma } from './db.js';
 import { ingestQueue, createWorker } from './queue.js';
 import { registerJobs } from './jobs/scheduler.js';
 import { processGdeltIngest } from './jobs/ingest-gdelt.js';
+import { processGkgIngest } from './jobs/ingest-gdelt-gkg.js';
 import { processFirmsIngest } from './jobs/ingest-firms.js';
 import { processOverpassIngest } from './jobs/ingest-overpass.js';
 import { processNgaIngest } from './jobs/ingest-nga.js';
@@ -57,6 +58,7 @@ app.use(sourcesRouter);
 // BullMQ worker
 const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>> = {
   gdelt: processGdeltIngest,
+  'gdelt-gkg': processGkgIngest,
   firms: processFirmsIngest,
   overpass: processOverpassIngest,
   nga: processNgaIngest,
