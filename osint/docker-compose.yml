@@ -30,7 +30,6 @@ services:
     volumes:
       - minio-data:/data
 
-  # Create the default bucket on startup
   minio-setup:
     image: minio/mc:latest
     depends_on:
@@ -43,6 +42,33 @@ services:
       exit 0;
       "
 
+  metabase:
+    image: metabase/metabase:latest
+    restart: unless-stopped
+    ports:
+      - "3333:3000"
+    environment:
+      MB_ANON_TRACKING_ENABLED: "false"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    volumes:
+      - metabase-data:/metabase-data
+
+  # Auto-configure Metabase on first boot (creates admin + connects DB)
+  metabase-setup:
+    image: curlimages/curl:latest
+    depends_on:
+      metabase:
+        condition: service_healthy
+    volumes:
+      - ./scripts/metabase-setup.sh:/setup.sh:ro
+    entrypoint: ["/bin/sh", "/setup.sh"]
+
 volumes:
   redis-data:
   minio-data:
+  metabase-data:
