@@ -13,6 +13,9 @@ type JobDef = { name: string; interval: number; enabled: boolean };
 const JOBS: JobDef[] = [
   { name: 'gdelt',   interval: config.gdelt.pollInterval,   enabled: true },
   { name: 'gdelt-gkg', interval: config.gdelt.pollInterval, enabled: true },
+  { name: 'gdelt-mentions', interval: config.gdelt.pollInterval, enabled: true },
+  { name: 'gdelt-gqg', interval: 5 * 60 * 1000, enabled: true },
+  { name: 'gdelt-gfg', interval: 60 * 60 * 1000, enabled: true },
   { name: 'firms',   interval: config.firms.pollInterval,   enabled: !!config.firms.mapKey },
   { name: 'overpass', interval: config.overpass.pollInterval, enabled: true },
   { name: 'nga',     interval: config.nga.pollInterval,     enabled: true },

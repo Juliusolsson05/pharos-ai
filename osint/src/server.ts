@@ -10,6 +10,9 @@ import { ingestQueue, createWorker } from './queue.js';
 import { registerJobs } from './jobs/scheduler.js';
 import { processGdeltIngest } from './jobs/ingest-gdelt.js';
 import { processGkgIngest } from './jobs/ingest-gdelt-gkg.js';
+import { processMentionsIngest } from './jobs/ingest-gdelt-mentions.js';
+import { processGqgIngest } from './jobs/ingest-gdelt-gqg.js';
+import { processGfgIngest } from './jobs/ingest-gdelt-gfg.js';
 import { processFirmsIngest } from './jobs/ingest-firms.js';
 import { processOverpassIngest } from './jobs/ingest-overpass.js';
 import { processNgaIngest } from './jobs/ingest-nga.js';
@@ -59,6 +62,9 @@ app.use(sourcesRouter);
 const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>> = {
   gdelt: processGdeltIngest,
   'gdelt-gkg': processGkgIngest,
+  'gdelt-mentions': processMentionsIngest,
+  'gdelt-gqg': processGqgIngest,
+  'gdelt-gfg': processGfgIngest,
   firms: processFirmsIngest,
   overpass: processOverpassIngest,
   nga: processNgaIngest,

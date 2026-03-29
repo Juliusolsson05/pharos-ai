@@ -59,6 +59,73 @@ model SourceSync {
   @@map("source_syncs")
 }
 
+// ─── GDELT Mentions — links events to articles ─────────────
+
+model GdeltMention {
+  id                       String   @id @default(cuid())
+  globalEventId            String
+  eventTimeDate            String
+  mentionTimeDate          String
+  mentionType              Int
+  mentionSourceName        String
+  mentionIdentifier        String
+  sentenceId               Int
+  actor1CharOffset         Int
+  actor2CharOffset         Int
+  actionCharOffset         Int
+  inRawText                Boolean  @default(true)
+  confidence               Int
+  mentionDocLen            Int
+  mentionDocTone           Float
+  mentionDocTranslationInfo String?
+  raw                      Json
+  ingestedAt               DateTime @default(now())
+
+  @@index([globalEventId])
+  @@index([mentionSourceName])
+  @@index([confidence])
+  @@schema("osint")
+  @@map("gdelt_mentions")
+}
+
+// ─── GDELT GQG — direct quotes from news articles ──────────
+
+model GdeltQuote {
+  id         String   @id @default(cuid())
+  articleUrl String
+  title      String
+  lang       String?
+  date       String
+  quote      String
+  pre        String?
+  post       String?
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@index([date])
+  @@index([articleUrl])
+  @@schema("osint")
+  @@map("gdelt_quotes")
+}
+
+// ─── GDELT GFG — news frontpage links ───────────────────────
+
+model GdeltFrontpage {
+  id         String   @id @default(cuid())
+  hour       String
+  domain     String
+  url        String
+  position   Int
+  linkText   String?
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@index([hour])
+  @@index([domain])
+  @@schema("osint")
+  @@map("gdelt_frontpages")
+}
+
 // ─── GDELT GKG — articles with themes, entities, locations ──
 
 model GkgRecord {
