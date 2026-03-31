@@ -34,8 +34,7 @@ function setRange(lut: Uint8Array, start: number, end: number, from: [number, nu
 
 function buildColorLut() {
   const lut = new Uint8Array(256 * 3);
-  setRange(lut, 0, 5, [0, 0, 0], [0, 0, 0]);
-  setRange(lut, 6, 38, [2, 4, 18], [2, 4, 18]);
+  setRange(lut, 0, 38, [2, 4, 18], [2, 4, 18]);
   setRange(lut, 39, 100, [2, 4, 18], [182, 84, 8]);
   setRange(lut, 101, 180, [182, 84, 8], [242, 204, 28]);
   setRange(lut, 181, 255, [242, 204, 28], [255, 255, 228]);

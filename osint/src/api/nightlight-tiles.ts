@@ -4,7 +4,13 @@ import { config } from '../config.js';
 import { prisma } from '../db.js';
 import { getTile } from '../lib/storage.js';
 import { ok, err } from '../lib/api-utils.js';
-import { dailyTileKey, snapshotTileKey } from '../providers/nightlights/index.js';
+import {
+  dailyTileKey,
+  getCompositeManifest,
+  getCompositeTile,
+  getLatestCompositeManifest,
+  snapshotTileKey,
+} from '../providers/nightlights/index.js';
 
 const router = Router();
 
@@ -20,6 +26,60 @@ function parseTileParams(params: Record<string, string | undefined>) {
 
   return { date, z, x, y };
 }
+
+function parseDateParam(params: Record<string, string | undefined>) {
+  const date = params.date || '';
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null;
+}
+
+router.get('/api/nightlights/latest/manifest', async (_req, res) => {
+  try {
+    const manifest = await getLatestCompositeManifest();
+    return ok(res, manifest);
+  } catch (error) {
+    return err(res, 'NOT_FOUND', error instanceof Error ? error.message : 'No composite nightlights available', 404);
+  }
+});
+
+router.get('/api/nightlights/composite/:date/manifest', async (req, res) => {
+  const date = parseDateParam(req.params);
+  if (!date) {
+    return err(res, 'INVALID_PARAMS', 'Invalid date', 400);
+  }
+
+  try {
+    const manifest = await getCompositeManifest(date);
+    return ok(res, manifest);
+  } catch (error) {
+    return err(res, 'NOT_FOUND', error instanceof Error ? error.message : 'No composite nightlights available', 404);
+  }
+});
+
+router.get('/api/nightlights/composite/:date/:z/:x/:y.webp', async (req, res) => {
+  const parsed = parseTileParams(req.params);
+  if (!parsed) {
+    return err(res, 'INVALID_PARAMS', 'Invalid tile coordinates or date', 400);
+  }
+
+  try {
+    const result = await getCompositeTile(parsed.date, parsed);
+    if (!result) {
+      res.status(404).send('');
+      return;
+    }
+
+    res.setHeader('Content-Type', 'image/webp');
+    res.setHeader('Cache-Control', result.source === 'daily' ? 'public, max-age=86400, immutable' : 'public, max-age=604800, immutable');
+    res.setHeader('X-Nightlights-Source', result.source);
+    res.setHeader('X-Nightlights-Daily-Date', result.resolvedDailyDate);
+    if (result.resolvedSnapshotDate) {
+      res.setHeader('X-Nightlights-Snapshot-Date', result.resolvedSnapshotDate);
+    }
+    res.send(result.tile);
+  } catch (error) {
+    return err(res, 'NOT_FOUND', error instanceof Error ? error.message : 'No composite nightlights available', 404);
+  }
+});
 
 // Serve a display tile by date and coordinates
 router.get('/api/nightlights/:date/:z/:x/:y.webp', async (req, res) => {
