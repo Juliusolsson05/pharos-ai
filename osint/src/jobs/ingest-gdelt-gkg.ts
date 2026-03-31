@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { uploadRaw } from '../lib/storage.js';
 import { fetchLatestGkgUrl, downloadAndParse } from '../providers/gdelt-gkg/index.js';
 
@@ -45,17 +46,17 @@ export async function processGkgIngest(job: Job) {
           domain: r.domain,
           url: r.url,
           themes: r.themes,
-          locations: r.locations as unknown as Record<string, unknown>,
+          locations: toJson(r.locations),
           persons: r.persons,
           organizations: r.organizations,
           tone: r.tone,
           imageUrl: r.imageUrl || null,
           pageTitle: r.pageTitle,
-          raw: r.raw as unknown as Record<string, unknown>,
+          raw: toJson(r.raw),
         },
         update: {
           tone: r.tone,
-          raw: r.raw as unknown as Record<string, unknown>,
+          raw: toJson(r.raw),
         },
       });
       stored++;

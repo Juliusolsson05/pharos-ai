@@ -1,25 +1,28 @@
-# Tile Mask (Support Data — GSHHG + Natural Earth)
+# Tile Mask (Support Data)
 
 ## What this is
 
-Support data, not an OSINT ingest provider. A one-time compute pipeline that determines which z8 map tiles contain inhabited land. Other providers (nightlights) read from this table to avoid fetching ocean/polar/empty tiles.
+Support data, not an OSINT ingest provider. This compute pipeline determines which z8 map tiles contain meaningful inhabited or strategic land. Nightlights reads from this table to avoid fetching ocean, polar, and empty terrain tiles.
 
 ## Data sources
 
-- **GSHHG** (Global Self-consistent Hierarchical High-resolution Geography) — coastline polygons that define land vs ocean. Intermediate resolution (~3.35 MB). From NOAA.
+- **NASA GIBS OSM Land Water Map** — pixel-accurate land/water mask derived at z8 from z4 source tiles.
 - **Natural Earth 10m populated places** — ~7,000 city/town point locations with population data. From naturalearthdata.com.
+- **GHSL settlements** — global built-up / settlement density raster.
 - **Strategic chokepoints** — hardcoded list of tiles covering Hormuz, Suez, Bab el-Mandeb, Malacca, etc.
 
 ## How it works
 
-1. Downloads both shapefiles, parses to GeoJSON
-2. Pre-indexes coastline polygons into a coarse spatial grid
-3. Pre-indexes populated places into z8 tile keys
-4. For each of the 65,536 z8 tiles, computes:
-   - `hasLand` — does any coastline polygon bbox overlap this tile?
-   - `hasPopulation` — does any populated place fall in this tile?
-   - `isStrategic` — is this tile a known chokepoint?
-   - `include` = `hasLand AND (hasPopulation OR isStrategic)`
+1. Seeds `land-mask`
+2. Seeds `populated-places`
+3. Seeds `settlements`
+4. Computes strategic tile membership in-memory
+5. For each of the 65,536 z8 tiles, computes:
+   - `hasLand` — land mask says the tile contains land
+   - `hasSettlement` — GHSL says the tile contains built-up area
+   - `hasPopulation` — a populated place falls in the tile
+   - `isStrategic` — the tile is a hardcoded chokepoint
+   - `include` = `hasLand AND (meaningful settlement OR populated place OR strategic)`
 
 ## How to run
 
@@ -27,17 +30,18 @@ Support data, not an OSINT ingest provider. A one-time compute pipeline that det
 npm run seed -- --provider tile-mask
 ```
 
-Expected runtime: 30-90 seconds. Expected result: ~12,000-15,000 included tiles.
+Expected runtime: 30-90 seconds after the support datasets are present.
 
 ## Prisma model
 
 ```
 TileMask {
   z, x, y           — tile coordinates (unique)
-  hasLand            — coastline polygon overlaps this tile
+  hasLand            — land mask says the tile contains land
+  hasSettlement      — GHSL sees settlement pixels in the tile
   hasPopulation      — populated place exists in this tile
   isStrategic        — hardcoded chokepoint
-  include            — materialized: hasLand AND (hasPopulation OR isStrategic)
+  include            — materialized: hasLand AND (settlement OR population OR strategic)
   landCoveragePct    — future use
   qualityTier        — "iran" | "middle-east" | "world"
 }
@@ -46,11 +50,11 @@ TileMask {
 ## Consumers
 
 - `ingest-nightlights.ts` calls `getIncludedTiles()` which reads `WHERE include = true` from this table
-- Falls back to all 65,536 tiles if the table is empty (tile-mask hasn't been run yet)
+- If this table is empty, `nightlights-daily` fails fast instead of fetching the full globe
 
 ## When to recompute
 
-Rarely. Coastlines don't change. Recompute only if:
+Rarely. Recompute only if:
 - You add new strategic chokepoints
 - You change the quality tier definitions
-- Natural Earth releases a significantly updated dataset
+- Natural Earth or GHSL release a significantly updated dataset

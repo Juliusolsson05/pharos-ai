@@ -1,4 +1,5 @@
 import { prisma } from '../../../db.js';
+import { toJson } from '../../../lib/json.js';
 import { uploadRaw } from '../../../lib/storage.js';
 import { downloadPopulatedPlaces, NAT_EARTH_VERSION } from './fetch.js';
 
@@ -50,7 +51,7 @@ export async function seed(_opts: { from?: string; to?: string; delay?: number }
           adm1Name: p.adm1name || null,
           worldcity: p.worldcity === 1,
           megacity: p.megacity === 1,
-          raw: p as unknown as Record<string, unknown>,
+          raw: toJson(p),
         };
       }),
     });

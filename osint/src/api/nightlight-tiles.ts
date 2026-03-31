@@ -4,24 +4,31 @@ import { config } from '../config.js';
 import { prisma } from '../db.js';
 import { getTile } from '../lib/storage.js';
 import { ok, err } from '../lib/api-utils.js';
+import { dailyTileKey, snapshotTileKey } from '../providers/nightlights/index.js';
 
 const router = Router();
 
+function parseTileParams(params: Record<string, string | undefined>) {
+  const date = params.date || '';
+  const z = parseInt(params.z || '', 10);
+  const x = parseInt(params.x || '', 10);
+  const y = parseInt((params['y.webp'] ?? params.y?.replace('.webp', '') ?? ''), 10);
+
+  if (isNaN(z) || isNaN(x) || isNaN(y) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return null;
+  }
+
+  return { date, z, x, y };
+}
+
 // Serve a display tile by date and coordinates
 router.get('/api/nightlights/:date/:z/:x/:y.webp', async (req, res) => {
-  const { date, z, x } = req.params;
-  const yStr = req.params['y.webp'] ?? req.params.y?.replace('.webp', '') ?? '';
-
-  const zi = parseInt(z);
-  const xi = parseInt(x);
-  const yi = parseInt(yStr);
-
-  if (isNaN(zi) || isNaN(xi) || isNaN(yi) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  const parsed = parseTileParams(req.params);
+  if (!parsed) {
     return err(res, 'INVALID_PARAMS', 'Invalid tile coordinates or date', 400);
   }
 
-  // Deterministic S3 key — no DB lookup needed for display tiles
-  const s3Key = `nightlights/${date}/${zi}/${xi}/${yi}.webp`;
+  const s3Key = dailyTileKey(parsed.date, parsed.z, parsed.x, parsed.y);
   const tile = await getTile(config.nightlights.tileBucket, s3Key);
 
   if (!tile) {
@@ -36,18 +43,12 @@ router.get('/api/nightlights/:date/:z/:x/:y.webp', async (req, res) => {
 
 // Serve a full-land snapshot tile
 router.get('/api/nightlights/snapshots/:date/:z/:x/:y.webp', async (req, res) => {
-  const { date, z, x } = req.params;
-  const yStr = req.params['y.webp'] ?? req.params.y?.replace('.webp', '') ?? '';
-
-  const zi = parseInt(z);
-  const xi = parseInt(x);
-  const yi = parseInt(yStr);
-
-  if (isNaN(zi) || isNaN(xi) || isNaN(yi) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  const parsed = parseTileParams(req.params);
+  if (!parsed) {
     return err(res, 'INVALID_PARAMS', 'Invalid tile coordinates or date', 400);
   }
 
-  const s3Key = `nightlights-snapshots/${date}/${zi}/${xi}/${yi}.webp`;
+  const s3Key = snapshotTileKey(parsed.date, parsed.z, parsed.x, parsed.y);
   const tile = await getTile(config.nightlights.tileBucket, s3Key);
 
   if (!tile) {

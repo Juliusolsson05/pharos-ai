@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 
 import { config } from '../../config.js';
 import { prisma } from '../../db.js';
+import { toJson } from '../../lib/json.js';
 import type { StreamHandle } from '../types.js';
 
 // --- Types ---
@@ -130,7 +131,7 @@ async function flush() {
           heading: v.heading,
           shipType: v.shipType,
           destination: v.destination || null,
-          raw: v.raw,
+          raw: toJson(v.raw),
           lastSeen: now,
         },
         update: {
@@ -141,7 +142,7 @@ async function flush() {
           heading: v.heading,
           shipType: v.shipType,
           destination: v.destination || null,
-          raw: v.raw,
+          raw: toJson(v.raw),
           lastSeen: now,
         },
       });

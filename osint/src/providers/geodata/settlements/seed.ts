@@ -1,4 +1,5 @@
 import { prisma } from '../../../db.js';
+import { toJson } from '../../../lib/json.js';
 import { uploadRaw } from '../../../lib/storage.js';
 import { downloadGhsl, computeTileStats, GHSL_VERSION } from './fetch.js';
 
@@ -45,11 +46,11 @@ export async function seed(_opts: { from?: string; to?: string; delay?: number }
         hasSettlement: s.hasSettlement,
         maxClass: s.maxClass,
         settlementPct: Math.round(s.settlementPct * 100) / 100,
-        raw: {
+        raw: toJson({
           histogram: s.classHistogram,
           totalPixels: s.totalPixels,
           settledPixels: s.settledPixels,
-        } as unknown as Record<string, unknown>,
+        }),
       })),
     });
 

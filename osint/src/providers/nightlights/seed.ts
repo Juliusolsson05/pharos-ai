@@ -36,7 +36,7 @@ export async function seed(opts: { from: string; to: string; delay?: number }): 
 
   for (let i = 0; i < dates.length; i++) {
     const date = dates[i];
-    await ingestQueue.add('nightlights', { source: 'nightlights', date }, JOB_OPTS);
+    await ingestQueue.add('nightlights-daily', { source: 'nightlights-daily', date }, JOB_OPTS);
     console.log(`  [${i + 1}/${dates.length}] Queued ${date}`);
 
     if (i < dates.length - 1 && delay > 0) {

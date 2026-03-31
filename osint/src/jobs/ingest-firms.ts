@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchFirms, buildHeatPoints } from '../providers/firms/index.js';
 
 const SOURCE = 'firms';
@@ -24,11 +25,11 @@ export async function processFirmsIngest(job: Job) {
           scan: r.scan, track: r.track, acqDate: r.acqDate, acqTime: r.acqTime,
           satellite: r.satellite, confidence: r.confidence, version: r.version,
           brightTi5: r.brightTi5, frp: r.frp, daynight: r.daynight,
-          raw: r as unknown as Record<string, unknown>,
+          raw: toJson(r),
         },
         update: {
           frp: r.frp, confidence: r.confidence, brightTi4: r.brightTi4,
-          raw: r as unknown as Record<string, unknown>,
+          raw: toJson(r),
         },
       });
       stored++;

@@ -1,15 +1,95 @@
 import sharp from 'sharp';
 
+import type { TileCoord } from '../../lib/tile-math.js';
+
+const DISPLAY_SIZE = 256;
+const WATER_THRESHOLD = 100;
+
+type DisplayTileInput = {
+  png: Buffer;
+  coord: TileCoord;
+  maskTile: Buffer;
+  quality: number;
+};
+
 // Configure sharp once — libvips handles threading internally
 sharp.concurrency(4);
 sharp.cache({ memory: 50 });
+
+const COLOR_LUT = buildColorLut();
+
+function lerp(a: number, b: number, t: number) {
+  return Math.round(a + (b - a) * t);
+}
+
+function setRange(lut: Uint8Array, start: number, end: number, from: [number, number, number], to: [number, number, number]) {
+  for (let value = start; value <= end; value++) {
+    const t = start === end ? 1 : (value - start) / (end - start);
+    const offset = value * 3;
+    lut[offset] = lerp(from[0], to[0], t);
+    lut[offset + 1] = lerp(from[1], to[1], t);
+    lut[offset + 2] = lerp(from[2], to[2], t);
+  }
+}
+
+function buildColorLut() {
+  const lut = new Uint8Array(256 * 3);
+  setRange(lut, 0, 5, [0, 0, 0], [0, 0, 0]);
+  setRange(lut, 6, 38, [2, 4, 18], [2, 4, 18]);
+  setRange(lut, 39, 100, [2, 4, 18], [182, 84, 8]);
+  setRange(lut, 101, 180, [182, 84, 8], [242, 204, 28]);
+  setRange(lut, 181, 255, [242, 204, 28], [255, 255, 228]);
+  return lut;
+}
+
+async function buildAlphaMask(maskTile: Buffer, coord: TileCoord) {
+  const localX = coord.x % 16;
+  const localY = coord.y % 16;
+
+  const { data } = await sharp(maskTile)
+    .grayscale()
+    .extract({ left: localX * 16, top: localY * 16, width: 16, height: 16 })
+    .resize(DISPLAY_SIZE, DISPLAY_SIZE, { kernel: 'nearest' })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const alpha = Buffer.alloc(DISPLAY_SIZE * DISPLAY_SIZE);
+  for (let i = 0; i < data.length; i++) {
+    alpha[i] = data[i] < WATER_THRESHOLD ? 255 : 0;
+  }
+
+  return alpha;
+}
 
 /**
  * Convert raw PNG tile to WebP display tile at the given quality.
  * Input and output are both 256x256.
  */
-export async function toDisplayTile(png: Buffer, quality: number): Promise<Buffer> {
-  return sharp(png).webp({ quality, effort: 4 }).toBuffer();
+export async function toDisplayTile({ png, coord, maskTile, quality }: DisplayTileInput): Promise<Buffer> {
+  const [source, alpha] = await Promise.all([
+    sharp(png)
+      .grayscale()
+      .resize(DISPLAY_SIZE, DISPLAY_SIZE, { fit: 'fill' })
+      .raw()
+      .toBuffer(),
+    buildAlphaMask(maskTile, coord),
+  ]);
+
+  const rgba = Buffer.alloc(DISPLAY_SIZE * DISPLAY_SIZE * 4);
+
+  for (let i = 0; i < source.length; i++) {
+    const brightness = source[i];
+    const lutOffset = brightness * 3;
+    const rgbaOffset = i * 4;
+    rgba[rgbaOffset] = COLOR_LUT[lutOffset];
+    rgba[rgbaOffset + 1] = COLOR_LUT[lutOffset + 1];
+    rgba[rgbaOffset + 2] = COLOR_LUT[lutOffset + 2];
+    rgba[rgbaOffset + 3] = alpha[i];
+  }
+
+  return sharp(rgba, {
+    raw: { width: DISPLAY_SIZE, height: DISPLAY_SIZE, channels: 4 },
+  }).webp({ quality, effort: 4 }).toBuffer();
 }
 
 /**

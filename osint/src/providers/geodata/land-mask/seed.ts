@@ -1,4 +1,5 @@
 import { prisma } from '../../../db.js';
+import { toJson } from '../../../lib/json.js';
 import { uploadRaw } from '../../../lib/storage.js';
 import { computeLandMask, LAND_MASK_VERSION } from './fetch.js';
 
@@ -50,7 +51,7 @@ export async function seed(_opts: { from?: string; to?: string; delay?: number }
         z: r.z, x: r.x, y: r.y,
         hasLand: r.hasLand,
         landPct: r.landPct,
-        raw: { landPixels: r.landPixels, totalPixels: r.totalPixels, sourceZoom: 4 } as Record<string, unknown>,
+        raw: toJson({ landPixels: r.landPixels, totalPixels: r.totalPixels, sourceZoom: 4 }),
       })),
     });
 

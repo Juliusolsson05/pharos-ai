@@ -1,3 +1,5 @@
+import { latLonToTile } from '../../../lib/tile-math.js';
+
 // Strategically important locations — included even without population data
 
 const STRATEGIC_POINTS: { name: string; lat: number; lon: number }[] = [
@@ -14,13 +16,10 @@ const STRATEGIC_POINTS: { name: string; lat: number; lon: number }[] = [
 ];
 
 export function getStrategicTiles(z: number = 8): Set<string> {
-  const n = 2 ** z;
   const tiles = new Set<string>();
   for (const p of STRATEGIC_POINTS) {
-    const x = Math.floor(((p.lon + 180) / 360) * n);
-    const latRad = (p.lat * Math.PI) / 180;
-    const y = Math.floor(((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n);
-    tiles.add(`${x},${y}`);
+    const tile = latLonToTile(p.lat, p.lon, z);
+    tiles.add(`${tile.x},${tile.y}`);
   }
   return tiles;
 }

@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchOpenskyStates, filterMilitaryFlights, buildAssets } from '../providers/opensky/index.js';
 
 const SOURCE = 'opensky';
@@ -28,12 +29,12 @@ export async function processOpenskyIngest(job: Job) {
           lat: f.lat, lon: f.lon, baroAltitude: f.altitude,
           velocity: f.velocity, heading: f.heading,
           milOperator: f.operator, milCountry: f.country,
-          raw: f as unknown as Record<string, unknown>,
+          raw: toJson(f),
         },
         update: {
           callsign: f.callsign || null, lat: f.lat, lon: f.lon,
           baroAltitude: f.altitude, velocity: f.velocity, heading: f.heading,
-          raw: f as unknown as Record<string, unknown>, seenAt: new Date(),
+          raw: toJson(f), seenAt: new Date(),
         },
       });
       stored++;

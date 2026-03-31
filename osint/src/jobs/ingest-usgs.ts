@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchQuakes, buildHeatPoints } from '../providers/usgs/index.js';
 
 const SOURCE = 'usgs';
@@ -23,9 +24,9 @@ export async function processUsgsIngest(job: Job) {
           eventId: q.id, place: q.place, magnitude: q.magnitude,
           depthKm: q.depthKm, lat: q.lat, lon: q.lon,
           occurredAt: new Date(q.occurredAt), sourceUrl: q.sourceUrl,
-          raw: q as unknown as Record<string, unknown>,
+          raw: toJson(q),
         },
-        update: { raw: q as unknown as Record<string, unknown> },
+        update: { raw: toJson(q) },
       });
       stored++;
     } catch { /* dedupe */ }

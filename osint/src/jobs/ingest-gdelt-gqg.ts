@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchGqg } from '../providers/gdelt-gqg/index.js';
 
 const SOURCE = 'gdelt-gqg';
@@ -44,7 +45,7 @@ export async function processGqgIngest(job: Job) {
             quote: q.quote,
             pre: q.pre || null,
             post: q.post || null,
-            raw: { ...article, currentQuote: q } as unknown as Record<string, unknown>,
+            raw: toJson({ ...article, currentQuote: q }),
           },
         });
         stored++;

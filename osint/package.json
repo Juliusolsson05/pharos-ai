@@ -15,7 +15,6 @@
     "@bull-board/api": "^6.20.6",
     "@bull-board/express": "^6.20.6",
     "@prisma/client": "^6.0.0",
-    "@turf/turf": "^7.0.0",
     "adm-zip": "^0.5.16",
     "bullmq": "^5.30.0",
     "dotenv": "^17.3.1",

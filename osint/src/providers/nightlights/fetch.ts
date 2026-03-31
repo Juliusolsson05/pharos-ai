@@ -1,9 +1,14 @@
 import pLimit from 'p-limit';
 
 import { config } from '../../config.js';
-import type { TileCoord } from './regions.js';
+import type { TileCoord } from '../../lib/tile-math.js';
 
 const FETCH_TIMEOUT = 15_000;
+const LAND_MASK_PARENT_ZOOM = 4;
+const LAND_MASK_BASE_URL =
+  'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OSM_Land_Water_Map/default/default/GoogleMapsCompatible_Level9';
+
+const landMaskCache = new Map<string, Promise<Buffer>>();
 
 function tileUrl(date: string, coord: TileCoord): string {
   return `${config.nightlights.gibsBaseUrl}/${date}/${config.nightlights.tileMatrixSet}/${coord.z}/${coord.y}/${coord.x}.png`;
@@ -20,6 +25,44 @@ export async function fetchTile(date: string, coord: TileCoord): Promise<Buffer 
   if (!res.ok) throw new Error(`GIBS ${res.status} for ${url}`);
 
   return Buffer.from(await res.arrayBuffer());
+}
+
+function landMaskParentKey(coord: TileCoord) {
+  return `${Math.floor(coord.x / 16)}:${Math.floor(coord.y / 16)}`;
+}
+
+function landMaskTileUrl(coord: TileCoord) {
+  const x = Math.floor(coord.x / 16);
+  const y = Math.floor(coord.y / 16);
+  return `${LAND_MASK_BASE_URL}/${LAND_MASK_PARENT_ZOOM}/${y}/${x}.png`;
+}
+
+export async function fetchLandMaskParentTile(coord: TileCoord): Promise<Buffer> {
+  const key = landMaskParentKey(coord);
+  const cached = landMaskCache.get(key);
+  if (cached) {
+    return cached;
+  }
+
+  const pending = (async () => {
+    const url = landMaskTileUrl(coord);
+    const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });
+
+    if (!res.ok) {
+      throw new Error(`Land mask ${res.status} for ${url}`);
+    }
+
+    return Buffer.from(await res.arrayBuffer());
+  })();
+
+  landMaskCache.set(key, pending);
+
+  try {
+    return await pending;
+  } catch (error) {
+    landMaskCache.delete(key);
+    throw error;
+  }
 }
 
 /**

@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchNgaWarnings, buildWarnings } from '../providers/nga/index.js';
 
 const SOURCE = 'nga';
@@ -23,9 +24,9 @@ export async function processNgaIngest(job: Job) {
           navArea: w.navArea, msgYear: w.msgYear, msgNumber: w.msgNumber,
           subregion: w.subregion || null, text: w.text, status: 'A',
           issueDate: w.issueDate || null, authority: w.authority || null,
-          raw: w as unknown as Record<string, unknown>,
+          raw: toJson(w),
         },
-        update: { text: w.text, raw: w as unknown as Record<string, unknown> },
+        update: { text: w.text, raw: toJson(w) },
       });
       stored++;
     } catch { /* dedupe */ }

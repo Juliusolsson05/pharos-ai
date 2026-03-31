@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchOrefAlerts, fetchOrefHistory, buildHeatPoints } from '../providers/oref/index.js';
 
 const SOURCE = 'oref';
@@ -26,9 +27,9 @@ export async function processOrefIngest(job: Job) {
           alertId: a.id, cat: a.cat, title: a.title || null,
           desc: a.desc || null, areas: a.data,
           alertDate: a.alertDate ? new Date(a.alertDate) : null,
-          raw: a as unknown as Record<string, unknown>,
+          raw: toJson(a),
         },
-        update: { raw: a as unknown as Record<string, unknown> },
+        update: { raw: toJson(a) },
       });
       stored++;
     } catch { /* dedupe */ }

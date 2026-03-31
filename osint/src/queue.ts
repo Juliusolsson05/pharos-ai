@@ -1,6 +1,6 @@
 import { Queue, Worker } from 'bullmq';
 import type { ConnectionOptions, Job } from 'bullmq';
-import IORedis from 'ioredis';
+import { Redis } from 'ioredis';
 
 import { config } from './config.js';
 
@@ -17,7 +17,7 @@ const connection: ConnectionOptions = {
   maxRetriesPerRequest: null,
 };
 
-export const redis = new IORedis(config.redis.url, { maxRetriesPerRequest: null });
+export const redis = new Redis(config.redis.url, { maxRetriesPerRequest: null });
 
 export const ingestQueue = new Queue('osint-ingest', { connection });
 

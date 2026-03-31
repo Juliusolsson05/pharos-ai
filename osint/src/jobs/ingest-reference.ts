@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { loadInstallations, loadVessels } from '../providers/reference/index.js';
 
 const SOURCE = 'reference';
@@ -43,7 +44,7 @@ export async function processReferenceIngest(job: Job) {
           hardening: inst.hardening ? String(inst.hardening) : null,
           description: String(inst.description || ''),
           sourceUrl: inst.sourceUrl ? String(inst.sourceUrl) : null,
-          raw: inst,
+          raw: toJson(inst),
         },
         update: {
           nameLocal: inst.nameLocal ? String(inst.nameLocal) : null,
@@ -61,7 +62,7 @@ export async function processReferenceIngest(job: Job) {
           hardening: inst.hardening ? String(inst.hardening) : null,
           description: String(inst.description || ''),
           sourceUrl: inst.sourceUrl ? String(inst.sourceUrl) : null,
-          raw: inst,
+          raw: toJson(inst),
         },
       });
       instStored++;
@@ -101,7 +102,7 @@ export async function processReferenceIngest(job: Job) {
           status: String(v.status || 'DEPLOYED'),
           description: String(v.description || ''),
           sourceUrl: v.sourceUrl ? String(v.sourceUrl) : null,
-          raw: v,
+          raw: toJson(v),
         },
         update: {
           hullNumber: v.hullNumber ? String(v.hullNumber) : null,
@@ -118,7 +119,7 @@ export async function processReferenceIngest(job: Job) {
           status: String(v.status || 'DEPLOYED'),
           description: String(v.description || ''),
           sourceUrl: v.sourceUrl ? String(v.sourceUrl) : null,
-          raw: v,
+          raw: toJson(v),
         },
       });
       vesselStored++;

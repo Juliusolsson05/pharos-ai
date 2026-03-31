@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchMirta, buildInstallations } from '../providers/mirta/index.js';
 
 const SOURCE = 'mirta';
@@ -31,14 +32,14 @@ export async function processMirtaIngest(job: Job) {
           isJointBase: s.isJointBase,
           lat: s.lat,
           lon: s.lon,
-          raw: s as unknown as Record<string, unknown>,
+          raw: toJson(s),
         },
         update: {
           siteName: s.siteName,
           operationalStatus: s.operationalStatus || null,
           lat: s.lat,
           lon: s.lon,
-          raw: s as unknown as Record<string, unknown>,
+          raw: toJson(s),
         },
       });
       stored++;

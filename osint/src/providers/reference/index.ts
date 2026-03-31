@@ -1,9 +1,7 @@
 import { readFileSync, readdirSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, '..', '..', '..', 'data', 'reference');
+const DATA_DIR = join(process.cwd(), 'data', 'reference');
 
 export function loadInstallations(): Record<string, unknown>[] {
   const dir = join(DATA_DIR, 'installations');

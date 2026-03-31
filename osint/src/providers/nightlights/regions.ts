@@ -1,4 +1,5 @@
-export type TileCoord = { z: number; x: number; y: number };
+import type { TileCoord } from '../../lib/tile-math.js';
+import { tileBounds } from '../../lib/tile-math.js';
 
 type QualityTier = {
   name: string;
@@ -17,16 +18,6 @@ const TIERS: QualityTier[] = [
 ];
 
 const DEFAULT_QUALITY = { region: 'world', quality: 60 };
-
-function tileBounds(x: number, y: number, z: number) {
-  const n = 2 ** z;
-  const west = (x / n) * 360 - 180;
-  const east = ((x + 1) / n) * 360 - 180;
-  const north = (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n))) * 180) / Math.PI;
-  const south =
-    (Math.atan(Math.sinh(Math.PI * (1 - (2 * (y + 1)) / n))) * 180) / Math.PI;
-  return { south, north, west, east };
-}
 
 function intersects(
   a: { south: number; north: number; west: number; east: number },
@@ -50,26 +41,9 @@ export function getQualityForTile(coord: TileCoord): { region: string; quality: 
 }
 
 /**
- * Generate the full z8 tile grid (all 65,536 tiles).
- * Used as fallback when no tile mask is available.
- */
-export function getAllTiles(z: number = 8): TileCoord[] {
-  const max = 2 ** z;
-  const tiles: TileCoord[] = [];
-  for (let x = 0; x < max; x++) {
-    for (let y = 0; y < max; y++) {
-      tiles.push({ z, x, y });
-    }
-  }
-  return tiles;
-}
-
-/**
  * Get tiles that the tile-mask pipeline marked as included (inhabited land).
- * Falls back to getAllTiles() if the tile_masks table hasn't been populated.
  */
 export async function getIncludedTiles(z: number = 8): Promise<TileCoord[]> {
-  // Lazy import to avoid circular deps at module load
   const { prisma } = await import('../../db.js');
 
   const masks = await prisma.tileMask.findMany({
@@ -78,9 +52,25 @@ export async function getIncludedTiles(z: number = 8): Promise<TileCoord[]> {
   });
 
   if (masks.length === 0) {
-    console.warn('[nightlights] No tile mask found — falling back to all tiles. Run: npm run seed -- --provider geodata/tile-mask');
-    return getAllTiles(z);
+    throw new Error('No tile mask found. Run: npm run seed -- --provider geodata/tile-mask');
   }
 
   return masks.map((m) => ({ z: m.z, x: m.x, y: m.y }));
 }
+
+export async function getLandTiles(z: number = 8): Promise<TileCoord[]> {
+  const { prisma } = await import('../../db.js');
+
+  const tiles = await prisma.landMaskTile.findMany({
+    where: { z, hasLand: true },
+    select: { z: true, x: true, y: true },
+  });
+
+  if (tiles.length === 0) {
+    throw new Error('No land mask found. Run: npm run seed -- --provider geodata/land-mask');
+  }
+
+  return tiles.map((tile) => ({ z: tile.z, x: tile.x, y: tile.y }));
+}
+
+export type { TileCoord };

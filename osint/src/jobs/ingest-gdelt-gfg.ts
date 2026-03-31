@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchLatestGfgUrl, downloadAndParse } from '../providers/gdelt-gfg/index.js';
 
 const SOURCE = 'gdelt-gfg';
@@ -52,7 +53,7 @@ export async function processGfgIngest(job: Job) {
           domain: new URL(l.fromUrl).hostname,
           url: l.toUrl,
           position: l.linkId,
-          raw: { ...l, fromUrl: l.fromUrl, linkPercent: l.linkPercent } as unknown as Record<string, unknown>,
+          raw: toJson({ ...l, fromUrl: l.fromUrl, linkPercent: l.linkPercent }),
         },
       });
       stored++;

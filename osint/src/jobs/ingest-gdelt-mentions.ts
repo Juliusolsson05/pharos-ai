@@ -1,6 +1,7 @@
 import type { Job } from 'bullmq';
 
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchLatestMentionsUrl, downloadAndParse } from '../providers/gdelt-mentions/index.js';
 
 const SOURCE = 'gdelt-mentions';
@@ -52,7 +53,7 @@ export async function processMentionsIngest(job: Job) {
           mentionDocLen: r.mentionDocLen,
           mentionDocTone: r.mentionDocTone,
           mentionDocTranslationInfo: r.mentionDocTranslationInfo || null,
-          raw: r as unknown as Record<string, unknown>,
+          raw: toJson(r),
         },
       });
       stored++;

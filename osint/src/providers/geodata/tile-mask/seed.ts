@@ -7,7 +7,7 @@ const BATCH_SIZE = 500;
 
 /**
  * Compute tile masks from the three independent geodata tables.
- * Requires coastlines, settlements, and populated-places to be seeded first.
+ * Requires land-mask, settlements, and populated-places to be seeded first.
  * This is pure computation — no downloads, no S3 uploads.
  */
 export async function seed(_opts: { from?: string; to?: string; delay?: number }): Promise<void> {

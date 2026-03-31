@@ -110,6 +110,8 @@ osint/
     │   ├── safecast/           # Radiation monitoring
     │   ├── submarine-cables/   # TeleGeography cable routes
     │   ├── cloudflare-radar/   # Internet outage detection
+    │   ├── nightlights/        # NASA Black Marble tiles + display pipeline
+    │   ├── geodata/            # land-mask / settlements / populated places / tile-mask
     │   └── reference/          # Curated JSON reference data
     ├── streams/                # Persistent connections (WebSocket, etc.)
     │   ├── types.ts            # StreamHandle interface
@@ -130,6 +132,9 @@ osint/
     │   ├── ingest-safecast.ts
     │   ├── ingest-submarine-cables.ts
     │   ├── ingest-cloudflare-radar.ts
+    │   ├── ingest-nightlights.ts
+    │   ├── ingest-nightlights-snapshot.ts
+    │   ├── ingest-tile-mask.ts
     │   ├── ingest-reference.ts
     │   └── scheduler.ts
     └── lib/

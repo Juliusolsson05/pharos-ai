@@ -2,6 +2,7 @@ import type { Job } from 'bullmq';
 
 import { config } from '../config.js';
 import { prisma } from '../db.js';
+import { toJson } from '../lib/json.js';
 import { fetchGpsJam, buildThreatZones } from '../providers/gpsjam/index.js';
 
 const SOURCE = 'gpsjam';
@@ -22,9 +23,9 @@ export async function processGpsjamIngest(job: Job) {
         where: { h3: h.h3 },
         create: {
           h3: h.h3, lat: h.lat, lon: h.lon, level: h.level, region: h.region || null,
-          raw: h as unknown as Record<string, unknown>,
+          raw: toJson(h),
         },
-        update: { level: h.level, raw: h as unknown as Record<string, unknown>, seenAt: new Date() },
+        update: { level: h.level, raw: toJson(h), seenAt: new Date() },
       });
       stored++;
     } catch { /* dedupe */ }

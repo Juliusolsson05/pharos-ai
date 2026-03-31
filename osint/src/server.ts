@@ -26,7 +26,7 @@ import { processEonetIngest } from './jobs/ingest-eonet.js';
 import { processSafecastIngest } from './jobs/ingest-safecast.js';
 import { processSubmarineCablesIngest } from './jobs/ingest-submarine-cables.js';
 import { processCloudflareRadarIngest } from './jobs/ingest-cloudflare-radar.js';
-import { processNightlightsIngest } from './jobs/ingest-nightlights.js';
+import { processNightlightsDailyIngest } from './jobs/ingest-nightlights.js';
 import { processNightlightsSnapshotIngest } from './jobs/ingest-nightlights-snapshot.js';
 import { processTileMaskIngest } from './jobs/ingest-tile-mask.js';
 import { processReferenceIngest } from './jobs/ingest-reference.js';
@@ -84,7 +84,7 @@ const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>
   safecast: processSafecastIngest,
   'submarine-cables': processSubmarineCablesIngest,
   'cloudflare-radar': processCloudflareRadarIngest,
-  nightlights: processNightlightsIngest,
+  'nightlights-daily': processNightlightsDailyIngest,
   'nightlights-snapshot': processNightlightsSnapshotIngest,
   'tile-mask': processTileMaskIngest,
   reference: processReferenceIngest,

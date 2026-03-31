@@ -1,5 +1,7 @@
 import AdmZip from 'adm-zip';
 
+import { tileBounds } from '../../../lib/tile-math.js';
+
 const GHSL_SMOD_URL =
   'https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_SMOD_GLOBE_R2023A/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss/V2-0/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0.zip';
 const FETCH_TIMEOUT = 180_000;
@@ -44,7 +46,7 @@ export async function downloadGhsl(): Promise<GhslRaster> {
   console.log(`[settlements] Extracted GeoTIFF (${(tifBuffer.length / 1024 / 1024).toFixed(0)} MB)`);
 
   const { fromArrayBuffer: parseGeoTiff } = await import('geotiff');
-  const arrayBuf = tifBuffer.buffer.slice(tifBuffer.byteOffset, tifBuffer.byteOffset + tifBuffer.byteLength);
+  const arrayBuf = tifBuffer.buffer.slice(tifBuffer.byteOffset, tifBuffer.byteOffset + tifBuffer.byteLength) as ArrayBuffer;
   const tiff = await parseGeoTiff(arrayBuf);
   const image = await tiff.getImage();
   const width = image.getWidth();
@@ -80,11 +82,7 @@ export function computeTileStats(
 
   for (let tx = 0; tx < n; tx++) {
     for (let ty = 0; ty < n; ty++) {
-      // Tile bounds in degrees (Web Mercator tile → WGS84 lat/lon)
-      const tileWest = (tx / n) * 360 - 180;
-      const tileEast = ((tx + 1) / n) * 360 - 180;
-      const tileNorth = (Math.atan(Math.sinh(Math.PI * (1 - (2 * ty) / n))) * 180) / Math.PI;
-      const tileSouth = (Math.atan(Math.sinh(Math.PI * (1 - (2 * (ty + 1)) / n))) * 180) / Math.PI;
+      const { west: tileWest, east: tileEast, north: tileNorth, south: tileSouth } = tileBounds(tx, ty, z);
 
       // Convert to raster pixel coords (WGS84: lon -180..180, lat 90..-90)
       const pxLeft = Math.max(0, Math.min(width - 1, Math.floor(((tileWest + 180) / 360) * width)));

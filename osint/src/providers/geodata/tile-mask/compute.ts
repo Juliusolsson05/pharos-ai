@@ -1,5 +1,8 @@
+import { latLonToTile } from '../../../lib/tile-math.js';
 import { prisma } from '../../../db.js';
 import { getQualityForTile } from '../../nightlights/regions.js';
+
+const MIN_SETTLEMENT_CLASS = 12;
 
 export type TileMaskRow = {
   z: number;
@@ -54,10 +57,8 @@ export async function computeMasksFromDb(
   const popIndex = new Set<string>();
   for (const p of places) {
     if (p.lat < -85 || p.lat > 85) continue;
-    const tx = Math.floor(((p.lon + 180) / 360) * n);
-    const latRad = (p.lat * Math.PI) / 180;
-    const ty = Math.floor(((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n);
-    popIndex.add(`${tx},${ty}`);
+    const tile = latLonToTile(p.lat, p.lon, z);
+    popIndex.add(`${tile.x},${tile.y}`);
   }
   console.log(`[tile-mask] Population index: ${popIndex.size} tiles with city points`);
 
@@ -81,7 +82,7 @@ export async function computeMasksFromDb(
       const isStrategic = strategicSet.has(key);
 
       // Include: land AND (meaningful settlement OR city OR strategic)
-      const include = hasLand && (maxSettlementClass >= 12 || hasPopulation || isStrategic);
+      const include = hasLand && (maxSettlementClass >= MIN_SETTLEMENT_CLASS || hasPopulation || isStrategic);
 
       const { region } = getQualityForTile({ z, x, y });
 
