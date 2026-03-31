@@ -525,3 +525,168 @@ model ReferenceVessel {
   @@schema("osint")
   @@map("reference_vessels")
 }
+
+// ─── GSHHG coastline polygons (support data) ───────────────
+// Source: https://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip
+// 32,830 polygons at intermediate resolution
+
+model CoastlinePolygon {
+  id          String   @id @default(cuid())
+  gshhgId     String   @unique                 // GSHHG polygon ID (string in source)
+  level       Int                              // 1=land, 2=lake, 3=island-in-lake, 4=pond
+  source      String?                          // data source attribution
+  parentId    Int?
+  siblingId   Int?
+  area        Float                            // polygon area (km²)
+  south       Float
+  north       Float
+  west        Float
+  east        Float
+  geometry    Json                             // GeoJSON Polygon
+  raw         Json
+  ingestedAt  DateTime @default(now())
+
+  @@index([level])
+  @@index([south, north])
+  @@schema("osint")
+  @@map("coastline_polygons")
+}
+
+// ─── Natural Earth populated places (support data) ──────────
+// Source: https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places_simple.zip
+// 7,342 places globally
+
+model PopulatedPlace {
+  id           String   @id @default(cuid())
+  neId         BigInt   @unique                // Natural Earth ID
+  name         String
+  nameAscii    String?
+  lat          Float
+  lon          Float
+  popMax       Int?                            // maximum population estimate
+  popMin       Int?                            // minimum population estimate
+  scalerank    Int?                            // 0-10, lower = more important
+  labelrank    Int?
+  featureClass String?                         // Admin-0 capital, populated place, etc.
+  countryName  String?                         // adm0name
+  countryCode  String?                         // iso_a2
+  sovName      String?                         // sovereign state
+  adm1Name     String?                         // admin-1 (state/province)
+  worldcity    Boolean  @default(false)
+  megacity     Boolean  @default(false)
+  raw          Json
+  ingestedAt   DateTime @default(now())
+
+  @@index([lat, lon])
+  @@index([popMax])
+  @@index([countryCode])
+  @@index([scalerank])
+  @@schema("osint")
+  @@map("populated_places")
+}
+
+// ─── Land mask (NASA GIBS OSM Land Water Map) ───────────────
+// Source: OSM_Land_Water_Map WMTS layer, pixel-accurate land/water
+
+model LandMaskTile {
+  id          String   @id @default(cuid())
+  z           Int
+  x           Int
+  y           Int
+  hasLand     Boolean
+  landPct     Float
+  raw         Json
+  computedAt  DateTime @default(now())
+
+  @@unique([z, x, y])
+  @@index([hasLand])
+  @@schema("osint")
+  @@map("land_mask_tiles")
+}
+
+// ─── GHSL settlement classification (support data) ──────────
+// Source: JRC GHS-SMOD R2023A (WGS84 30 arc-second raster)
+// Values: 10=water, 11=very low density, 12=low density, 13=rural cluster,
+//         21=suburban, 22=semi-dense, 23=dense, 30=urban centre
+
+model SettlementTile {
+  id              String   @id @default(cuid())
+  z               Int
+  x               Int
+  y               Int
+  hasSettlement   Boolean                          // any pixel >= 11 in tile
+  maxClass        Int                              // highest settlement class found
+  settlementPct   Float                            // % of tile pixels with settlement
+  raw             Json                             // class distribution histogram
+  computedAt      DateTime @default(now())
+
+  @@unique([z, x, y])
+  @@index([hasSettlement])
+  @@index([maxClass])
+  @@schema("osint")
+  @@map("settlement_tiles")
+}
+
+// ─── Tile mask (derived from coastlines + places + settlement) ─
+
+model TileMask {
+  id              String   @id @default(cuid())
+  z               Int
+  x               Int
+  y               Int
+  hasLand         Boolean
+  hasSettlement   Boolean  @default(false)
+  hasPopulation   Boolean
+  isStrategic     Boolean  @default(false)
+  include         Boolean
+  landCoveragePct Float?
+  qualityTier     String
+  source          String   @default("gshhg+natearth+ghsl")
+  computedAt      DateTime @default(now())
+
+  @@unique([z, x, y])
+  @@index([include])
+  @@index([qualityTier])
+  @@schema("osint")
+  @@map("tile_masks")
+}
+
+// ─── Nighttime lights (NASA Black Marble) ───────────────────
+
+model NightlightTile {
+  id          String   @id @default(cuid())
+  date        String
+  z           Int
+  x           Int
+  y           Int
+  region      String
+  s3Key       String
+  mlPixels    Bytes
+  avgRadiance Float
+  ingestedAt  DateTime @default(now())
+
+  @@unique([date, z, x, y])
+  @@index([date])
+  @@index([region])
+  @@index([avgRadiance])
+  @@schema("osint")
+  @@map("nightlight_tiles")
+}
+
+// ─── Nightlight full-land snapshots (bi-weekly) ─────────────
+// Display-only tiles for ALL land — fills in the map background
+
+model NightlightSnapshot {
+  id          String   @id @default(cuid())
+  date        String
+  z           Int
+  x           Int
+  y           Int
+  s3Key       String
+  ingestedAt  DateTime @default(now())
+
+  @@unique([date, z, x, y])
+  @@index([date])
+  @@schema("osint")
+  @@map("nightlight_snapshots")
+}

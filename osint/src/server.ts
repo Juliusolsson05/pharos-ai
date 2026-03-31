@@ -26,12 +26,17 @@ import { processEonetIngest } from './jobs/ingest-eonet.js';
 import { processSafecastIngest } from './jobs/ingest-safecast.js';
 import { processSubmarineCablesIngest } from './jobs/ingest-submarine-cables.js';
 import { processCloudflareRadarIngest } from './jobs/ingest-cloudflare-radar.js';
+import { processNightlightsIngest } from './jobs/ingest-nightlights.js';
+import { processNightlightsSnapshotIngest } from './jobs/ingest-nightlights-snapshot.js';
+import { processTileMaskIngest } from './jobs/ingest-tile-mask.js';
 import { processReferenceIngest } from './jobs/ingest-reference.js';
 import { startStreams, stopStreams } from './streams/index.js';
+import { ensureBucket } from './lib/storage.js';
 
 import healthRouter from './api/health.js';
 import mapDataRouter from './api/map-data.js';
 import sourcesRouter from './api/sources.js';
+import nightlightTilesRouter from './api/nightlight-tiles.js';
 
 const app = express();
 app.use(express.json());
@@ -57,6 +62,7 @@ app.use('/admin/queues', serverAdapter.getRouter());
 app.use(healthRouter);
 app.use(mapDataRouter);
 app.use(sourcesRouter);
+app.use(nightlightTilesRouter);
 
 // BullMQ worker
 const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>> = {
@@ -78,6 +84,9 @@ const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>
   safecast: processSafecastIngest,
   'submarine-cables': processSubmarineCablesIngest,
   'cloudflare-radar': processCloudflareRadarIngest,
+  nightlights: processNightlightsIngest,
+  'nightlights-snapshot': processNightlightsSnapshotIngest,
+  'tile-mask': processTileMaskIngest,
   reference: processReferenceIngest,
 };
 
@@ -102,6 +111,7 @@ worker.on('error', (err) => {
 // Startup
 async function start() {
   await prisma.$executeRawUnsafe('CREATE SCHEMA IF NOT EXISTS osint');
+  await ensureBucket(config.nightlights.tileBucket);
   await registerJobs();
 
   // Start persistent streams (WebSocket connections, etc.)

@@ -29,6 +29,8 @@ const JOBS: JobDef[] = [
   { name: 'safecast',  interval: 2 * 60 * 60 * 1000,       enabled: true },
   { name: 'submarine-cables', interval: 7 * 24 * 60 * 60 * 1000, enabled: true },
   { name: 'cloudflare-radar', interval: config.cloudflareRadar.pollInterval, enabled: !!config.cloudflareRadar.token },
+  { name: 'nightlights', interval: config.nightlights.pollInterval, enabled: true },
+  { name: 'nightlights-snapshot', interval: config.nightlights.snapshotInterval, enabled: true },
   { name: 'reference', interval: 24 * 60 * 60 * 1000,      enabled: true },
 ];
 

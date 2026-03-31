@@ -64,4 +64,16 @@ export const config = {
     token: process.env.CLOUDFLARE_API_TOKEN || '',
     pollInterval: 30 * 60 * 1000, // 30 min
   },
+
+  nightlights: {
+    gibsBaseUrl: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_GapFilled_BRDF_Corrected_DayNightBand_Radiance/default',
+    tileMatrixSet: 'GoogleMapsCompatible_Level8',
+    zoomLevel: 8,
+    pollInterval: 24 * 60 * 60 * 1000, // 24h
+    snapshotInterval: 14 * 24 * 60 * 60 * 1000, // 14 days
+    tileBucket: process.env.S3_TILE_BUCKET || 'osint-tiles',
+    fetchConcurrency: 25,
+    processConcurrency: 3,
+    backfillStartDate: '2026-02-27',
+  },
 } as const;
