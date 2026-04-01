@@ -23,28 +23,6 @@ model RawIngest {
   @@map("raw_ingests")
 }
 
-model MapFeature {
-  id            String    @id @default(cuid())
-  featureType   String
-  sourceEventId String?
-  actor         String?
-  priority      String
-  category      String
-  type          String
-  status        String?
-  timestamp     DateTime?
-  geometry      Json
-  properties    Json
-  source        String
-  createdAt     DateTime  @default(now())
-
-  @@index([featureType])
-  @@index([timestamp])
-  @@index([source])
-  @@schema("osint")
-  @@map("map_features")
-}
-
 model SourceSync {
   id            String    @id @default(cuid())
   source        String    @unique
@@ -57,6 +35,107 @@ model SourceSync {
 
   @@schema("osint")
   @@map("source_syncs")
+}
+
+// ─── Cloudflare Radar — internet outages ────────────────────
+
+model CloudflareRadarOutage {
+  id          String   @id @default(cuid())
+  outageId    String   @unique
+  asn         Int?
+  asnName     String?
+  asnCountry  String
+  startDate   String
+  endDate     String?
+  scope       String
+  description String
+  linkedUrl   String?
+  lat         Float?
+  lon         Float?
+  raw         Json
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  @@index([asnCountry])
+  @@index([scope])
+  @@index([lastSeenAt])
+  @@schema("osint")
+  @@map("cloudflare_radar_outages")
+}
+
+// ─── EONET / GDACS — natural disaster events ───────────────
+
+model EonetEvent {
+  id         String   @id @default(cuid())
+  eventId    String
+  origin     String
+  title      String
+  category   String
+  lat        Float
+  lon        Float
+  eventDate  String
+  sourceUrl  String?
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@unique([origin, eventId])
+  @@index([origin])
+  @@index([category])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("eonet_events")
+}
+
+// ─── Safecast — radiation readings ──────────────────────────
+
+model SafecastReading {
+  id           String   @id @default(cuid())
+  readingId    Int      @unique
+  latitude     Float
+  longitude    Float
+  value        Float
+  unit         String
+  capturedAt   String
+  deviceId     Int?
+  locationName String?
+  raw          Json
+  ingestedAt   DateTime @default(now())
+
+  @@index([capturedAt])
+  @@index([value])
+  @@index([latitude, longitude])
+  @@schema("osint")
+  @@map("safecast_readings")
+}
+
+// ─── Submarine cables — routes and landing points ───────────
+
+model SubmarineCable {
+  id         String   @id @default(cuid())
+  cableId    String   @unique
+  name       String
+  color      String?
+  geometry   Json
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@index([name])
+  @@schema("osint")
+  @@map("submarine_cables")
+}
+
+model SubmarineLandingPoint {
+  id             String   @id @default(cuid())
+  landingPointId String   @unique
+  name           String
+  lat            Float
+  lon            Float
+  raw            Json
+  ingestedAt     DateTime @default(now())
+
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("submarine_landing_points")
 }
 
 // ─── GDELT Mentions — links events to articles ─────────────
@@ -340,6 +419,34 @@ model OpenskySighting {
   @@map("opensky_sightings")
 }
 
+model OpenskySightingHistory {
+  id             String   @id @default(cuid())
+  icao24         String
+  seenAt         DateTime
+  callsign       String?
+  originCountry  String?
+  lat            Float
+  lon            Float
+  baroAltitude   Float?
+  geoAltitude    Float?
+  onGround       Boolean  @default(false)
+  velocity       Float?
+  heading        Float?
+  verticalRate   Float?
+  squawk         String?
+  positionSource Int?
+  category       Int?
+  milOperator    String?
+  milCountry     String?
+  raw            Json
+
+  @@unique([icao24, seenAt])
+  @@index([seenAt])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("opensky_sighting_history")
+}
+
 // ─── USGS earthquakes ───────────────────────────────────────
 
 model UsgsQuake {
@@ -412,6 +519,29 @@ model GpsjamHex {
   @@index([lat, lon])
   @@schema("osint")
   @@map("gpsjam_hexes")
+}
+
+model GpsjamHexHistory {
+  id            String   @id @default(cuid())
+  h3            String
+  seenAt        DateTime
+  lat           Float
+  lon           Float
+  level         String
+  region        String?
+  npAvg         Float?
+  pct           Float?
+  bad           Int?
+  total         Int?
+  sampleCount   Int?
+  aircraftCount Int?
+  raw           Json
+
+  @@unique([h3, seenAt])
+  @@index([seenAt])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("gpsjam_hex_history")
 }
 
 // ─── MIRTA — US DoD installations (ArcGIS) ──────────────────
@@ -645,6 +775,171 @@ model NightlightTile {
   @@index([avgRadiance])
   @@schema("osint")
   @@map("nightlight_tiles")
+}
+
+// ─── World Port Index (NGA Pub 150) ─────────────────────────
+
+model Port {
+  id              String   @id @default(cuid())
+  wpiNumber       Int      @unique
+  name            String
+  alternateName   String?
+  countryCode     String
+  regionName      String?
+  worldWaterBody  String?
+  unLocode        String?
+  lat             Float
+  lon             Float
+  harborSize      String?
+  harborType      String?
+  harborUse       String?
+  shelterAfforded String?
+  maxVesselLength Int?
+  maxVesselDraft  Int?
+  channelDepth    Int?
+  anchorageDepth  Int?
+  cargoPierDepth  Int?
+  oilTerminalDepth Int?
+  repairCapability String?
+  drydock          String?
+  railway          String?
+  hasOilTerminal   Boolean  @default(false)
+  hasLngTerminal   Boolean  @default(false)
+  hasContainer     Boolean  @default(false)
+  hasBulk          Boolean  @default(false)
+  hasCranes        Boolean  @default(false)
+  raw             Json
+  ingestedAt      DateTime @default(now())
+
+  @@index([countryCode])
+  @@index([harborSize])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("ports")
+}
+
+// ─── Global Power Plant Database (WRI) ──────────────────────
+
+model PowerPlant {
+  id                String   @id @default(cuid())
+  gppdIdnr          String   @unique
+  name              String
+  countryCode       String
+  countryLong       String
+  lat               Float
+  lon               Float
+  capacityMw        Float
+  primaryFuel       String
+  otherFuel1        String?
+  otherFuel2        String?
+  otherFuel3        String?
+  commissioningYear Int?
+  owner             String?
+  sourceUrl         String?
+  estimatedGwh      Float?
+  raw               Json
+  ingestedAt        DateTime @default(now())
+
+  @@index([countryCode])
+  @@index([primaryFuel])
+  @@index([capacityMw])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("power_plants")
+}
+
+// ─── OGIM: Oil & Gas Infrastructure (EDF/Zenodo) ───────────
+
+model OgimFacility {
+  id            String   @id @default(cuid())
+  ogimId        Int      @unique
+  category      String
+  region        String?
+  country       String
+  stateProvince String?
+  onOffshore    String
+  name          String?
+  facId         String?
+  facType       String?
+  facStatus     String?
+  ogimStatus    String?
+  operator      String?
+  installDate   String?
+  commodity     String?
+  lat           Float
+  lon           Float
+  // Capacity fields (null = N/A or -999)
+  liqCapacityBpd    Float?
+  liqThroughputBpd  Float?
+  gasCapacityMmcfd  Float?
+  gasThroughputMmcfd Float?
+  numStorageTanks   Int?
+  numComprUnits     Int?
+  siteHp            Float?
+  // Flaring-specific
+  flareYear         Int?
+  flareTempK        Int?
+  gasFlaredMmcf     Float?
+  flareSegmentType  String?
+  raw               Json
+  ingestedAt        DateTime @default(now())
+
+  @@index([category])
+  @@index([country])
+  @@index([region])
+  @@index([ogimStatus])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("ogim_facilities")
+}
+
+model OgimPipeline {
+  id            String   @id @default(cuid())
+  ogimId        Int      @unique
+  region        String?
+  country       String
+  stateProvince String?
+  onOffshore    String
+  name          String?
+  facType       String?
+  ogimStatus    String?
+  operator      String?
+  commodity     String?
+  diameterMm    Float?
+  lengthKm      Float
+  material      String?
+  liqCapacityBpd    Float?
+  gasThroughputMmcfd Float?
+  gasCapacityMmcfd  Float?
+  geometry      Json
+  raw           Json
+  ingestedAt    DateTime @default(now())
+
+  @@index([country])
+  @@index([region])
+  @@index([lengthKm])
+  @@schema("osint")
+  @@map("ogim_pipelines")
+}
+
+model OgimBasin {
+  id            String   @id @default(cuid())
+  ogimId        Int      @unique
+  category      String
+  region        String?
+  country       String
+  onOffshore    String
+  name          String?
+  reservoirType String?
+  areaKm2       Float
+  geometry      Json
+  raw           Json
+  ingestedAt    DateTime @default(now())
+
+  @@index([category])
+  @@index([country])
+  @@schema("osint")
+  @@map("ogim_basins")
 }
 
 // ─── Nightlight full-land snapshots (bi-weekly) ─────────────
