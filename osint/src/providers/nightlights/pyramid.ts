@@ -62,6 +62,8 @@ export async function buildPyramid({
   concurrency = 5,
   log,
 }: BuildPyramidOptions) {
+  // We only build parents for tiles that actually exist at z8. That keeps the pyramid
+  // sparse and avoids manufacturing empty ocean/background tiles just for lower zooms.
   let current = storedTiles.filter((tile) => tile.z === 8);
   const levelCounts: Record<number, number> = {};
 

@@ -44,6 +44,8 @@ export async function fetchLandMaskParentTile(coord: TileCoord): Promise<Buffer>
     return cached;
   }
 
+  // One z4 land-mask tile is reused by 256 child z8 nightlight tiles, so caching
+  // the in-flight fetch avoids hammering GIBS during dense daily runs.
   const pending = (async () => {
     const url = landMaskTileUrl(coord);
     const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });

@@ -152,34 +152,6 @@ async function flush() {
     }
   }
 
-  // Derive map features
-  await prisma.mapFeature.deleteMany({ where: { source: SOURCE } });
-
-  const features = batch.map((v) => ({
-    featureType: 'ASSET',
-    sourceEventId: `ais-${v.mmsi}`,
-    actor: classifyActor(v),
-    priority: 'P3',
-    category: 'MARITIME',
-    type: classifyType(v.shipType),
-    status: v.speed > 0.5 ? 'ACTIVE' : 'ANCHORED',
-    timestamp: now,
-    geometry: { position: [v.lon, v.lat] },
-    properties: {
-      name: v.shipName || v.mmsi,
-      mmsi: v.mmsi,
-      speed: v.speed,
-      heading: v.heading,
-      destination: v.destination,
-      shipType: v.shipType,
-    },
-    source: SOURCE,
-  }));
-
-  if (features.length > 0) {
-    await prisma.mapFeature.createMany({ data: features });
-  }
-
   // Update source sync
   await prisma.sourceSync.upsert({
     where: { source: SOURCE },
@@ -188,28 +160,6 @@ async function flush() {
   });
 
   console.log(`[ais] Flush: ${stored} vessels written`);
-}
-
-// --- Ship type classification ---
-
-// AIS ship type codes: https://api.vtexplorer.com/docs/ref-aistypes.html
-function classifyType(shipType: number): string {
-  if (shipType >= 60 && shipType <= 69) return 'PASSENGER';
-  if (shipType >= 70 && shipType <= 79) return 'CARGO';
-  if (shipType >= 80 && shipType <= 89) return 'TANKER';
-  if (shipType >= 40 && shipType <= 49) return 'HIGH_SPEED';
-  if (shipType >= 50 && shipType <= 59) return 'PILOT_VESSEL';
-  if (shipType === 35) return 'MILITARY';
-  if (shipType >= 30 && shipType <= 39) return 'FISHING';
-  return 'OTHER';
-}
-
-function classifyActor(v: VesselPosition): string {
-  const name = v.shipName.toUpperCase();
-  if (name.includes('NATO') || name.includes('WARSHIP')) return 'NATO';
-  if (name.includes('NAVY') || name.includes('MILITARY')) return 'MILITARY';
-  if (v.shipType === 35) return 'MILITARY';
-  return v.shipName || v.mmsi;
 }
 
 // --- Stream handle ---

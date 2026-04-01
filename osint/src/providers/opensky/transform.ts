@@ -47,7 +47,9 @@ export function buildAssets(flights: MilitaryFlight[]): Asset[] {
     actor: f.country,
     priority: 'P2' as const,
     category: 'INSTALLATION' as const,
-    type: 'AIR_BASE' as const, // using AIR_BASE for airborne assets
+    // The shared map contract has no aircraft asset type yet, so airborne military
+    // sightings are projected into AIR_BASE to stay compatible with the existing UI.
+    type: 'AIR_BASE' as const,
     status: 'ACTIVE' as const,
     name: `${f.callsign || f.icao24} (${f.operator.toUpperCase()})`,
     position: [f.lon, f.lat] as [number, number],

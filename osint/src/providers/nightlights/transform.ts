@@ -45,6 +45,9 @@ async function buildAlphaMask(maskTile: Buffer, coord: TileCoord) {
   const localX = coord.x % 16;
   const localY = coord.y % 16;
 
+  // The land/water layer is only fetched at z4. Each z4 tile covers a 16x16 block
+  // of z8 nightlight tiles, so we crop the matching child region and scale it back
+  // up to 256x256 to keep water transparent in the rendered output.
   const { data } = await sharp(maskTile)
     .grayscale()
     .extract({ left: localX * 16, top: localY * 16, width: 16, height: 16 })
@@ -63,6 +66,10 @@ async function buildAlphaMask(maskTile: Buffer, coord: TileCoord) {
 /**
  * Convert raw PNG tile to WebP display tile at the given quality.
  * Input and output are both 256x256.
+ *
+ * We keep a display-specific path separate from ML storage so the frontend gets
+ * an opinionated, water-masked visual tile while the analysis pipeline keeps the
+ * raw brightness signal instead of the styled colors.
  */
 export async function toDisplayTile({ png, coord, maskTile, quality }: DisplayTileInput): Promise<Buffer> {
   const [source, alpha] = await Promise.all([
@@ -94,6 +101,9 @@ export async function toDisplayTile({ png, coord, maskTile, quality }: DisplayTi
 /**
  * Convert raw PNG tile to a 32x32 grayscale ML array.
  * Returns the raw uint8 pixel buffer (1,024 bytes) and the average radiance.
+ *
+ * The ML representation is intentionally much smaller than the display tile so we
+ * can query long time ranges in Postgres without storing full-resolution imagery.
  */
 export async function toMlTile(png: Buffer): Promise<{ pixels: Buffer; avgRadiance: number }> {
   const pixels = await sharp(png)

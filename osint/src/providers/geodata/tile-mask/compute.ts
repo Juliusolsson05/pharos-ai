@@ -2,6 +2,9 @@ import { latLonToTile } from '../../../lib/tile-math.js';
 import { prisma } from '../../../db.js';
 import { getQualityForTile } from '../../nightlights/regions.js';
 
+// Class 11 is extremely sparse rural coverage and explodes the tile count without
+// adding much map value. Starting at 12 keeps the daily nightlights run focused on
+// inhabited or strategically relevant land instead of fetching broad empty terrain.
 const MIN_SETTLEMENT_CLASS = 12;
 
 export type TileMaskRow = {
@@ -81,7 +84,8 @@ export async function computeMasksFromDb(
       const hasPopulation = popIndex.has(key);
       const isStrategic = strategicSet.has(key);
 
-      // Include: land AND (meaningful settlement OR city OR strategic)
+      // The include flag is intentionally strict because it directly controls how many
+      // daily tiles we fetch from NASA and later store in S3/Postgres.
       const include = hasLand && (maxSettlementClass >= MIN_SETTLEMENT_CLASS || hasPopulation || isStrategic);
 
       const { region } = getQualityForTile({ z, x, y });

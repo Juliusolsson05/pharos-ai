@@ -128,7 +128,8 @@ export async function getCompositeTile(requestedDate: string, coord: TileCoord):
   let tile: Buffer;
 
   if (dailyTile && snapshotTile) {
-    // Merge: snapshot as base, daily on top (daily has transparent gaps that snapshot fills)
+    // Daily tiles only exist for the included, high-signal mask. Compositing them over the
+    // broader snapshot keeps the focused daily product without leaving the rest of the map blank.
     const sharp = (await import('sharp')).default;
     tile = await sharp(snapshotTile)
       .composite([{ input: dailyTile }])
