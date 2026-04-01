@@ -1,5 +1,6 @@
 import { ingestQueue } from '../queue.js';
-import { config } from '../config.js';
+import { prisma } from '../db.js';
+import { SCHEDULED_JOBS } from './index.js';
 
 const JOB_OPTS = {
   attempts: 3,
@@ -8,34 +9,8 @@ const JOB_OPTS = {
   removeOnFail: 50,
 };
 
-type JobDef = { name: string; interval: number; enabled: boolean };
-
-const JOBS: JobDef[] = [
-  { name: 'gdelt',   interval: config.gdelt.pollInterval,   enabled: true },
-  { name: 'gdelt-gkg', interval: config.gdelt.pollInterval, enabled: true },
-  { name: 'gdelt-mentions', interval: config.gdelt.pollInterval, enabled: true },
-  { name: 'gdelt-gqg', interval: 5 * 60 * 1000, enabled: true },
-  { name: 'gdelt-gfg', interval: 60 * 60 * 1000, enabled: true },
-  { name: 'firms',   interval: config.firms.pollInterval,   enabled: !!config.firms.mapKey },
-  { name: 'overpass', interval: config.overpass.pollInterval, enabled: true },
-  { name: 'nga',     interval: config.nga.pollInterval,     enabled: true },
-  { name: 'usgs',    interval: config.usgs.pollInterval,    enabled: true },
-  { name: 'ucdp',    interval: config.ucdp.pollInterval,    enabled: true },
-  { name: 'opensky', interval: config.opensky.pollInterval, enabled: true },
-  { name: 'gpsjam',  interval: config.gpsjam.pollInterval,  enabled: !!config.gpsjam.apiKey },
-  { name: 'oref',    interval: config.oref.pollInterval,    enabled: true },
-  { name: 'mirta',     interval: 7 * 24 * 60 * 60 * 1000,   enabled: true },
-  { name: 'eonet',     interval: 2 * 60 * 60 * 1000,       enabled: true },
-  { name: 'safecast',  interval: 2 * 60 * 60 * 1000,       enabled: true },
-  { name: 'submarine-cables', interval: 7 * 24 * 60 * 60 * 1000, enabled: true },
-  { name: 'cloudflare-radar', interval: config.cloudflareRadar.pollInterval, enabled: !!config.cloudflareRadar.token },
-  { name: 'nightlights-daily', interval: config.nightlights.pollInterval, enabled: true },
-  { name: 'nightlights-snapshot', interval: config.nightlights.snapshotInterval, enabled: true },
-  { name: 'reference', interval: 24 * 60 * 60 * 1000,      enabled: true },
-];
-
 export async function registerJobs() {
-  const jobNames = new Set(JOBS.map((j) => j.name));
+  const jobNames = new Set(SCHEDULED_JOBS.map((j) => j.name));
 
   // Remove stale repeatable jobs we own
   const existing = await ingestQueue.getRepeatableJobs();
@@ -45,7 +20,11 @@ export async function registerJobs() {
     }
   }
 
-  for (const def of JOBS) {
+  // Check which sources ran recently so we skip unnecessary immediate runs
+  const syncs = await prisma.sourceSync.findMany({ select: { source: true, lastRunAt: true } });
+  const lastRunMap = new Map(syncs.map((s) => [s.source, s.lastRunAt]));
+
+  for (const def of SCHEDULED_JOBS) {
     if (!def.enabled) {
       console.log(`[scheduler] ${def.name} skipped (not configured)`);
       continue;
@@ -57,8 +36,15 @@ export async function registerJobs() {
       { repeat: { every: def.interval }, ...JOB_OPTS },
     );
 
-    // Immediate first run
-    await ingestQueue.add(def.name, { source: def.name }, JOB_OPTS);
+    // Only trigger an immediate run if the source hasn't run within its interval
+    const lastRun = lastRunMap.get(def.name);
+    const elapsed = lastRun ? Date.now() - lastRun.getTime() : Infinity;
+    if (elapsed > def.interval) {
+      await ingestQueue.add(def.name, { source: def.name }, JOB_OPTS);
+    } else {
+      const remaining = Math.round((def.interval - elapsed) / 60_000);
+      console.log(`[scheduler] ${def.name} skipped immediate run (ran ${Math.round(elapsed / 60_000)}min ago, next in ${remaining}min)`);
+    }
 
     const label = def.interval >= 3_600_000
       ? `${def.interval / 3_600_000}h`
