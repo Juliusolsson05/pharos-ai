@@ -58,8 +58,10 @@ npm run dev
 |-----|------|
 | `localhost:4000/admin/queues` | Bull Board — job dashboard (logs, progress, results) |
 | `localhost:4000/api/health` | Service health (DB, Redis, streams, all sources) |
-| `localhost:4000/api/map-data` | Map-ready data (same shape as main app) |
 | `localhost:4000/api/sources` | Per-source sync metadata |
+| `localhost:4000/api/providers/{provider}/features` | Provider-specific derived features |
+| `localhost:4000/api/providers/{provider}/raw` | Provider-specific raw typed rows |
+| `localhost:4000/api/providers/{provider}/meta` | Provider freshness and counts |
 | `localhost:9001` | MinIO console — browse raw archived files |
 
 ## Stack
@@ -84,7 +86,7 @@ osint/
 │   └── vessels/
 ├── docs/
 │   ├── JOBS.md                 # Job system practices
-│   └── providers/              # Spec doc per data source
+│   └── providers/              # One folder per source: spec doc + LICENSE.md
 └── src/
     ├── server.ts               # Express + BullMQ worker + stream startup
     ├── config.ts               # Env-driven config
@@ -93,8 +95,17 @@ osint/
     ├── types.ts                # Shared types (MapDataResponse, etc.)
     ├── api/
     │   ├── health.ts
-    │   ├── map-data.ts
-    │   └── sources.ts
+    │   ├── sources.ts
+    │   ├── nightlights/
+    │   │   └── index.ts
+    │   └── providers/
+    │       ├── index.ts
+    │       ├── provider-router.ts
+    │       ├── provider-helpers.ts
+    │       ├── gdelt/
+    │       ├── firms/
+    │       ├── opensky/
+    │       └── ...
     ├── providers/              # One folder per polling data source
     │   ├── gdelt/              # GDELT 2.0 conflict events (CSV exports)
     │   ├── firms/              # NASA FIRMS thermal hotspots
@@ -111,6 +122,8 @@ osint/
     │   ├── submarine-cables/   # TeleGeography cable routes
     │   ├── cloudflare-radar/   # Internet outage detection
     │   ├── nightlights/        # NASA Black Marble tiles + display pipeline
+    │   ├── ports/              # NGA World Port Index (Pub 150)
+    │   ├── power-plants/       # WRI Global Power Plant Database
     │   ├── geodata/            # land-mask / settlements / populated places / tile-mask
     │   └── reference/          # Curated JSON reference data
     ├── streams/                # Persistent connections (WebSocket, etc.)
@@ -134,6 +147,8 @@ osint/
     │   ├── ingest-cloudflare-radar.ts
     │   ├── ingest-nightlights.ts
     │   ├── ingest-nightlights-snapshot.ts
+    │   ├── ingest-ports.ts
+    │   ├── ingest-power-plants.ts
     │   ├── ingest-tile-mask.ts
     │   ├── ingest-reference.ts
     │   └── scheduler.ts
@@ -152,7 +167,26 @@ The service has two ingestion patterns:
 
 ## API envelope
 
-All responses use `{ ok, data }` / `{ ok: false, error: { code, message } }` — same pattern as the main app.
+All responses use `{ ok, data }` / `{ ok: false, error: { code, message } }`.
+
+## API structure
+
+The OSINT API is provider-first.
+
+- Service endpoints stay at the top level:
+  - `/api/health`
+  - `/api/sources`
+- Nightlights remains its own module under `/api/nightlights/...`
+- Source data is exposed under `/api/providers/{provider}/...`
+
+Each provider exposes up to three endpoints:
+
+- `GET /api/providers/{provider}/features`
+  - Derived features for that provider from `osint.map_features`
+- `GET /api/providers/{provider}/raw`
+  - Raw rows from the provider's typed table when available
+- `GET /api/providers/{provider}/meta`
+  - Counts plus `source_syncs` freshness metadata
 
 ## Current sources
 
@@ -174,6 +208,8 @@ All responses use `{ ok, data }` / `{ ok: false, error: { code, message } }` —
 | Safecast | Radiation monitoring | 2h | None | Active |
 | Submarine cables | Cable routes + landing points | 7 days | None | Active |
 | Cloudflare Radar | Internet outages (ME) | 30 min | Free CF token | Needs token |
+| NGA World Port Index | Global ports + terminals (3,800) | 30 days | None | Active |
+| WRI Power Plants | Global power plants (34,900) | 30 days | None | Active |
 | Reference data | Curated Iranian/Israeli/vessel data | 24h | None | Active |
 
 ### Persistent streams
@@ -184,7 +220,7 @@ All responses use `{ ok, data }` / `{ ok: false, error: { code, message } }` —
 
 ## Database
 
-Each provider has its own typed Prisma table (e.g. `gdelt_events`, `firms_detections`, `mirta_sites`, `ais_positions`). Every table includes a `raw Json` column preserving the full unmodified source payload. The shared `map_features` table holds derived features for the API.
+Each provider has its own typed Prisma table (e.g. `gdelt_events`, `firms_detections`, `mirta_sites`, `ais_positions`). Every table includes a `raw Json` column preserving the full unmodified source payload. Provider APIs expose either derived `map_features`, typed raw rows, or both depending on the source.
 
 See `prisma/schema.prisma` for the full schema.
 
@@ -192,7 +228,14 @@ See `prisma/schema.prisma` for the full schema.
 
 See `.env.example`. All have sensible local defaults in `config.ts`.
 
+## Adding a new provider
+
+Every provider must have a corresponding folder in `docs/providers/{name}/` with:
+
+1. **`{name}.md`** — spec doc covering the data source, API endpoints, fields, update frequency, and mapping to map features
+2. **`LICENSE.md`** — the data license for the source, verified from the provider's official website. Include the exact license name, attribution requirements, and links to the original terms. Do not guess or assume — if the license is unclear, document that explicitly.
+
 ## Docs
 
 - [Job system practices](docs/JOBS.md) — how to write job processors, use `job.log()`, progress tracking, retries
-- [Provider specs](docs/providers/) — per-source documentation of every field, endpoint, and mapping
+- [Provider specs](docs/providers/) — per-source documentation and data licenses for every provider

@@ -3,40 +3,20 @@ import express from 'express';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
+import type { Job } from 'bullmq';
 
 import { config } from './config.js';
 import { prisma } from './db.js';
 import { ingestQueue, createWorker } from './queue.js';
+import { PROCESSORS } from './jobs/index.js';
 import { registerJobs } from './jobs/scheduler.js';
-import { processGdeltIngest } from './jobs/ingest-gdelt.js';
-import { processGkgIngest } from './jobs/ingest-gdelt-gkg.js';
-import { processMentionsIngest } from './jobs/ingest-gdelt-mentions.js';
-import { processGqgIngest } from './jobs/ingest-gdelt-gqg.js';
-import { processGfgIngest } from './jobs/ingest-gdelt-gfg.js';
-import { processFirmsIngest } from './jobs/ingest-firms.js';
-import { processOverpassIngest } from './jobs/ingest-overpass.js';
-import { processNgaIngest } from './jobs/ingest-nga.js';
-import { processUsgsIngest } from './jobs/ingest-usgs.js';
-import { processUcdpIngest } from './jobs/ingest-ucdp.js';
-import { processOpenskyIngest } from './jobs/ingest-opensky.js';
-import { processGpsjamIngest } from './jobs/ingest-gpsjam.js';
-import { processOrefIngest } from './jobs/ingest-oref.js';
-import { processMirtaIngest } from './jobs/ingest-mirta.js';
-import { processEonetIngest } from './jobs/ingest-eonet.js';
-import { processSafecastIngest } from './jobs/ingest-safecast.js';
-import { processSubmarineCablesIngest } from './jobs/ingest-submarine-cables.js';
-import { processCloudflareRadarIngest } from './jobs/ingest-cloudflare-radar.js';
-import { processNightlightsDailyIngest } from './jobs/ingest-nightlights.js';
-import { processNightlightsSnapshotIngest } from './jobs/ingest-nightlights-snapshot.js';
-import { processTileMaskIngest } from './jobs/ingest-tile-mask.js';
-import { processReferenceIngest } from './jobs/ingest-reference.js';
 import { startStreams, stopStreams } from './streams/index.js';
 import { ensureBucket } from './lib/storage.js';
+import { registerProviderRoutes } from './api/providers/index.js';
 
 import healthRouter from './api/health.js';
-import mapDataRouter from './api/map-data.js';
+import nightlightsRouter from './api/nightlights/index.js';
 import sourcesRouter from './api/sources.js';
-import nightlightTilesRouter from './api/nightlight-tiles.js';
 
 const app = express();
 app.use(express.json());
@@ -60,38 +40,13 @@ app.use('/admin/queues', serverAdapter.getRouter());
 
 // Routes
 app.use(healthRouter);
-app.use(mapDataRouter);
 app.use(sourcesRouter);
-app.use(nightlightTilesRouter);
+app.use(nightlightsRouter);
+registerProviderRoutes(app);
 
 // BullMQ worker
-const processors: Record<string, (job: import('bullmq').Job) => Promise<unknown>> = {
-  gdelt: processGdeltIngest,
-  'gdelt-gkg': processGkgIngest,
-  'gdelt-mentions': processMentionsIngest,
-  'gdelt-gqg': processGqgIngest,
-  'gdelt-gfg': processGfgIngest,
-  firms: processFirmsIngest,
-  overpass: processOverpassIngest,
-  nga: processNgaIngest,
-  usgs: processUsgsIngest,
-  ucdp: processUcdpIngest,
-  opensky: processOpenskyIngest,
-  gpsjam: processGpsjamIngest,
-  oref: processOrefIngest,
-  mirta: processMirtaIngest,
-  eonet: processEonetIngest,
-  safecast: processSafecastIngest,
-  'submarine-cables': processSubmarineCablesIngest,
-  'cloudflare-radar': processCloudflareRadarIngest,
-  'nightlights-daily': processNightlightsDailyIngest,
-  'nightlights-snapshot': processNightlightsSnapshotIngest,
-  'tile-mask': processTileMaskIngest,
-  reference: processReferenceIngest,
-};
-
 const worker = createWorker(async (job) => {
-  const fn = processors[job.name];
+  const fn = PROCESSORS[job.name] as ((job: Job) => Promise<unknown>) | undefined;
   if (!fn) throw new Error(`Unknown job name: ${job.name}`);
   return fn(job);
 });
