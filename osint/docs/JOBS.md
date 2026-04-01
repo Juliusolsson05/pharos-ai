@@ -202,7 +202,7 @@ Available at `http://localhost:4000/admin/queues`. Shows:
 
 ### Raw data rule
 
-Each provider's typed table must contain a `raw Json` column with **everything** the source gives us, even fields we don't currently use. The transform layer picks what it needs for `map_features`, but the raw data is preserved. This lets us:
+Each provider's typed table must contain a `raw Json` column with **everything** the source gives us, even fields we don't currently use. The API and downstream transforms pick what they need from those typed tables, but the raw data is preserved. This lets us:
 - Re-process historical data when we add new map feature types
 - Debug data quality issues by comparing raw vs transformed
 - Build new analytics without re-fetching from the source
