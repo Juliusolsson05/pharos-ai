@@ -26,7 +26,7 @@ const PORT_COLORS: Record<string, string> = {
 export function getAircraftIcon(affiliation: string): IconEntry {
   const key = affiliation.toLowerCase();
   const sidc = AIRCRAFT_SIDCS[key] || AIRCRAFT_SIDCS.unknown;
-  return getOrCreate(`ac-${key}`, sidc, { icon: false });
+  return getOrCreate(`ac-${key}`, sidc);
 }
 
 export function getVesselIcon(shipType: number | null | undefined, affiliation?: string): IconEntry {
@@ -39,7 +39,39 @@ export function getVesselIcon(shipType: number | null | undefined, affiliation?:
   if (shipType && shipType >= 70 && shipType <= 79) {
     return getOrCreate('vs-cargo', VESSEL_SIDCS.cargo);
   }
+  if (shipType && shipType >= 30 && shipType <= 39) {
+    return getOrCreate('vs-fishing', VESSEL_SIDCS.fishing);
+  }
   return getOrCreate('vs-neutral', VESSEL_SIDCS.neutral);
+}
+
+export function getReferenceVesselIcon(vesselType: string, affiliation: string): IconEntry {
+  const id = affiliation === 'HOSTILE' ? '06' : affiliation === 'FRIENDLY' ? '03' : '04';
+  const type = vesselType.toUpperCase();
+
+  if (type === 'CARRIER') {
+    const sidc = `10${id}3000001201000000`;
+    return getOrCreate(`vs-carrier-${id}`, sidc);
+  }
+  if (type === 'DESTROYER') {
+    const sidc = `10${id}3000001202030000`;
+    return getOrCreate(`vs-destroyer-${id}`, sidc);
+  }
+  if (type === 'FRIGATE') {
+    const sidc = `10${id}3000001202040000`;
+    return getOrCreate(`vs-frigate-${id}`, sidc);
+  }
+  if (type === 'AMPHIBIOUS') {
+    const sidc = `10${id}3000001203000000`;
+    return getOrCreate(`vs-amphibious-${id}`, sidc);
+  }
+  if (type === 'SUBMARINE') {
+    const sidc = `10${id}3500001100000000`;
+    return getOrCreate(`vs-submarine-${id}`, sidc);
+  }
+  // Fallback: generic military combatant
+  const sidc = `10${id}3000001200000000`;
+  return getOrCreate(`vs-combatant-${id}`, sidc);
 }
 
 export function getInstallationIcon(type: string, affiliation: string): IconEntry {
@@ -70,13 +102,17 @@ export function getUsgsIcon(): IconEntry {
 }
 
 export function getPortIcon(port: { hasOilTerminal: boolean; hasLngTerminal: boolean; hasContainer: boolean }): IconEntry {
+  if (port.hasOilTerminal) {
+    return getOrCreate('port-oil', installationSidc('NEUTRAL', INSTALLATION_ENTITIES.PETROLEUM_FACILITY));
+  }
+  if (port.hasLngTerminal) {
+    return getOrCreate('port-lng', installationSidc('NEUTRAL', INSTALLATION_ENTITIES.NATURAL_GAS));
+  }
+
   let color = PORT_COLORS.default;
   let key = 'port-default';
 
-  if (port.hasOilTerminal || port.hasLngTerminal) {
-    color = PORT_COLORS.oil;
-    key = 'port-oil';
-  } else if (port.hasContainer) {
+  if (port.hasContainer) {
     color = PORT_COLORS.container;
     key = 'port-container';
   }
