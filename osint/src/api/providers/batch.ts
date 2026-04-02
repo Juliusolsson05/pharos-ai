@@ -17,7 +17,7 @@ function parseBatchParams(query: Record<string, unknown>): BatchQuery[] {
 
   return raw.split(',').map((entry) => {
     const [provider, limitStr] = entry.split(':');
-    const limit = limitStr ? Math.min(Math.max(parseInt(limitStr, 10) || 100, 1), 500) : 100;
+    const limit = limitStr ? Math.max(parseInt(limitStr, 10) || 100, 1) : 100;
     return { provider: provider.trim(), limit };
   });
 }

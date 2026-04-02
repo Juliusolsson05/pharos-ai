@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'gpsjam',
     interval: config.gpsjam.pollInterval,
+    workload: 'standard',
     enabled: !!config.gpsjam.apiKey,
     processor: processGpsjamIngest,
   },

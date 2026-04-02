@@ -69,11 +69,18 @@ export const AIRCRAFT_SIDCS: Record<string, string> = {
 };
 
 export const VESSEL_SIDCS: Record<string, string> = {
-  military: '10033000001208000000',
-  tanker:   '10043000001401090000',
-  cargo:    '10043000001401010000',
-  neutral:  '10043000001401000000',
-  unknown:  '10013000001401000000',
+  military:  '10033000001200000000',
+  carrier:   '10033000001201000000',
+  destroyer: '10033000001202030000',
+  frigate:   '10033000001202040000',
+  amphibious:'10033000001203000000',
+  submarine: '10033500001100000000',
+  tanker:    '10043000001401090000',
+  cargo:     '10043000001401010000',
+  fishing:   '10043000001402000000',
+  merchant:  '10043000001401000000',
+  neutral:   '10043000001401000000',
+  unknown:   '10013000001401000000',
 };
 
 export function installationSidc(affiliation: string, entityCode: string): string {
@@ -82,12 +89,14 @@ export function installationSidc(affiliation: string, entityCode: string): strin
 }
 
 export const INSTALLATION_ENTITIES: Record<string, string> = {
-  AIR_BASE:    '120803',
-  NAVAL_BASE:  '121310',
-  ARMY_BASE:   '120802',
-  NUCLEAR_SITE:'111500',
-  COMMAND:     '120600',
-  LAUNCH_ZONE: '111400',
+  AIR_BASE:          '121301',
+  NAVAL_BASE:        '121309',
+  ARMY_BASE:         '120802',
+  NUCLEAR_SITE:      '111500',
+  COMMAND:           '120600',
+  LAUNCH_ZONE:       '111400',
+  PETROLEUM_FACILITY:'120504',
+  NATURAL_GAS:       '120503',
 };
 
 export const EVENT_SIDCS: Record<string, string> = {

@@ -8,9 +8,12 @@ const SOURCE = 'overpass';
 export async function processOverpassIngest(job: Job) {
   const start = Date.now();
   const ingestedAt = new Date();
-  await job.log('Fetching military installations from OSM Overpass (Middle East)');
+  const regions: string[] | undefined = job.data.regions;
+  await job.log(regions
+    ? `Fetching Overpass installations for regions: ${regions.join(', ')}`
+    : 'Fetching Overpass installations (all regions)');
 
-  const elements = await fetchOverpass();
+  const elements = await fetchOverpass(async (msg) => { await job.log(msg); }, regions);
   await job.log(`Fetched ${elements.length} raw OSM elements`);
   await job.updateProgress(30);
 

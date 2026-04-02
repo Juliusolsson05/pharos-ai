@@ -38,7 +38,7 @@ export function loadReferenceFeatures() {
 
 type BatchResponse = Record<string, { items: unknown[]; total: number }>;
 
-const BATCH_QUERY = 'gdelt:200,firms:500,usgs:200,opensky:500,eonet:400,overpass:500,ports:500,aisstream:500';
+const BATCH_QUERY = 'gdelt:500,firms:2000,usgs:500,opensky:1000,eonet:500,overpass:50000,ports:5000,aisstream:2000';
 
 export function loadBatch() {
   return readJson<BatchResponse>(`/api/batch?providers=${BATCH_QUERY}`);

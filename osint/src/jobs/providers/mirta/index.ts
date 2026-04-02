@@ -6,6 +6,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'mirta',
     interval: 7 * 24 * 60 * 60 * 1000,
+    workload: 'standard',
     enabled: true,
     processor: processMirtaIngest,
   },

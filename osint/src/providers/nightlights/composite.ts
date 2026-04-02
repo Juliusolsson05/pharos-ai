@@ -6,6 +6,21 @@ import { dailyTileKey, snapshotTileKey } from './keys.js';
 
 type CompositeSource = 'daily' | 'snapshot';
 
+type ResolvedCompositeDates = {
+  requestedDate: string;
+  resolvedDailyDate: string;
+  resolvedSnapshotDate: string | null;
+};
+
+type CompositeCacheEntry = {
+  value: ResolvedCompositeDates;
+  expiresAt: number;
+};
+
+const COMPOSITE_DATE_CACHE_TTL_MS = 30 * 60 * 1000;
+const compositeDateCache = new Map<string, CompositeCacheEntry>();
+const inflightCompositeDates = new Map<string, Promise<ResolvedCompositeDates>>();
+
 export type CompositeManifest = {
   requestedDate: string;
   resolvedDailyDate: string;
@@ -22,6 +37,25 @@ export type CompositeTileResult = {
   resolvedDailyDate: string;
   resolvedSnapshotDate: string | null;
 };
+
+function readCachedCompositeDates(key: string): ResolvedCompositeDates | null {
+  const cached = compositeDateCache.get(key);
+  if (!cached) return null;
+
+  if (cached.expiresAt <= Date.now()) {
+    compositeDateCache.delete(key);
+    return null;
+  }
+
+  return cached.value;
+}
+
+function writeCachedCompositeDates(key: string, value: ResolvedCompositeDates) {
+  compositeDateCache.set(key, {
+    value,
+    expiresAt: Date.now() + COMPOSITE_DATE_CACHE_TTL_MS,
+  });
+}
 
 async function resolveDate(table: 'nightlightTile' | 'nightlightSnapshot', requestedDate: string) {
   const rows = table === 'nightlightTile'
@@ -61,30 +95,75 @@ async function resolveLatestDate(table: 'nightlightTile' | 'nightlightSnapshot')
   return rows[0]?.date ?? null;
 }
 
-export async function resolveCompositeDates(requestedDate: string) {
-  const resolvedDailyDate = await resolveDate('nightlightTile', requestedDate);
-  if (!resolvedDailyDate) {
-    throw new Error(`No daily nightlights available on or before ${requestedDate}`);
+export async function resolveCompositeDates(requestedDate: string): Promise<ResolvedCompositeDates> {
+  const cacheKey = `date:${requestedDate}`;
+  const cached = readCachedCompositeDates(cacheKey);
+  if (cached) {
+    return cached;
   }
 
-  const resolvedSnapshotDate =
-    await resolveDate('nightlightSnapshot', resolvedDailyDate)
-    ?? await resolveLatestDate('nightlightSnapshot');
+  const inflight = inflightCompositeDates.get(cacheKey);
+  if (inflight) {
+    return inflight;
+  }
 
-  return {
-    requestedDate,
-    resolvedDailyDate,
-    resolvedSnapshotDate,
-  };
+  const pending = (async () => {
+    try {
+      const resolvedDailyDate = await resolveDate('nightlightTile', requestedDate);
+      if (!resolvedDailyDate) {
+        throw new Error(`No daily nightlights available on or before ${requestedDate}`);
+      }
+
+      const resolvedSnapshotDate =
+        await resolveDate('nightlightSnapshot', resolvedDailyDate)
+        ?? await resolveLatestDate('nightlightSnapshot');
+
+      const value = {
+        requestedDate,
+        resolvedDailyDate,
+        resolvedSnapshotDate,
+      };
+
+      writeCachedCompositeDates(cacheKey, value);
+      return value;
+    } finally {
+      inflightCompositeDates.delete(cacheKey);
+    }
+  })();
+
+  inflightCompositeDates.set(cacheKey, pending);
+  return pending;
 }
 
-export async function resolveLatestCompositeDates() {
-  const latestDailyDate = await resolveLatestDate('nightlightTile');
-  if (!latestDailyDate) {
-    throw new Error('No daily nightlights available');
+export async function resolveLatestCompositeDates(): Promise<ResolvedCompositeDates> {
+  const cacheKey = 'latest';
+  const cached = readCachedCompositeDates(cacheKey);
+  if (cached) {
+    return cached;
   }
 
-  return resolveCompositeDates(latestDailyDate);
+  const inflight = inflightCompositeDates.get(cacheKey);
+  if (inflight) {
+    return inflight;
+  }
+
+  const pending = (async () => {
+    try {
+      const latestDailyDate = await resolveLatestDate('nightlightTile');
+      if (!latestDailyDate) {
+        throw new Error('No daily nightlights available');
+      }
+
+      const value = await resolveCompositeDates(latestDailyDate);
+      writeCachedCompositeDates(cacheKey, value);
+      return value;
+    } finally {
+      inflightCompositeDates.delete(cacheKey);
+    }
+  })();
+
+  inflightCompositeDates.set(cacheKey, pending);
+  return pending;
 }
 
 export async function getCompositeManifest(requestedDate: string): Promise<CompositeManifest> {

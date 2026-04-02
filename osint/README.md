@@ -2,7 +2,7 @@
 
 > **Beta / In Development** — This package is under active development. APIs, schemas, and provider coverage are changing frequently. Not yet deployed to production.
 
-Standalone data ingestion backend for the OSINT map mode. Pulls from public OSINT sources, normalizes events, and writes map-ready features to a dedicated `osint` schema in the shared PostgreSQL database.
+Standalone data ingestion backend for the OSINT map mode. Pulls from public OSINT sources globally, stores typed raw data in a dedicated `osint` schema, and exposes per-provider REST APIs.
 
 The `web_beta/` directory contains an experimental Next.js frontend for exploring OSINT data on a map. It will be merged into a proper monorepo structure with multiple connected frontend apps in the future.
 
@@ -165,7 +165,7 @@ osint/
 
 The service has two ingestion patterns:
 
-**Jobs** (BullMQ) — for sources that expose a REST API or downloadable file. Each job runs on a schedule, fetches data, writes to a typed provider table, and derives map features. Jobs have retries, exponential backoff, progress tracking, and structured results visible in Bull Board.
+**Jobs** (BullMQ) — for sources that expose a REST API or downloadable file. Each job runs on a schedule, fetches data, and writes to a typed provider table. Jobs have retries, exponential backoff, progress tracking, and structured results visible in Bull Board.
 
 **Streams** (persistent connections) — for sources that push data continuously via WebSocket or similar protocols. Streams run alongside the Express server, accumulate data in memory, and flush to the DB in batches. They reconnect automatically on disconnect.
 
@@ -186,11 +186,13 @@ The OSINT API is provider-first.
 Each provider exposes up to three endpoints:
 
 - `GET /api/providers/{provider}/features`
-  - Derived features for that provider from `osint.map_features`
+  - Typed rows from the provider's table (excludes `raw` JSON by default, pass `?raw=true` to include)
 - `GET /api/providers/{provider}/raw`
-  - Raw rows from the provider's typed table when available
+  - Full rows including the `raw` JSON payload
 - `GET /api/providers/{provider}/meta`
   - Counts plus `source_syncs` freshness metadata
+- `GET /api/batch?providers=gdelt:500,firms:2000,...`
+  - Parallel multi-provider fetch in a single request
 
 ## Current sources
 
@@ -200,7 +202,7 @@ Each provider exposes up to three endpoints:
 |--------|-------|----------|------|--------|
 | GDELT 2.0 CSV | Strikes + heat points | 15 min | None | Active |
 | NASA FIRMS | Heat points (thermal) | 30 min | Free MAP_KEY | Active |
-| OSM Overpass | Military installations (4,500+) | 24h | None | Active |
+| OSM Overpass | Military installations (43,000+ global) | 24h | None | Active |
 | NGA Nav Warnings | Maritime threat zones (245) | 6h | None | Active |
 | USGS Earthquakes | Seismic events | 1h | None | Active |
 | UCDP GED | Conflict events | 6h | Needs token | Blocked |
@@ -211,7 +213,7 @@ Each provider exposes up to three endpoints:
 | EONET + GDACS | Natural disasters (400+) | 2h | None | Active |
 | Safecast | Radiation monitoring | 2h | None | Active |
 | Submarine cables | Cable routes + landing points | 7 days | None | Active |
-| Cloudflare Radar | Internet outages (ME) | 30 min | Free CF token | Needs token |
+| Cloudflare Radar | Internet outages (global) | 30 min | Free CF token | Needs token |
 | NGA World Port Index | Global ports + terminals (3,800) | 30 days | None | Active |
 | WRI Power Plants | Global power plants (34,900) | 30 days | None | Active |
 | Reference data | Curated Iranian/Israeli/vessel data | 24h | None | Active |
@@ -220,11 +222,11 @@ Each provider exposes up to three endpoints:
 
 | Source | What | Protocol |
 |--------|------|----------|
-| AISStream | Vessel positions (100+ ME vessels) | WebSocket |
+| AISStream | Vessel positions (1,000+ global) | WebSocket |
 
 ## Database
 
-Each provider has its own typed Prisma table (e.g. `gdelt_events`, `firms_detections`, `mirta_sites`, `ais_positions`). Every table includes a `raw Json` column preserving the full unmodified source payload. Provider APIs expose either derived `map_features`, typed raw rows, or both depending on the source.
+Each provider has its own typed Prisma table (e.g. `gdelt_events`, `firms_detections`, `mirta_sites`, `ais_positions`). Every table includes a `raw Json` column preserving the full unmodified source payload. The API exposes typed rows directly — there is no shared normalized feature table.
 
 See `prisma/schema.prisma` for the full schema.
 

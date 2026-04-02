@@ -17,11 +17,7 @@ export type RadarOutage = {
   lon: number | null;
 };
 
-// Country codes in our region of interest
-const ME_COUNTRIES = new Set([
-  'IR', 'IQ', 'SY', 'LB', 'IL', 'PS', 'JO', 'SA', 'AE', 'QA', 'BH', 'KW', 'OM', 'YE',
-  'EG', 'TR', 'CY', 'DJ', 'SD', 'LY', 'PK', 'AF',
-]);
+// No geographic filter — accept all countries
 
 // Approximate country centroids for map placement
 const COUNTRY_COORDS: Record<string, [number, number]> = {
@@ -74,16 +70,16 @@ export async function fetchOutages(): Promise<RadarOutage[]> {
 
   for (const a of data.result.annotations) {
     const countries = (a.locations || '').split(',').map((c) => c.trim().toUpperCase());
-    const meCountry = countries.find((c) => ME_COUNTRIES.has(c));
-    if (!meCountry) continue;
+    const country = countries[0] || '';
+    if (!country) continue;
 
-    const coords = COUNTRY_COORDS[meCountry];
+    const coords = COUNTRY_COORDS[country];
 
     outages.push({
       id: a.id || `outage-${a.asn}-${a.startDate}`,
       asn: a.asn,
       asnName: a.asnName || '',
-      asnCountry: meCountry,
+      asnCountry: country,
       startDate: a.startDate,
       endDate: a.endDate,
       scope: a.scope || '',

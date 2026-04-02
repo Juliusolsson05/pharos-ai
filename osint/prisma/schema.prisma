@@ -32,6 +32,10 @@ model SourceSync {
   lastError     String?
   lastRunCount  Int       @default(0)
   totalEvents   Int       @default(0)
+  /// How the provider populates data: append (additive), snapshot (full replace), upsert (merge by key)
+  sourceMode    String?
+  /// Current row count in the provider's typed table (updated each run)
+  currentRows   Int?
 
   @@schema("osint")
   @@map("source_syncs")

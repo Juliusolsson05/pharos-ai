@@ -1,6 +1,6 @@
 import {
   getInstallationIcon,
-  getVesselIcon,
+  getReferenceVesselIcon,
 } from '@/features/map/lib/icons';
 import type {
   AisFeature,
@@ -25,17 +25,9 @@ export function classifyVessel(d: AisFeature): string {
   return 'neutral';
 }
 
-function getReferenceVesselClass(item: ReferenceFeature) {
-  const type = item.type.toUpperCase();
-  if (type === 'CARRIER' || type === 'AMPHIBIOUS' || type === 'DESTROYER') {
-    return 'MILITARY';
-  }
-  return 'neutral';
-}
-
 export function getReferenceIcon(item: ReferenceFeature) {
   if (item.featureKind === 'vessel') {
-    return getVesselIcon(35, getReferenceVesselClass(item));
+    return getReferenceVesselIcon(item.type, item.affiliation);
   }
   return getInstallationIcon(item.type, item.affiliation);
 }

@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'overpass',
     interval: config.overpass.pollInterval,
+    workload: 'heavy',
     enabled: true,
     processor: processOverpassIngest,
   },

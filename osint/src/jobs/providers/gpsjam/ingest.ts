@@ -24,9 +24,16 @@ export async function processGpsjamIngest(job: Job) {
         where: { h3: h.h3 },
         create: {
           h3: h.h3, lat: h.lat, lon: h.lon, level: h.level, region: h.region || null,
+          npAvg: h.npAvg, pct: h.pct, bad: h.bad, total: h.total,
+          sampleCount: h.sampleCount, aircraftCount: h.aircraftCount,
           raw: toJson(h), seenAt,
         },
-        update: { lat: h.lat, lon: h.lon, level: h.level, region: h.region || null, raw: toJson(h), seenAt },
+        update: {
+          lat: h.lat, lon: h.lon, level: h.level, region: h.region || null,
+          npAvg: h.npAvg, pct: h.pct, bad: h.bad, total: h.total,
+          sampleCount: h.sampleCount, aircraftCount: h.aircraftCount,
+          raw: toJson(h), seenAt,
+        },
       });
       stored++;
     } catch { /* dedupe */ }

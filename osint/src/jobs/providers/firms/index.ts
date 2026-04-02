@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'firms',
     interval: config.firms.pollInterval,
+    workload: 'standard',
     enabled: !!config.firms.mapKey,
     processor: processFirmsIngest,
   },

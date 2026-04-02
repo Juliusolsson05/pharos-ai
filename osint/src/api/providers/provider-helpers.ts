@@ -14,7 +14,7 @@ export function parsePageParams(query: Record<string, unknown>) {
   const rawLimit = Number.parseInt(String(query.limit ?? '100'), 10);
   const rawOffset = Number.parseInt(String(query.offset ?? '0'), 10);
 
-  const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 500) : 100;
+  const limit = Number.isFinite(rawLimit) ? Math.max(rawLimit, 1) : 100;
   const offset = Number.isFinite(rawOffset) ? Math.max(rawOffset, 0) : 0;
   const includeRaw = String(query.raw) === 'true';
 

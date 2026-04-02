@@ -15,22 +15,30 @@ router.get('/features', async (req, res) => {
     return err(res, 'INVALID_KIND', 'Use ?kind=all, ?kind=installations, or ?kind=vessels', 400);
   }
 
-  const [installations, vessels] = await Promise.all([
-    kind === 'vessels'
-      ? Promise.resolve([])
-      : prisma.referenceInstallation.findMany({ orderBy: { seededAt: 'desc' }, take: kind === 'all' ? limit : limit, skip: offset }),
-    kind === 'installations'
-      ? Promise.resolve([])
-      : prisma.referenceVessel.findMany({ orderBy: { seededAt: 'desc' }, take: kind === 'all' ? limit : limit, skip: offset }),
-  ]);
+  let items: unknown[];
+  let total: number;
 
-  const items = [
-    ...installations.map((item) => ({ featureKind: 'installation', ...item })),
-    ...vessels.map((item) => ({ featureKind: 'vessel', ...item })),
-  ].slice(0, limit);
-
-  const total = (kind === 'vessels' ? 0 : await prisma.referenceInstallation.count())
-    + (kind === 'installations' ? 0 : await prisma.referenceVessel.count());
+  if (kind === 'installations') {
+    total = await prisma.referenceInstallation.count();
+    const rows = await prisma.referenceInstallation.findMany({ orderBy: { seededAt: 'desc' }, take: limit, skip: offset });
+    items = rows.map((item) => ({ featureKind: 'installation' as const, ...item }));
+  } else if (kind === 'vessels') {
+    total = await prisma.referenceVessel.count();
+    const rows = await prisma.referenceVessel.findMany({ orderBy: { seededAt: 'desc' }, take: limit, skip: offset });
+    items = rows.map((item) => ({ featureKind: 'vessel' as const, ...item }));
+  } else {
+    // kind=all: merge both tables, paginate the combined list
+    const [allInstallations, allVessels] = await Promise.all([
+      prisma.referenceInstallation.findMany({ orderBy: { seededAt: 'desc' } }),
+      prisma.referenceVessel.findMany({ orderBy: { seededAt: 'desc' } }),
+    ]);
+    const merged = [
+      ...allInstallations.map((item) => ({ featureKind: 'installation' as const, ...item })),
+      ...allVessels.map((item) => ({ featureKind: 'vessel' as const, ...item })),
+    ];
+    total = merged.length;
+    items = merged.slice(offset, offset + limit);
+  }
 
   return ok(res, {
     source: SOURCE,
