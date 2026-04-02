@@ -51,6 +51,31 @@ function ovSize(item: OverpassFeature) {
   return (item.military === 'airfield' || item.military === 'naval_base') ? 18 : 16;
 }
 
+function ovScore(item: OverpassFeature): number {
+  let score = 0;
+  const mil = item.military ?? '';
+  if (mil === 'airfield') score += 30;
+  else if (mil === 'naval_base') score += 30;
+  else if (mil === 'base') score += 20;
+  else if (mil === 'barracks') score += 10;
+  else score += 5; // range, checkpoint, etc.
+
+  if (item.name) score += 15;
+  if (item.wikidata || item.wikipedia) score += 25;
+  return score;
+}
+
+const OVERPASS_LIMIT = 5000;
+
+function filterOverpass(items: OverpassFeature[]): OverpassFeature[] {
+  if (items.length <= OVERPASS_LIMIT) return items;
+  return items
+    .map((item) => ({ item, score: ovScore(item) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, OVERPASS_LIMIT)
+    .map(({ item }) => item);
+}
+
 function evSize(item: EonetFeature) {
   if (item.category === 'Volcanoes' || item.category === 'VO') return 18;
   if (item.category === 'Severe Storms' || item.category === 'TC') return 17;
@@ -75,7 +100,7 @@ function eventProps(zoom: number) {
   return { sizeScale: smooth(zoom, 3.0), sizeUnits: 'pixels' as const, sizeMinPixels: 10, sizeMaxPixels: 70, billboard: false };
 }
 function portProps(zoom: number) {
-  return { sizeScale: smooth(zoom, 2.5), sizeUnits: 'pixels' as const, sizeMinPixels: 8, sizeMaxPixels: 60, billboard: false };
+  return { sizeScale: smooth(zoom, 2.5), sizeUnits: 'pixels' as const, sizeMinPixels: 14, sizeMaxPixels: 60, billboard: false };
 }
 
 // ─── Hook ───────────────────────────────────────────────────
@@ -116,7 +141,7 @@ export function useMapLayers({ layers: on, data, zoom }: { layers: LayerState; d
         getSize: (d) => refSize(d), ...siteProps(zoom),
       }),
       on.overpass && new IconLayer<OverpassFeature>({
-        id: 'overpass', data: data.overpass, pickable: true,
+        id: 'overpass', data: filterOverpass(data.overpass), pickable: true,
         getPosition: (d) => [d.lon, d.lat],
         getIcon: (d) => icon('overpass', d),
         getSize: (d) => ovSize(d), ...siteProps(zoom),
@@ -125,7 +150,7 @@ export function useMapLayers({ layers: on, data, zoom }: { layers: LayerState; d
         id: 'ports', data: data.ports, pickable: true,
         getPosition: (d) => [d.lon, d.lat],
         getIcon: (d) => icon('port', d),
-        getSize: (d) => d.harborSize === 'Large' ? 16 : d.harborSize === 'Medium' ? 13 : 10, ...portProps(zoom),
+        getSize: (d) => d.harborSize === 'Large' ? 24 : d.harborSize === 'Medium' ? 20 : 16, ...portProps(zoom),
       }),
       on.ais && new IconLayer<AisFeature>({
         id: 'ais', data: data.ais, pickable: true,
