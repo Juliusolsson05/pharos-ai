@@ -1,7 +1,7 @@
 import { config } from '../../config.js';
 
 const FETCH_TIMEOUT = 20_000;
-const BBOX = '25,10,65,42';
+const BBOX = '-180,-90,180,90';
 
 export type FirmsRow = {
   latitude: number;

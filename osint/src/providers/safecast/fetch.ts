@@ -1,8 +1,7 @@
 const BASE_URL = 'https://api.safecast.org/measurements.json';
 const FETCH_TIMEOUT = 15_000;
 
-// Middle East bounding box for filtering
-const ME_BOUNDS = { south: 5, north: 45, west: 20, east: 70 };
+
 
 export type SafecastReading = {
   id: number;
@@ -39,13 +38,7 @@ export async function fetchRadiation(limit: number = 500): Promise<SafecastReadi
   }>;
 
   return data
-    .filter((r) => {
-      if (!r.latitude || !r.longitude) return false;
-      return (
-        r.latitude >= ME_BOUNDS.south && r.latitude <= ME_BOUNDS.north &&
-        r.longitude >= ME_BOUNDS.west && r.longitude <= ME_BOUNDS.east
-      );
-    })
+    .filter((r) => r.latitude != null && r.longitude != null)
     .map((r) => ({
       id: r.id,
       latitude: r.latitude!,

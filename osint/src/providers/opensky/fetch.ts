@@ -2,8 +2,9 @@ const FETCH_TIMEOUT = 30_000;
 
 // Two query regions covering our theater (from World Monitor)
 const REGIONS = [
-  { name: 'WESTERN', lamin: 13, lamax: 55, lomin: -10, lomax: 57 },
-  { name: 'PACIFIC', lamin: 10, lamax: 46, lomin: 57, lomax: 80 },
+  { name: 'AMERICAS', lamin: -60, lamax: 70, lomin: -170, lomax: -30 },
+  { name: 'EUROPE_AFRICA', lamin: -40, lamax: 72, lomin: -30, lomax: 57 },
+  { name: 'ASIA_PACIFIC', lamin: -50, lamax: 72, lomin: 57, lomax: 180 },
 ];
 
 export type OpenskyState = {
