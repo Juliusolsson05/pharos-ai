@@ -1,6 +1,10 @@
 # Pharos OSINT Service
 
+> **Beta / In Development** — This package is under active development. APIs, schemas, and provider coverage are changing frequently. Not yet deployed to production.
+
 Standalone data ingestion backend for the OSINT map mode. Pulls from public OSINT sources, normalizes events, and writes map-ready features to a dedicated `osint` schema in the shared PostgreSQL database.
+
+The `web_beta/` directory contains an experimental Next.js frontend for exploring OSINT data on a map. It will be merged into a proper monorepo structure with multiple connected frontend apps in the future.
 
 ## Background
 
