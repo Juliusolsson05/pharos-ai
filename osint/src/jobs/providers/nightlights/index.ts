@@ -8,12 +8,14 @@ export const jobs: JobDefinition[] = [
   {
     name: 'nightlights-daily',
     interval: config.nightlights.pollInterval,
+    workload: 'heavy',
     enabled: true,
     processor: processNightlightsDailyIngest,
   },
   {
     name: 'nightlights-snapshot',
     interval: config.nightlights.snapshotInterval,
+    workload: 'heavy',
     enabled: true,
     processor: processNightlightsSnapshotIngest,
   },

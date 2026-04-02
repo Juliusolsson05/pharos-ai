@@ -6,6 +6,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'tile-mask',
     interval: 0,
+    workload: 'heavy',
     enabled: false,
     processor: processTileMaskIngest,
   },

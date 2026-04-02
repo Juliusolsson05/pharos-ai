@@ -6,6 +6,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'safecast',
     interval: 2 * 60 * 60 * 1000,
+    workload: 'standard',
     enabled: true,
     processor: processSafecastIngest,
   },

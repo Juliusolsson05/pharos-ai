@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'nga',
     interval: config.nga.pollInterval,
+    workload: 'standard',
     enabled: true,
     processor: processNgaIngest,
   },
