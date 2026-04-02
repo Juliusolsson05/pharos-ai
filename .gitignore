@@ -34,6 +34,7 @@ yarn-error.log*
 .env*
 !.env.local.example
 !.env.vps.example
+!osint/.env.example
 
 # prisma generated client
 /src/generated/prisma
@@ -52,3 +53,8 @@ API-diff.diff
 
 # Electron build output
 dist/
+
+# OSINT build artifacts and scratch
+osint/dist/
+osint/temp/
+osint/.foldercrawlignore

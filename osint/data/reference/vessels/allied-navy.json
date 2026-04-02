@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Charles de Gaulle",
+    "hullNumber": "R91",
+    "class": "Charles de Gaulle",
+    "type": "CARRIER",
+    "country": "FR",
+    "affiliation": "FRIENDLY",
+    "operator": "French Navy Task Force 473",
+    "strikeGroup": "Task Force 473",
+    "airWing": "Carrier Air Group",
+    "displacement": 42500,
+    "personnel": 1950,
+    "homePort": "Toulon, France",
+    "typicalPatrolLat": 25.0,
+    "typicalPatrolLon": 57.0,
+    "role": ["Power projection", "Strike", "Air superiority"],
+    "status": "DEPLOYED",
+    "description": "France's nuclear-powered carrier. Embarks Rafale-M fighters and E-2C Hawkeye AEW aircraft. Periodically deploys to Arabian Sea for Operation Clemenceau.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/French_aircraft_carrier_Charles_de_Gaulle"
+  }
+]

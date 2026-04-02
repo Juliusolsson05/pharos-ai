@@ -1,0 +1,970 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/osint-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["osint"]
+}
+
+// ─── Cross-provider tables ──────────────────────────────────
+
+model RawIngest {
+  id        String   @id @default(cuid())
+  source    String
+  fetchedAt DateTime @default(now())
+  fileKey   String?
+  rowCount  Int
+  meta      Json?
+
+  @@schema("osint")
+  @@map("raw_ingests")
+}
+
+model SourceSync {
+  id            String    @id @default(cuid())
+  source        String    @unique
+  lastCursor    String?
+  lastRunAt     DateTime?
+  lastRunStatus String?
+  lastError     String?
+  lastRunCount  Int       @default(0)
+  totalEvents   Int       @default(0)
+
+  @@schema("osint")
+  @@map("source_syncs")
+}
+
+// ─── Cloudflare Radar — internet outages ────────────────────
+
+model CloudflareRadarOutage {
+  id          String   @id @default(cuid())
+  outageId    String   @unique
+  asn         Int?
+  asnName     String?
+  asnCountry  String
+  startDate   String
+  endDate     String?
+  scope       String
+  description String
+  linkedUrl   String?
+  lat         Float?
+  lon         Float?
+  raw         Json
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  @@index([asnCountry])
+  @@index([scope])
+  @@index([lastSeenAt])
+  @@schema("osint")
+  @@map("cloudflare_radar_outages")
+}
+
+// ─── EONET / GDACS — natural disaster events ───────────────
+
+model EonetEvent {
+  id         String   @id @default(cuid())
+  eventId    String
+  origin     String
+  title      String
+  category   String
+  lat        Float
+  lon        Float
+  eventDate  String
+  sourceUrl  String?
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@unique([origin, eventId])
+  @@index([origin])
+  @@index([category])
+  @@index([lat, lon])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("eonet_events")
+}
+
+// ─── Safecast — radiation readings ──────────────────────────
+
+model SafecastReading {
+  id           String   @id @default(cuid())
+  readingId    Int      @unique
+  latitude     Float
+  longitude    Float
+  value        Float
+  unit         String
+  capturedAt   String
+  deviceId     Int?
+  locationName String?
+  raw          Json
+  ingestedAt   DateTime @default(now())
+
+  @@index([capturedAt])
+  @@index([value])
+  @@index([latitude, longitude])
+  @@schema("osint")
+  @@map("safecast_readings")
+}
+
+// ─── Submarine cables — routes and landing points ───────────
+
+model SubmarineCable {
+  id         String   @id @default(cuid())
+  cableId    String   @unique
+  name       String
+  color      String?
+  geometry   Json
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@index([name])
+  @@schema("osint")
+  @@map("submarine_cables")
+}
+
+model SubmarineLandingPoint {
+  id             String   @id @default(cuid())
+  landingPointId String   @unique
+  name           String
+  lat            Float
+  lon            Float
+  raw            Json
+  ingestedAt     DateTime @default(now())
+
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("submarine_landing_points")
+}
+
+// ─── GDELT Mentions — links events to articles ─────────────
+
+model GdeltMention {
+  id                       String   @id @default(cuid())
+  globalEventId            String
+  eventTimeDate            String
+  mentionTimeDate          String
+  mentionType              Int
+  mentionSourceName        String
+  mentionIdentifier        String
+  sentenceId               Int
+  actor1CharOffset         Int
+  actor2CharOffset         Int
+  actionCharOffset         Int
+  inRawText                Boolean  @default(true)
+  confidence               Int
+  mentionDocLen            Int
+  mentionDocTone           Float
+  mentionDocTranslationInfo String?
+  raw                      Json
+  ingestedAt               DateTime @default(now())
+
+  @@index([globalEventId])
+  @@index([mentionSourceName])
+  @@index([confidence])
+  @@schema("osint")
+  @@map("gdelt_mentions")
+}
+
+// ─── GDELT GQG — direct quotes from news articles ──────────
+
+model GdeltQuote {
+  id         String   @id @default(cuid())
+  articleUrl String
+  title      String
+  lang       String?
+  date       String
+  quote      String
+  pre        String?
+  post       String?
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@index([date])
+  @@index([articleUrl])
+  @@schema("osint")
+  @@map("gdelt_quotes")
+}
+
+// ─── GDELT GFG — news frontpage links ───────────────────────
+
+model GdeltFrontpage {
+  id         String   @id @default(cuid())
+  hour       String
+  domain     String
+  url        String
+  position   Int
+  linkText   String?
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@index([hour])
+  @@index([domain])
+  @@schema("osint")
+  @@map("gdelt_frontpages")
+}
+
+// ─── GDELT GKG — articles with themes, entities, locations ──
+
+model GkgRecord {
+  id            String   @id @default(cuid())
+  recordId      String   @unique
+  date          String
+  domain        String
+  url           String
+  themes        String[]
+  locations     Json
+  persons       String[]
+  organizations String[]
+  tone          Float    @default(0)
+  imageUrl      String?
+  pageTitle     String
+  raw           Json
+  ingestedAt    DateTime @default(now())
+
+  @@index([date])
+  @@index([domain])
+  @@index([tone])
+  @@schema("osint")
+  @@map("gkg_records")
+}
+
+// ─── GDELT 2.0 — all 61 CSV columns ────────────────────────
+
+model GdeltEvent {
+  id                    String   @id @default(cuid())
+  globalEventId         String   @unique
+  day                   Int
+  monthYear             Int
+  year                  Int
+  fractionDate          Float
+  actor1Code            String?
+  actor1Name            String?
+  actor1CountryCode     String?
+  actor1KnownGroupCode  String?
+  actor1EthnicCode      String?
+  actor1Religion1Code   String?
+  actor1Religion2Code   String?
+  actor1Type1Code       String?
+  actor1Type2Code       String?
+  actor1Type3Code       String?
+  actor2Code            String?
+  actor2Name            String?
+  actor2CountryCode     String?
+  actor2KnownGroupCode  String?
+  actor2EthnicCode      String?
+  actor2Religion1Code   String?
+  actor2Religion2Code   String?
+  actor2Type1Code       String?
+  actor2Type2Code       String?
+  actor2Type3Code       String?
+  isRootEvent           Boolean  @default(false)
+  eventCode             String
+  eventBaseCode         String?
+  eventRootCode         String?
+  quadClass             Int?
+  goldsteinScale        Float?
+  numMentions           Int      @default(1)
+  numSources            Int      @default(1)
+  numArticles           Int      @default(1)
+  avgTone               Float    @default(0)
+  actor1GeoType         Int?
+  actor1GeoFullName     String?
+  actor1GeoCountryCode  String?
+  actor1GeoAdm1Code     String?
+  actor1GeoAdm2Code     String?
+  actor1GeoLat          Float?
+  actor1GeoLon          Float?
+  actor1GeoFeatureId    String?
+  actor2GeoType         Int?
+  actor2GeoFullName     String?
+  actor2GeoCountryCode  String?
+  actor2GeoAdm1Code     String?
+  actor2GeoAdm2Code     String?
+  actor2GeoLat          Float?
+  actor2GeoLon          Float?
+  actor2GeoFeatureId    String?
+  actionGeoType         Int?
+  actionGeoFullName     String?
+  actionGeoCountryCode  String?
+  actionGeoAdm1Code     String?
+  actionGeoAdm2Code     String?
+  actionGeoLat          Float
+  actionGeoLon          Float
+  actionGeoFeatureId    String?
+  dateAdded             String?
+  sourceUrl             String?
+  raw                   Json
+  ingestId              String?
+  ingestedAt            DateTime @default(now())
+
+  @@index([day])
+  @@index([eventCode])
+  @@index([actionGeoLat, actionGeoLon])
+  @@index([actor1CountryCode])
+  @@index([quadClass])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("gdelt_events")
+}
+
+// ─── NASA FIRMS — all 13 CSV columns ────────────────────────
+
+model FirmsDetection {
+  id         String   @id @default(cuid())
+  latitude   Float
+  longitude  Float
+  brightTi4  Float
+  scan       Float
+  track      Float
+  acqDate    String
+  acqTime    String
+  satellite  String
+  confidence String
+  version    String?
+  brightTi5  Float?
+  frp        Float
+  daynight   String
+  raw        Json
+  ingestedAt DateTime @default(now())
+
+  @@unique([latitude, longitude, acqDate, acqTime])
+  @@index([acqDate])
+  @@index([confidence])
+  @@index([frp])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("firms_detections")
+}
+
+// ─── OSM Overpass — military installations ───────────────────
+
+model OverpassInstallation {
+  id              String   @id @default(cuid())
+  osmType         String
+  osmId           BigInt
+  lat             Float
+  lon             Float
+  name            String?
+  nameEn          String?
+  nameAr          String?
+  military        String?
+  militaryService String?
+  aeroway         String?
+  landuse         String?
+  operator        String?
+  country         String?
+  wikidata        String?
+  wikipedia       String?
+  raw             Json
+  ingestedAt      DateTime @default(now())
+
+  @@unique([osmType, osmId])
+  @@index([military])
+  @@index([lat, lon])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("overpass_installations")
+}
+
+// ─── NGA navigational warnings ──────────────────────────────
+
+model NgaWarning {
+  id              String   @id @default(cuid())
+  navArea         String
+  msgYear         Int
+  msgNumber       Int
+  subregion       String?
+  text            String
+  status          String?
+  issueDate       String?
+  authority       String?
+  cancelDate      String?
+  cancelNavArea   String?
+  cancelMsgYear   Int?
+  cancelMsgNumber Int?
+  raw             Json
+  ingestedAt      DateTime @default(now())
+
+  @@unique([navArea, msgYear, msgNumber])
+  @@index([navArea])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("nga_warnings")
+}
+
+// ─── OpenSky — military flight sightings ────────────────────
+
+model OpenskySighting {
+  id             String   @id @default(cuid())
+  icao24         String   @unique
+  callsign       String?
+  originCountry  String?
+  lat            Float
+  lon            Float
+  baroAltitude   Float?
+  geoAltitude    Float?
+  onGround       Boolean  @default(false)
+  velocity       Float?
+  heading        Float?
+  verticalRate   Float?
+  squawk         String?
+  positionSource Int?
+  category       Int?
+  milOperator    String?
+  milCountry     String?
+  raw            Json
+  seenAt         DateTime @default(now())
+
+  @@index([milOperator])
+  @@index([lat, lon])
+  @@index([seenAt])
+  @@schema("osint")
+  @@map("opensky_sightings")
+}
+
+model OpenskySightingHistory {
+  id             String   @id @default(cuid())
+  icao24         String
+  seenAt         DateTime
+  callsign       String?
+  originCountry  String?
+  lat            Float
+  lon            Float
+  baroAltitude   Float?
+  geoAltitude    Float?
+  onGround       Boolean  @default(false)
+  velocity       Float?
+  heading        Float?
+  verticalRate   Float?
+  squawk         String?
+  positionSource Int?
+  category       Int?
+  milOperator    String?
+  milCountry     String?
+  raw            Json
+
+  @@unique([icao24, seenAt])
+  @@index([seenAt])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("opensky_sighting_history")
+}
+
+// ─── USGS earthquakes ───────────────────────────────────────
+
+model UsgsQuake {
+  id           String   @id @default(cuid())
+  eventId      String   @unique
+  place        String?
+  magnitude    Float
+  magType      String?
+  depthKm      Float
+  lat          Float
+  lon          Float
+  occurredAt   DateTime
+  felt         Int?
+  cdi          Float?
+  mmi          Float?
+  alert        String?
+  tsunami      Int?
+  significance Int?
+  status       String?
+  net          String?
+  sourceUrl    String?
+  raw          Json
+  ingestedAt   DateTime @default(now())
+
+  @@index([occurredAt])
+  @@index([magnitude])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("usgs_quakes")
+}
+
+// ─── OREF alerts (Israel Home Front Command) ────────────────
+
+model OrefAlert {
+  id         String    @id @default(cuid())
+  alertId    String    @unique
+  cat        String
+  title      String?
+  desc       String?
+  areas      String[]
+  alertDate  DateTime?
+  raw        Json
+  ingestedAt DateTime  @default(now())
+
+  @@index([cat])
+  @@index([alertDate])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("oref_alerts")
+}
+
+// ─── GPSJam / Wingbits interference ─────────────────────────
+
+model GpsjamHex {
+  id            String   @id @default(cuid())
+  h3            String   @unique
+  lat           Float
+  lon           Float
+  level         String
+  region        String?
+  npAvg         Float?
+  pct           Float?
+  bad           Int?
+  total         Int?
+  sampleCount   Int?
+  aircraftCount Int?
+  raw           Json
+  seenAt        DateTime @default(now())
+
+  @@index([level])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("gpsjam_hexes")
+}
+
+model GpsjamHexHistory {
+  id            String   @id @default(cuid())
+  h3            String
+  seenAt        DateTime
+  lat           Float
+  lon           Float
+  level         String
+  region        String?
+  npAvg         Float?
+  pct           Float?
+  bad           Int?
+  total         Int?
+  sampleCount   Int?
+  aircraftCount Int?
+  raw           Json
+
+  @@unique([h3, seenAt])
+  @@index([seenAt])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("gpsjam_hex_history")
+}
+
+// ─── MIRTA — US DoD installations (ArcGIS) ──────────────────
+
+model MirtaSite {
+  id                  String   @id @default(cuid())
+  objectId            Int      @unique
+  siteName            String
+  featureName         String?
+  featureDescription  String?
+  countryName         String?
+  stateCode           String?
+  reportingComponent  String?
+  operationalStatus   String?
+  isJointBase         Boolean  @default(false)
+  lat                 Float
+  lon                 Float
+  raw                 Json
+  ingestedAt          DateTime @default(now())
+
+  @@index([reportingComponent])
+  @@index([operationalStatus])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("mirta_sites")
+}
+
+// ─── AIS vessel positions (live stream) ─────────────────────
+
+model AisPosition {
+  id          String   @id @default(cuid())
+  mmsi        String   @unique
+  shipName    String?
+  lat         Float
+  lon         Float
+  speed       Float?
+  heading     Float?
+  shipType    Int?
+  destination String?
+  lastSeen    DateTime @default(now())
+  raw         Json
+
+  @@index([lat, lon])
+  @@index([lastSeen])
+  @@index([shipType])
+  @@schema("osint")
+  @@map("ais_positions")
+}
+
+// ─── Reference: military installations ──────────────────────
+
+model ReferenceInstallation {
+  id            String   @id @default(cuid())
+  name          String
+  nameLocal     String?
+  lat           Float
+  lon           Float
+  country       String
+  affiliation   String
+  type          String
+  operators     String[]
+  units         String[]
+  equipment     String[]
+  personnel     Int?
+  runwayLengthM Int?
+  role          String[]
+  status        String
+  hardening     String?
+  description   String
+  sourceUrl     String?
+  raw           Json
+  seededAt      DateTime @default(now())
+
+  @@unique([name, country])
+  @@index([country])
+  @@index([affiliation])
+  @@index([type])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("reference_installations")
+}
+
+// ─── Reference: naval vessels ───────────────────────────────
+
+model ReferenceVessel {
+  id               String   @id @default(cuid())
+  name             String
+  hullNumber       String?
+  vesselClass      String?
+  type             String
+  country          String
+  affiliation      String
+  operator         String
+  strikeGroup      String?
+  airWing          String?
+  displacement     Int?
+  personnel        Int?
+  homePort         String?
+  typicalPatrolLat Float?
+  typicalPatrolLon Float?
+  role             String[]
+  status           String
+  description      String
+  sourceUrl        String?
+  raw              Json
+  seededAt         DateTime @default(now())
+
+  @@unique([name, country])
+  @@index([country])
+  @@index([type])
+  @@schema("osint")
+  @@map("reference_vessels")
+}
+
+// ─── Natural Earth populated places (support data) ──────────
+// Source: https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places_simple.zip
+// 7,342 places globally
+
+model PopulatedPlace {
+  id           String   @id @default(cuid())
+  neId         BigInt   @unique                // Natural Earth ID
+  name         String
+  nameAscii    String?
+  lat          Float
+  lon          Float
+  popMax       Int?                            // maximum population estimate
+  popMin       Int?                            // minimum population estimate
+  scalerank    Int?                            // 0-10, lower = more important
+  labelrank    Int?
+  featureClass String?                         // Admin-0 capital, populated place, etc.
+  countryName  String?                         // adm0name
+  countryCode  String?                         // iso_a2
+  sovName      String?                         // sovereign state
+  adm1Name     String?                         // admin-1 (state/province)
+  worldcity    Boolean  @default(false)
+  megacity     Boolean  @default(false)
+  raw          Json
+  ingestedAt   DateTime @default(now())
+
+  @@index([lat, lon])
+  @@index([popMax])
+  @@index([countryCode])
+  @@index([scalerank])
+  @@schema("osint")
+  @@map("populated_places")
+}
+
+// ─── Land mask (NASA GIBS OSM Land Water Map) ───────────────
+// Source: OSM_Land_Water_Map WMTS layer, pixel-accurate land/water
+
+model LandMaskTile {
+  id          String   @id @default(cuid())
+  z           Int
+  x           Int
+  y           Int
+  hasLand     Boolean
+  landPct     Float
+  raw         Json
+  computedAt  DateTime @default(now())
+
+  @@unique([z, x, y])
+  @@index([hasLand])
+  @@schema("osint")
+  @@map("land_mask_tiles")
+}
+
+// ─── GHSL settlement classification (support data) ──────────
+// Source: JRC GHS-SMOD R2023A (WGS84 30 arc-second raster)
+// Values: 10=water, 11=very low density, 12=low density, 13=rural cluster,
+//         21=suburban, 22=semi-dense, 23=dense, 30=urban centre
+
+model SettlementTile {
+  id              String   @id @default(cuid())
+  z               Int
+  x               Int
+  y               Int
+  hasSettlement   Boolean                          // any pixel >= 11 in tile
+  maxClass        Int                              // highest settlement class found
+  settlementPct   Float                            // % of tile pixels with settlement
+  raw             Json                             // class distribution histogram
+  computedAt      DateTime @default(now())
+
+  @@unique([z, x, y])
+  @@index([hasSettlement])
+  @@index([maxClass])
+  @@schema("osint")
+  @@map("settlement_tiles")
+}
+
+// ─── Tile mask (derived from land mask + places + settlement) ─
+
+model TileMask {
+  id              String   @id @default(cuid())
+  z               Int
+  x               Int
+  y               Int
+  hasLand         Boolean
+  hasSettlement   Boolean  @default(false)
+  hasPopulation   Boolean
+  isStrategic     Boolean  @default(false)
+  include         Boolean
+  landCoveragePct Float?
+  qualityTier     String
+  source          String   @default("land-mask+natearth+ghsl")
+  computedAt      DateTime @default(now())
+
+  @@unique([z, x, y])
+  @@index([include])
+  @@index([qualityTier])
+  @@schema("osint")
+  @@map("tile_masks")
+}
+
+// ─── Nighttime lights (NASA Black Marble) ───────────────────
+
+model NightlightTile {
+  id          String   @id @default(cuid())
+  date        String
+  z           Int
+  x           Int
+  y           Int
+  region      String
+  s3Key       String
+  mlPixels    Bytes
+  avgRadiance Float
+  ingestedAt  DateTime @default(now())
+
+  @@unique([date, z, x, y])
+  @@index([date])
+  @@index([region])
+  @@index([avgRadiance])
+  @@schema("osint")
+  @@map("nightlight_tiles")
+}
+
+// ─── World Port Index (NGA Pub 150) ─────────────────────────
+
+model Port {
+  id              String   @id @default(cuid())
+  wpiNumber       Int      @unique
+  name            String
+  alternateName   String?
+  countryCode     String
+  regionName      String?
+  worldWaterBody  String?
+  unLocode        String?
+  lat             Float
+  lon             Float
+  harborSize      String?
+  harborType      String?
+  harborUse       String?
+  shelterAfforded String?
+  maxVesselLength Int?
+  maxVesselDraft  Int?
+  channelDepth    Int?
+  anchorageDepth  Int?
+  cargoPierDepth  Int?
+  oilTerminalDepth Int?
+  repairCapability String?
+  drydock          String?
+  railway          String?
+  hasOilTerminal   Boolean  @default(false)
+  hasLngTerminal   Boolean  @default(false)
+  hasContainer     Boolean  @default(false)
+  hasBulk          Boolean  @default(false)
+  hasCranes        Boolean  @default(false)
+  raw             Json
+  ingestedAt      DateTime @default(now())
+
+  @@index([countryCode])
+  @@index([harborSize])
+  @@index([lat, lon])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("ports")
+}
+
+// ─── Global Power Plant Database (WRI) ──────────────────────
+
+model PowerPlant {
+  id                String   @id @default(cuid())
+  gppdIdnr          String   @unique
+  name              String
+  countryCode       String
+  countryLong       String
+  lat               Float
+  lon               Float
+  capacityMw        Float
+  primaryFuel       String
+  otherFuel1        String?
+  otherFuel2        String?
+  otherFuel3        String?
+  commissioningYear Int?
+  owner             String?
+  sourceUrl         String?
+  estimatedGwh      Float?
+  raw               Json
+  ingestedAt        DateTime @default(now())
+
+  @@index([countryCode])
+  @@index([primaryFuel])
+  @@index([capacityMw])
+  @@index([lat, lon])
+  @@index([ingestedAt])
+  @@schema("osint")
+  @@map("power_plants")
+}
+
+// ─── OGIM: Oil & Gas Infrastructure (EDF/Zenodo) ───────────
+
+model OgimFacility {
+  id            String   @id @default(cuid())
+  ogimId        Int      @unique
+  category      String
+  region        String?
+  country       String
+  stateProvince String?
+  onOffshore    String
+  name          String?
+  facId         String?
+  facType       String?
+  facStatus     String?
+  ogimStatus    String?
+  operator      String?
+  installDate   String?
+  commodity     String?
+  lat           Float
+  lon           Float
+  // Capacity fields (null = N/A or -999)
+  liqCapacityBpd    Float?
+  liqThroughputBpd  Float?
+  gasCapacityMmcfd  Float?
+  gasThroughputMmcfd Float?
+  numStorageTanks   Int?
+  numComprUnits     Int?
+  siteHp            Float?
+  // Flaring-specific
+  flareYear         Int?
+  flareTempK        Int?
+  gasFlaredMmcf     Float?
+  flareSegmentType  String?
+  raw               Json
+  ingestedAt        DateTime @default(now())
+
+  @@index([category])
+  @@index([country])
+  @@index([region])
+  @@index([ogimStatus])
+  @@index([lat, lon])
+  @@schema("osint")
+  @@map("ogim_facilities")
+}
+
+model OgimPipeline {
+  id            String   @id @default(cuid())
+  ogimId        Int      @unique
+  region        String?
+  country       String
+  stateProvince String?
+  onOffshore    String
+  name          String?
+  facType       String?
+  ogimStatus    String?
+  operator      String?
+  commodity     String?
+  diameterMm    Float?
+  lengthKm      Float
+  material      String?
+  liqCapacityBpd    Float?
+  gasThroughputMmcfd Float?
+  gasCapacityMmcfd  Float?
+  geometry      Json
+  raw           Json
+  ingestedAt    DateTime @default(now())
+
+  @@index([country])
+  @@index([region])
+  @@index([lengthKm])
+  @@schema("osint")
+  @@map("ogim_pipelines")
+}
+
+model OgimBasin {
+  id            String   @id @default(cuid())
+  ogimId        Int      @unique
+  category      String
+  region        String?
+  country       String
+  onOffshore    String
+  name          String?
+  reservoirType String?
+  areaKm2       Float
+  geometry      Json
+  raw           Json
+  ingestedAt    DateTime @default(now())
+
+  @@index([category])
+  @@index([country])
+  @@schema("osint")
+  @@map("ogim_basins")
+}
+
+// ─── Nightlight full-land snapshots (bi-weekly) ─────────────
+// Display-only tiles for ALL land — fills in the map background
+
+model NightlightSnapshot {
+  id          String   @id @default(cuid())
+  date        String
+  z           Int
+  x           Int
+  y           Int
+  s3Key       String
+  ingestedAt  DateTime @default(now())
+
+  @@unique([date, z, x, y])
+  @@index([date])
+  @@schema("osint")
+  @@map("nightlight_snapshots")
+}
