@@ -74,7 +74,6 @@
     "deck.gl": "^9.2.10",
     "dotenv": "^17.3.1",
     "flag-icons": "^7.5.0",
-    "geotiff": "^3.0.5",
     "leaflet": "^1.9.4",
     "lightweight-charts": "^5.1.0",
     "lucide-react": "^0.575.0",
