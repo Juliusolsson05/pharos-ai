@@ -5,10 +5,19 @@ export type UsgsQuake = {
   id: string;
   place: string;
   magnitude: number;
+  magType: string;
   depthKm: number;
   lat: number;
   lon: number;
   occurredAt: number;
+  felt: number | null;
+  cdi: number | null;
+  mmi: number | null;
+  alert: string | null;
+  tsunami: number | null;
+  significance: number | null;
+  status: string | null;
+  net: string | null;
   sourceUrl: string;
 };
 
@@ -23,21 +32,33 @@ export async function fetchQuakes(): Promise<UsgsQuake[]> {
   const geojson = (await res.json()) as {
     features: Array<{
       id: string;
-      properties: { place: string; mag: number; time: number; url: string };
+      properties: Record<string, unknown>;
       geometry: { coordinates: [number, number, number] };
     }>;
   };
 
   return geojson.features
     .filter((f) => f.geometry?.coordinates && f.properties)
-    .map((f) => ({
-      id: f.id,
-      place: f.properties.place || '',
-      magnitude: f.properties.mag ?? 0,
-      depthKm: f.geometry.coordinates[2] ?? 0,
-      lat: f.geometry.coordinates[1],
-      lon: f.geometry.coordinates[0],
-      occurredAt: f.properties.time ?? 0,
-      sourceUrl: f.properties.url || '',
-    }));
+    .map((f) => {
+      const p = f.properties;
+      return {
+        id: f.id,
+        place: String(p.place || ''),
+        magnitude: Number(p.mag ?? 0),
+        magType: String(p.magType || ''),
+        depthKm: f.geometry.coordinates[2] ?? 0,
+        lat: f.geometry.coordinates[1],
+        lon: f.geometry.coordinates[0],
+        occurredAt: Number(p.time ?? 0),
+        felt: p.felt != null ? Number(p.felt) : null,
+        cdi: p.cdi != null ? Number(p.cdi) : null,
+        mmi: p.mmi != null ? Number(p.mmi) : null,
+        alert: p.alert != null ? String(p.alert) : null,
+        tsunami: p.tsunami != null ? Number(p.tsunami) : null,
+        significance: p.sig != null ? Number(p.sig) : null,
+        status: p.status != null ? String(p.status) : null,
+        net: p.net != null ? String(p.net) : null,
+        sourceUrl: String(p.url || ''),
+      };
+    });
 }
