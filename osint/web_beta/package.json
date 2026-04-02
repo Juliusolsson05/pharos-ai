@@ -1,0 +1,32 @@
+{
+  "name": "@pharos/osint-web-beta",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 4173",
+    "build": "next build",
+    "start": "next start --port 4173",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.2.10",
+    "@deck.gl/layers": "^9.2.10",
+    "@deck.gl/react": "^9.2.10",
+    "@reduxjs/toolkit": "^2.11.2",
+    "@tanstack/react-query": "^5.90.21",
+    "deck.gl": "^9.2.10",
+    "maplibre-gl": "^5.19.0",
+    "milsymbol": "^2.2.0",
+    "next": "16.1.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-map-gl": "^8.1.0",
+    "react-redux": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "typescript": "^5.9.3"
+  }
+}
