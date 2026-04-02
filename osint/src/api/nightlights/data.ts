@@ -1,23 +1,88 @@
 import { prisma } from '../../db.js';
+import { tileBounds } from '../../lib/tile-math.js';
+
+export type TileBounds = [number, number, number, number]; // [west, south, east, north]
 
 export async function getSnapshotDates() {
-  const rows = await prisma.nightlightSnapshot.findMany({
-    select: { date: true },
-    distinct: ['date'],
-    orderBy: { date: 'desc' },
-  });
-
-  return rows.map((row) => row.date);
+  return prisma.$queryRaw<{ date: string }[]>`
+    SELECT DISTINCT date FROM osint.nightlight_snapshots ORDER BY date DESC
+  `.then((rows) => rows.map((r) => r.date));
 }
 
 export async function getDailyDates() {
-  const rows = await prisma.nightlightTile.findMany({
-    select: { date: true },
-    distinct: ['date'],
-    orderBy: { date: 'desc' },
-  });
+  return prisma.$queryRaw<{ date: string }[]>`
+    SELECT DISTINCT date FROM osint.nightlight_tiles ORDER BY date DESC
+  `.then((rows) => rows.map((r) => r.date));
+}
 
-  return rows.map((row) => row.date);
+export async function getDailyBounds(date: string): Promise<TileBounds | null> {
+  const rows = await prisma.$queryRaw<{ min_x: number; min_y: number; max_x: number; max_y: number }[]>`
+    SELECT MIN(x) AS min_x, MIN(y) AS min_y, MAX(x) AS max_x, MAX(y) AS max_y
+    FROM osint.nightlight_tiles WHERE date = ${date}
+  `;
+
+  const r = rows[0];
+  if (r?.min_x == null) return null;
+
+  const topLeft = tileBounds(r.min_x, r.min_y, 8);
+  const bottomRight = tileBounds(r.max_x, r.max_y, 8);
+  return [topLeft.west, bottomRight.south, bottomRight.east, topLeft.north];
+}
+
+export async function getSnapshotBounds(date: string): Promise<TileBounds | null> {
+  const rows = await prisma.$queryRaw<{ min_x: number; min_y: number; max_x: number; max_y: number }[]>`
+    SELECT MIN(x) AS min_x, MIN(y) AS min_y, MAX(x) AS max_x, MAX(y) AS max_y
+    FROM osint.nightlight_snapshots WHERE date = ${date}
+  `;
+
+  const r = rows[0];
+  if (r?.min_x == null) return null;
+
+  const topLeft = tileBounds(r.min_x, r.min_y, 8);
+  const bottomRight = tileBounds(r.max_x, r.max_y, 8);
+  return [topLeft.west, bottomRight.south, bottomRight.east, topLeft.north];
+}
+
+export async function resolveLatestDailyDate(): Promise<string | null> {
+  const rows = await prisma.$queryRaw<{ date: string | null }[]>`
+    SELECT date FROM osint.nightlight_tiles ORDER BY date DESC LIMIT 1
+  `;
+  return rows[0]?.date ?? null;
+}
+
+export async function resolveLatestSnapshotDate(): Promise<string | null> {
+  const rows = await prisma.$queryRaw<{ date: string | null }[]>`
+    SELECT date FROM osint.nightlight_snapshots ORDER BY date DESC LIMIT 1
+  `;
+  return rows[0]?.date ?? null;
+}
+
+export async function resolveDailyDateOnOrBefore(requestedDate: string): Promise<string | null> {
+  const rows = await prisma.$queryRaw<{ date: string | null }[]>`
+    SELECT date FROM osint.nightlight_tiles WHERE date <= ${requestedDate} ORDER BY date DESC LIMIT 1
+  `;
+  return rows[0]?.date ?? null;
+}
+
+export async function resolveSnapshotDateOnOrBefore(requestedDate: string): Promise<string | null> {
+  const rows = await prisma.$queryRaw<{ date: string | null }[]>`
+    SELECT date FROM osint.nightlight_snapshots WHERE date <= ${requestedDate} ORDER BY date DESC LIMIT 1
+  `;
+  return rows[0]?.date ?? null;
+}
+
+export async function getDailyCount(date: string) {
+  const rows = await prisma.$queryRaw<{ count: bigint }[]>`
+    SELECT COUNT(*) AS count FROM osint.nightlight_tiles WHERE date = ${date}
+  `;
+  return Number(rows[0]?.count ?? 0);
+}
+
+export async function getSnapshotCount(date: string) {
+  const rows = await prisma.$queryRaw<{ count: bigint }[]>`
+    SELECT COUNT(*) AS count FROM osint.nightlight_snapshots WHERE date = ${date}
+  `;
+  return Number(rows[0]?.count ?? 0);
 }
 
 export async function getAnomalies(from: string, to: string, threshold: number) {

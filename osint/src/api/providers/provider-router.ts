@@ -8,8 +8,8 @@ export function createProviderRouter(config: ProviderApiConfig) {
   const router = Router();
 
   router.get('/features', async (req, res) => {
-    const { limit, offset } = parsePageParams(req.query as Record<string, unknown>);
-    const features = await getFeatureRows(config, limit, offset);
+    const { limit, offset, includeRaw } = parsePageParams(req.query as Record<string, unknown>);
+    const features = await getFeatureRows(config, limit, offset, includeRaw);
     if (features === null) {
       return err(res, 'FEATURES_NOT_AVAILABLE', `Features endpoint is not available for ${config.source}`, 404);
     }

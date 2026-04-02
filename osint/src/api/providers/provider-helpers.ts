@@ -16,41 +16,9 @@ export function parsePageParams(query: Record<string, unknown>) {
 
   const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 500) : 100;
   const offset = Number.isFinite(rawOffset) ? Math.max(rawOffset, 0) : 0;
-  const featureType = typeof query.featureType === 'string' ? query.featureType : undefined;
+  const includeRaw = String(query.raw) === 'true';
 
-  return { limit, offset, featureType };
-}
-
-export function serializeFeature(feature: {
-  id: string;
-  featureType: string;
-  sourceEventId: string | null;
-  actor: string | null;
-  priority: string;
-  category: string;
-  type: string;
-  status: string | null;
-  timestamp: Date | null;
-  geometry: unknown;
-  properties: unknown;
-  source: string;
-  createdAt: Date;
-}) {
-  return {
-    id: feature.id,
-    featureType: feature.featureType,
-    sourceEventId: feature.sourceEventId,
-    actor: feature.actor,
-    priority: feature.priority,
-    category: feature.category,
-    type: feature.type,
-    status: feature.status,
-    timestamp: feature.timestamp?.toISOString() ?? null,
-    geometry: feature.geometry,
-    properties: feature.properties,
-    source: feature.source,
-    createdAt: feature.createdAt.toISOString(),
-  };
+  return { limit, offset, includeRaw };
 }
 
 function getDelegate(model: string) {
@@ -58,6 +26,25 @@ function getDelegate(model: string) {
     findMany: (args: JsonObject) => Promise<unknown[]>;
     count: (args?: JsonObject) => Promise<number>;
   };
+}
+
+function buildOmit(includeRaw: boolean) {
+  return includeRaw ? undefined : { raw: true };
+}
+
+export async function getFeatureRows(config: ProviderApiConfig, limit: number, offset: number, includeRaw = false) {
+  const model = config.featureModel || config.rawModel;
+  if (!model) {
+    return null;
+  }
+
+  const orderField = config.featureOrderField || config.rawOrderField || 'ingestedAt';
+  return getDelegate(model).findMany({
+    orderBy: { [orderField]: 'desc' },
+    take: limit,
+    skip: offset,
+    omit: buildOmit(includeRaw),
+  });
 }
 
 export async function getRawRows(config: ProviderApiConfig, limit: number, offset: number) {
@@ -73,18 +60,13 @@ export async function getRawRows(config: ProviderApiConfig, limit: number, offse
   });
 }
 
-export async function getFeatureRows(config: ProviderApiConfig, limit: number, offset: number) {
+export async function getFeatureCount(config: ProviderApiConfig) {
   const model = config.featureModel || config.rawModel;
   if (!model) {
     return null;
   }
 
-  const orderField = config.featureOrderField || config.rawOrderField || 'ingestedAt';
-  return getDelegate(model).findMany({
-    orderBy: { [orderField]: 'desc' },
-    take: limit,
-    skip: offset,
-  });
+  return getDelegate(model).count();
 }
 
 export async function getRawCount(config: ProviderApiConfig) {
@@ -93,13 +75,4 @@ export async function getRawCount(config: ProviderApiConfig) {
   }
 
   return getDelegate(config.rawModel).count();
-}
-
-export async function getFeatureCount(config: ProviderApiConfig) {
-  const model = config.featureModel || config.rawModel;
-  if (!model) {
-    return null;
-  }
-
-  return getDelegate(model).count();
 }

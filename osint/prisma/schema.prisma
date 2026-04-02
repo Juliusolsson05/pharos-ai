@@ -82,6 +82,7 @@ model EonetEvent {
   @@index([origin])
   @@index([category])
   @@index([lat, lon])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("eonet_events")
 }
@@ -304,6 +305,7 @@ model GdeltEvent {
   @@index([actionGeoLat, actionGeoLon])
   @@index([actor1CountryCode])
   @@index([quadClass])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("gdelt_events")
 }
@@ -332,6 +334,7 @@ model FirmsDetection {
   @@index([acqDate])
   @@index([confidence])
   @@index([frp])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("firms_detections")
 }
@@ -361,6 +364,7 @@ model OverpassInstallation {
   @@unique([osmType, osmId])
   @@index([military])
   @@index([lat, lon])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("overpass_installations")
 }
@@ -386,6 +390,7 @@ model NgaWarning {
 
   @@unique([navArea, msgYear, msgNumber])
   @@index([navArea])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("nga_warnings")
 }
@@ -415,6 +420,7 @@ model OpenskySighting {
 
   @@index([milOperator])
   @@index([lat, lon])
+  @@index([seenAt])
   @@schema("osint")
   @@map("opensky_sightings")
 }
@@ -493,6 +499,7 @@ model OrefAlert {
 
   @@index([cat])
   @@index([alertDate])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("oref_alerts")
 }
@@ -814,6 +821,7 @@ model Port {
   @@index([countryCode])
   @@index([harborSize])
   @@index([lat, lon])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("ports")
 }
@@ -844,6 +852,7 @@ model PowerPlant {
   @@index([primaryFuel])
   @@index([capacityMw])
   @@index([lat, lon])
+  @@index([ingestedAt])
   @@schema("osint")
   @@map("power_plants")
 }

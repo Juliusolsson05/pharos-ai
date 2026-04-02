@@ -17,7 +17,17 @@ const s3 = new S3Client({
   forcePathStyle: true, // required for MinIO
 });
 
+const S3_SLOW_MS = 200;
+
+function logS3(op: string, key: string, start: number) {
+  const ms = performance.now() - start;
+  if (ms >= S3_SLOW_MS) {
+    console.log(`[s3] ${op} ${key} ${ms.toFixed(1)}ms`);
+  }
+}
+
 export async function uploadRaw(key: string, body: Buffer): Promise<string> {
+  const start = performance.now();
   await s3.send(
     new PutObjectCommand({
       Bucket: config.s3.bucket,
@@ -25,6 +35,7 @@ export async function uploadRaw(key: string, body: Buffer): Promise<string> {
       Body: body,
     }),
   );
+  logS3('put', key, start);
   return key;
 }
 
@@ -34,19 +45,23 @@ export async function uploadTile(
   body: Buffer,
   contentType: string,
 ): Promise<string> {
+  const start = performance.now();
   await s3.send(
     new PutObjectCommand({ Bucket: bucket, Key: key, Body: body, ContentType: contentType }),
   );
+  logS3('put', key, start);
   return key;
 }
 
 export async function getTile(bucket: string, key: string): Promise<Buffer | null> {
+  const start = performance.now();
   try {
     const res = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
     const chunks: Uint8Array[] = [];
     for await (const chunk of res.Body as AsyncIterable<Uint8Array>) {
       chunks.push(chunk);
     }
+    logS3('get', key, start);
     return Buffer.concat(chunks);
   } catch (e: unknown) {
     if ((e as { name?: string }).name === 'NoSuchKey') return null;

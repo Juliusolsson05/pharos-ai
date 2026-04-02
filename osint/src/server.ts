@@ -14,12 +14,26 @@ import { startStreams, stopStreams } from './streams/index.js';
 import { ensureBucket } from './lib/storage.js';
 import { registerProviderRoutes } from './api/providers/index.js';
 
+import batchRouter from './api/providers/batch.js';
 import healthRouter from './api/health.js';
 import nightlightsRouter from './api/nightlights/index.js';
 import sourcesRouter from './api/sources.js';
 
 const app = express();
 app.use(express.json());
+
+// Request timing
+app.use((req, res, next) => {
+  const start = performance.now();
+  res.on('finish', () => {
+    const ms = (performance.now() - start).toFixed(1);
+    // Skip noisy tile requests and Bull Board polling
+    if (!req.originalUrl.includes('/admin/') && !req.originalUrl.endsWith('.webp')) {
+      console.log(`[http] ${req.method} ${req.originalUrl} ${res.statusCode} ${ms}ms`);
+    }
+  });
+  next();
+});
 
 // CORS for local playground dev
 app.use((_req, res, next) => {
@@ -42,6 +56,7 @@ app.use('/admin/queues', serverAdapter.getRouter());
 app.use(healthRouter);
 app.use(sourcesRouter);
 app.use(nightlightsRouter);
+app.use(batchRouter);
 registerProviderRoutes(app);
 
 // BullMQ worker
