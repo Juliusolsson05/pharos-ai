@@ -8,6 +8,51 @@ import { MapFeatureType } from '@/generated/prisma/enums';
 
 const VALID_FEATURE_TYPES = Object.values(MapFeatureType) as string[];
 
+const DEFAULT_ZONE_COLOR: [number, number, number, number] = [255, 69, 0, 120];
+
+/** Normalize a color value from any LLM-produced format into an RGBA tuple. */
+function normalizeColor(raw: unknown): [number, number, number, number] {
+  // Already an array: [r, g, b] or [r, g, b, a]
+  if (Array.isArray(raw)) {
+    const nums = raw.map(Number).filter(n => Number.isFinite(n));
+    if (nums.length >= 3) {
+      return [nums[0], nums[1], nums[2], nums[3] ?? 120];
+    }
+    return DEFAULT_ZONE_COLOR;
+  }
+
+  if (typeof raw !== 'string' || raw.trim() === '') return DEFAULT_ZONE_COLOR;
+  const s = raw.trim();
+
+  // Hex: "#FF4500", "#ff4500", "FF4500", "#F40"
+  const hexMatch = s.match(/^#?([0-9a-f]{3,8})$/i);
+  if (hexMatch) {
+    let hex = hexMatch[1];
+    // Short hex (#F40 -> FF4400)
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length === 4) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
+    if (hex.length >= 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      const a = hex.length >= 8 ? parseInt(hex.slice(6, 8), 16) : 120;
+      return [r, g, b, a];
+    }
+  }
+
+  // rgb(r, g, b) or rgba(r, g, b, a)
+  const rgbMatch = s.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([0-9.]+))?\s*\)$/i);
+  if (rgbMatch) {
+    const r = Number(rgbMatch[1]);
+    const g = Number(rgbMatch[2]);
+    const b = Number(rgbMatch[3]);
+    const a = rgbMatch[4] !== undefined ? Math.round(Number(rgbMatch[4]) * (Number(rgbMatch[4]) <= 1 ? 255 : 1)) : 120;
+    return [r, g, b, a];
+  }
+
+  return DEFAULT_ZONE_COLOR;
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const datasets = parseQueryArray(req.nextUrl.searchParams.get('datasets'));
@@ -128,7 +173,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         const props = f.properties as Props;
         return {
           id: f.id, sourceEventId: f.sourceEventId, actor: f.actor, priority: f.priority, category: f.category, type: f.type,
-          timestamp: f.timestamp?.toISOString() ?? '', coordinates: geo.coordinates, name: props.name, color: props.color,
+          timestamp: f.timestamp?.toISOString() ?? '', coordinates: geo.coordinates, name: props.name, color: normalizeColor(props.color),
         };
     })
     .filter(Boolean);
