@@ -18,6 +18,8 @@ export type OverpassFeature = {
   military?: string | null;
   operator?: string | null;
   country?: string | null;
+  wikidata?: string | null;
+  wikipedia?: string | null;
 };
 
 export type PortFeature = {
@@ -67,6 +69,7 @@ export type TileLayerInfo = {
 };
 
 export type NightlightsManifest = {
+  composite?: TileLayerInfo;
   daily: TileLayerInfo;
   snapshot: TileLayerInfo | null;
   minzoom: number;

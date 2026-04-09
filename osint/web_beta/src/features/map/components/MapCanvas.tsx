@@ -32,10 +32,13 @@ export function MapCanvas({
   onClick,
   getTooltip,
 }: Props) {
-  const snapshotUrl = showNightlights && manifest?.snapshot
+  const compositeUrl = showNightlights && manifest?.composite
+    ? `${OSINT_BASE_URL}${manifest.composite.tileUrl}`
+    : null;
+  const snapshotUrl = !compositeUrl && showNightlights && manifest?.snapshot
     ? `${OSINT_BASE_URL}${manifest.snapshot.tileUrl}`
     : null;
-  const dailyUrl = showNightlights && manifest?.daily
+  const dailyUrl = !compositeUrl && showNightlights && manifest?.daily
     ? `${OSINT_BASE_URL}${manifest.daily.tileUrl}`
     : null;
 
@@ -58,6 +61,24 @@ export function MapCanvas({
       style={deckStyle}
     >
       <Map mapStyle={MAP_STYLE} reuseMaps>
+        {compositeUrl ? (
+          <Source
+            id="nightlights-composite"
+            type="raster"
+            tiles={[compositeUrl]}
+            tileSize={manifest!.tileSize}
+            minzoom={manifest!.minzoom}
+            maxzoom={manifest!.maxzoom}
+            bounds={manifest!.composite?.bounds ?? undefined}
+          >
+            <Layer
+              id="nl-composite"
+              type="raster"
+              beforeId="boundary_county"
+              paint={{ 'raster-opacity': 0.5, 'raster-fade-duration': 250 }}
+            />
+          </Source>
+        ) : null}
         {snapshotUrl ? (
           <Source
             id="nightlights-snapshot"
@@ -68,7 +89,12 @@ export function MapCanvas({
             maxzoom={manifest!.maxzoom}
             bounds={manifest!.snapshot!.bounds ?? undefined}
           >
-            <Layer id="nl-snapshot" type="raster" beforeId="boundary_county" paint={{ 'raster-opacity': 0.5 }} />
+            <Layer
+              id="nl-snapshot"
+              type="raster"
+              beforeId="boundary_county"
+              paint={{ 'raster-opacity': 0.5, 'raster-fade-duration': 250 }}
+            />
           </Source>
         ) : null}
         {dailyUrl ? (
@@ -81,7 +107,12 @@ export function MapCanvas({
             maxzoom={manifest!.maxzoom}
             bounds={manifest!.daily.bounds ?? undefined}
           >
-            <Layer id="nl-daily" type="raster" beforeId="boundary_county" paint={{ 'raster-opacity': 0.5 }} />
+            <Layer
+              id="nl-daily"
+              type="raster"
+              beforeId="boundary_county"
+              paint={{ 'raster-opacity': 0.5, 'raster-fade-duration': 250 }}
+            />
           </Source>
         ) : null}
       </Map>

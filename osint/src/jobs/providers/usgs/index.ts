@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'usgs',
     interval: config.usgs.pollInterval,
+    workload: 'standard',
     enabled: true,
     processor: processUsgsIngest,
   },

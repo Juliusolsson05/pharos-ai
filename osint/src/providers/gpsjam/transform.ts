@@ -1,9 +1,6 @@
 import type { GpsJamHex } from './fetch.js';
 import type { ThreatZone } from '../../types.js';
 
-// Middle East region filter
-const REGION_BOUNDS = { south: 5, north: 45, west: 20, east: 70 };
-
 const LEVEL_COLORS: Record<string, [number, number, number, number]> = {
   high: [231, 106, 110, 100],   // danger
   medium: [236, 154, 60, 80],   // warning
@@ -16,11 +13,7 @@ const LEVEL_COLORS: Record<string, [number, number, number, number]> = {
  */
 export function buildThreatZones(hexes: GpsJamHex[]): ThreatZone[] {
   return hexes
-    .filter((h) =>
-      h.lat >= REGION_BOUNDS.south && h.lat <= REGION_BOUNDS.north &&
-      h.lon >= REGION_BOUNDS.west && h.lon <= REGION_BOUNDS.east &&
-      (h.level === 'medium' || h.level === 'high'),
-    )
+    .filter((h) => h.level === 'medium' || h.level === 'high')
     .map((h) => ({
       id: `gpsjam-${h.h3}`,
       sourceEventId: h.h3,

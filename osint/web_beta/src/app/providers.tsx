@@ -9,7 +9,7 @@ import { store } from '@/features/map/state/store';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: { queries: { staleTime: 60_000, retry: 1 } },
+    defaultOptions: { queries: { staleTime: 60_000, gcTime: 10 * 60_000, retry: 1 } },
   }));
 
   return (

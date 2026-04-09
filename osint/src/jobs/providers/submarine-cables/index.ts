@@ -6,6 +6,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'submarine-cables',
     interval: 7 * 24 * 60 * 60 * 1000,
+    workload: 'standard',
     enabled: true,
     processor: processSubmarineCablesIngest,
   },

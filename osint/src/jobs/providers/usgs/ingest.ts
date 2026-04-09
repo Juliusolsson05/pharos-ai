@@ -22,11 +22,19 @@ export async function processUsgsIngest(job: Job) {
         where: { eventId: q.id },
         create: {
           eventId: q.id, place: q.place, magnitude: q.magnitude,
-          depthKm: q.depthKm, lat: q.lat, lon: q.lon,
-          occurredAt: new Date(q.occurredAt), sourceUrl: q.sourceUrl,
+          magType: q.magType || null, depthKm: q.depthKm, lat: q.lat, lon: q.lon,
+          occurredAt: new Date(q.occurredAt),
+          felt: q.felt, cdi: q.cdi, mmi: q.mmi, alert: q.alert,
+          tsunami: q.tsunami, significance: q.significance,
+          status: q.status, net: q.net, sourceUrl: q.sourceUrl,
           raw: toJson(q),
         },
-        update: { raw: toJson(q) },
+        update: {
+          magnitude: q.magnitude, magType: q.magType || null,
+          felt: q.felt, cdi: q.cdi, mmi: q.mmi, alert: q.alert,
+          tsunami: q.tsunami, significance: q.significance,
+          status: q.status, raw: toJson(q),
+        },
       });
       stored++;
     } catch { /* dedupe */ }

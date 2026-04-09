@@ -42,7 +42,7 @@ export function MapLegend() {
   return (
     <section className="legend-panel">
       <div className="legend-header">MILSYMBOL LEGEND</div>
-      <div className="legend-copy">Aircraft uses the official air frame only. Vessel icons use official sea symbols.</div>
+      <div className="legend-copy">Icons use MIL-STD-2525D military symbology. Color indicates affiliation.</div>
       {AIRCRAFT_ITEMS.map((item) => <LegendRow key={item.label} item={item} />)}
       {VESSEL_ITEMS.map((item) => <LegendRow key={item.label} item={item} />)}
     </section>

@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'cloudflare-radar',
     interval: config.cloudflareRadar.pollInterval,
+    workload: 'standard',
     enabled: !!config.cloudflareRadar.token,
     processor: processCloudflareRadarIngest,
   },

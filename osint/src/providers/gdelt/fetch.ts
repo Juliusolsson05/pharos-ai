@@ -81,10 +81,10 @@ export async function downloadAndParse(zipUrl: string): Promise<{
     rows.push({
       globalEventId: cols[0],
       day: cols[1],
-      actor1Name: cols[5] || 'Unknown',
-      actor2Name: cols[15] || '',
+      actor1Name: cols[6] || cols[5] || 'Unknown',  // col 6 = Actor1Name, col 5 = Actor1Code (fallback)
+      actor2Name: cols[16] || cols[15] || '',         // col 16 = Actor2Name, col 15 = Actor2Code (fallback)
       eventCode,
-      numMentions: parseInt(cols[30], 10) || 1,
+      numMentions: parseInt(cols[31], 10) || 1,       // col 31 = NumMentions (was reading col 30 = GoldsteinScale)
       avgTone: parseFloat(cols[34]) || 0,
       countryCode: cols[53] || '',
       lat,

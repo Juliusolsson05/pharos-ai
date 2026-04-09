@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useAppDispatch, useAppSelector } from '@/features/map/state/hooks';
 import { toggleLayer, toggleNightlights } from '@/features/map/state/map-slice';
 import type { LayerState } from '@/features/map/state/map-slice';
@@ -31,6 +33,9 @@ export function MapControls() {
       >
         NIGHTLIGHTS
       </button>
+      <Link href="/symbols" className="toggle" style={{ marginTop: 12, display: 'block', textDecoration: 'none' }}>
+        SYMBOL REFERENCE →
+      </Link>
     </>
   );
 }

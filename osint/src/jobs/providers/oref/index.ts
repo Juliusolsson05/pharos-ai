@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'oref',
     interval: config.oref.pollInterval,
+    workload: 'realtime',
     enabled: true,
     processor: processOrefIngest,
   },

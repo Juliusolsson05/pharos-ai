@@ -7,6 +7,7 @@ export const jobs: JobDefinition[] = [
   {
     name: 'ucdp',
     interval: config.ucdp.pollInterval,
+    workload: 'standard',
     enabled: true,
     processor: processUcdpIngest,
   },

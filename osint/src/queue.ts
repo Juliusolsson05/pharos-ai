@@ -19,13 +19,22 @@ const connection: ConnectionOptions = {
 
 export const redis = new Redis(config.redis.url, { maxRetriesPerRequest: null });
 
-export const ingestQueue = new Queue('osint-ingest', { connection });
+// Three workload classes to prevent heavy jobs from blocking time-sensitive ones
+export const realtimeQueue = new Queue('osint-realtime', { connection });
+export const standardQueue = new Queue('osint-standard', { connection });
+export const heavyQueue = new Queue('osint-heavy', { connection });
 
-export function createWorker(
-  processor: (job: Job) => Promise<unknown>,
-) {
-  return new Worker('osint-ingest', processor, {
-    connection,
-    concurrency: 1,
-  });
+// Keep the old name for backward compatibility with scheduler
+export const ingestQueue = standardQueue;
+
+export function createRealtimeWorker(processor: (job: Job) => Promise<unknown>) {
+  return new Worker('osint-realtime', processor, { connection, concurrency: 2 });
+}
+
+export function createStandardWorker(processor: (job: Job) => Promise<unknown>) {
+  return new Worker('osint-standard', processor, { connection, concurrency: 1 });
+}
+
+export function createHeavyWorker(processor: (job: Job) => Promise<unknown>) {
+  return new Worker('osint-heavy', processor, { connection, concurrency: 1 });
 }

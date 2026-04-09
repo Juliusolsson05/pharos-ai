@@ -6,6 +6,12 @@ export type GpsJamHex = {
   lon: number;
   level: 'low' | 'medium' | 'high';
   region: string;
+  npAvg: number | null;
+  pct: number | null;
+  bad: number | null;
+  total: number | null;
+  sampleCount: number | null;
+  aircraftCount: number | null;
 };
 
 /**
@@ -40,5 +46,11 @@ export async function fetchGpsJam(apiKey: string): Promise<GpsJamHex[]> {
       lon: Number(h.lon),
       level: (String(h.level || 'low')) as GpsJamHex['level'],
       region: String(h.region || ''),
+      npAvg: h.npAvg != null ? Number(h.npAvg) : null,
+      pct: h.pct != null ? Number(h.pct) : null,
+      bad: h.bad != null ? Number(h.bad) : null,
+      total: h.total != null ? Number(h.total) : null,
+      sampleCount: h.sampleCount != null ? Number(h.sampleCount) : null,
+      aircraftCount: h.aircraftCount != null ? Number(h.aircraftCount) : null,
     }));
 }
