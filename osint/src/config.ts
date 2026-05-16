@@ -1,6 +1,22 @@
 export const config = {
   port: parseInt(process.env.PORT || '4000', 10),
 
+  cors: {
+    allowedOrigins: (
+      process.env.OSINT_CORS_ORIGINS ||
+      'http://localhost:3000,http://localhost:4000,http://127.0.0.1:3000,http://127.0.0.1:4000'
+    )
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  },
+
+  queueDashboard: {
+    enabled: process.env.OSINT_QUEUE_DASHBOARD_ENABLED === 'true',
+    username: process.env.OSINT_QUEUE_DASHBOARD_USERNAME || '',
+    password: process.env.OSINT_QUEUE_DASHBOARD_PASSWORD || '',
+  },
+
   db: {
     url: process.env.DATABASE_URL || 'postgresql://pharos:pharos@localhost:5434/pharos',
   },

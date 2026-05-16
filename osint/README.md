@@ -60,7 +60,7 @@ npm run dev
 
 | URL | What |
 |-----|------|
-| `localhost:4000/admin/queues` | Bull Board — job dashboard (logs, progress, results) |
+| `localhost:4000/admin/queues` | Optional Bull Board job dashboard (disabled by default; enable with `OSINT_QUEUE_DASHBOARD_ENABLED=true` and credentials) |
 | `localhost:4000/api/health` | Service health (DB, Redis, streams, all sources) |
 | `localhost:4000/api/sources` | Per-source sync metadata |
 | `localhost:4000/api/providers/{provider}/features` | Provider-specific derived features |
@@ -78,6 +78,22 @@ npm run dev
 | Prisma | ORM — `osint` schema in shared PostgreSQL |
 | MinIO (local) / R2 (prod) | S3-compatible object storage for raw files |
 | ws | WebSocket client for persistent streams |
+
+## Admin surfaces
+
+Bull Board exposes queue names, job payloads, logs, failures, and retry controls. It is disabled by default and should not be exposed publicly.
+
+To enable it for local or private operator use:
+
+```bash
+OSINT_QUEUE_DASHBOARD_ENABLED=true
+OSINT_QUEUE_DASHBOARD_USERNAME=admin
+OSINT_QUEUE_DASHBOARD_PASSWORD=change-this
+```
+
+HTTP Basic auth does not protect credentials on plaintext connections. If this dashboard is reachable beyond localhost, terminate TLS in front of it or keep it behind a private network boundary. The service does not provide brute-force protection for this operator UI.
+
+The OSINT API also restricts browser CORS to `OSINT_CORS_ORIGINS`, a comma-separated list of trusted frontend origins.
 
 ## Directory structure
 
