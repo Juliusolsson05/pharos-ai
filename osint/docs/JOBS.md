@@ -8,7 +8,7 @@ How the ingestion pipeline works and how to write jobs correctly.
 |-----------|---------|
 | BullMQ | Job queue — scheduling, retries, concurrency |
 | Redis | BullMQ backend (port 6382 locally) |
-| Bull Board | Web UI at `/admin/queues` — logs, progress, results |
+| Bull Board | Optional protected web UI at `/admin/queues` — logs, progress, results |
 
 ## Writing a job processor
 
@@ -181,7 +181,15 @@ This makes the health API unambiguous — you can tell if the last run was small
 
 ## Bull Board
 
-Available at `http://localhost:4000/admin/queues`. Shows:
+Disabled by default because it exposes queue internals and retry controls. Enable it only for local or private operator access:
+
+```bash
+OSINT_QUEUE_DASHBOARD_ENABLED=true
+OSINT_QUEUE_DASHBOARD_USERNAME=admin
+OSINT_QUEUE_DASHBOARD_PASSWORD=change-this
+```
+
+When enabled, it is available at `http://localhost:4000/admin/queues` and shows:
 
 - **Job list** — waiting, active, completed, failed, delayed
 - **Logs tab** — all `job.log()` entries with timestamps
